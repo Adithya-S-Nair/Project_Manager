@@ -4,7 +4,7 @@ import ReactApexChart from 'react-apexcharts';
 const GuageChart = ({project}) => {
 
     const [chartData, setChartData] = useState({
-        series: [70],
+        series: [20],
         options: {
           chart: {
             height: 350,
@@ -23,7 +23,7 @@ const GuageChart = ({project}) => {
     return (
         <div>
             <div id="chart">
-                <ReactApexChart options={chartData.options} series={chartData.series} type="radialBar" height={350} />
+                <ReactApexChart options={chartData.options} series={chartData.series} type="radialBar" height={250} />
             </div>
             <div id="html-dist"></div>
         </div>

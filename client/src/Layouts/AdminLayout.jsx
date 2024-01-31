@@ -83,7 +83,7 @@ const Layout = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
-    const isSmallScreen = useMediaQuery('(max-width: 650px)');
+    const isSmallScreen = useMediaQuery('(max-width: 820px)');
     const [open, setOpen] = React.useState(true);
     const [listOpen, setListOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
