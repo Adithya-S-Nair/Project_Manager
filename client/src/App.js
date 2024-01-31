@@ -15,7 +15,7 @@ import { AuthContext } from './Context/AuthContext';
 import Login from './Pages/Auth/Login'
 import Register from './Pages/Auth/Login'
 import AdminLayout from './Layouts/AdminLayout';
-import Dashboard from './Pages/Admin/Dashboard';
+import ProjectDashboard from './Pages/Common/ProjectDashboard';
 
 const App = () => {
   const user = true
@@ -50,7 +50,7 @@ const App = () => {
       children: [
         {
           path: "/",
-          element: <Dashboard />
+          element: <ProjectDashboard />
         }
       ]
     },
