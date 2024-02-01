@@ -79,7 +79,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-const Layout = () => {
+const AdminLayout = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
@@ -294,13 +294,13 @@ const Layout = () => {
                         </Collapse>
                     </List>
                 </Drawer>
-                <Main open={open} style={{minHeight:'100vh'}}>
+                <Main open={open} style={{ minHeight: '100vh' }}>
                     <DrawerHeader />
-                    <Outlet/>
+                    <Outlet />
                 </Main>
             </Box>
         </div>
     );
 };
 
-export default Layout;
+export default AdminLayout;

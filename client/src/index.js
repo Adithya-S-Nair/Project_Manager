@@ -6,17 +6,21 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import reportWebVitals from './reportWebVitals';
 
+// import { ThemeContextProvider } from './Context/ThemeContext';
 import { ThemeContextProvider } from './Context/ThemeContext';
+import { AuthContextProvider } from './Context/AuthContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const queryClient = new QueryClient();
-
+  
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
+      <AuthContextProvider>
       <ThemeContextProvider>
         <App />
       </ThemeContextProvider>
+      </AuthContextProvider>
       <ReactQueryDevtools />
     </QueryClientProvider>
   </React.StrictMode>

@@ -1,47 +1,30 @@
-import React, { useContext, useEffect } from 'react';
-import { makeRequest } from './Axios';
-import {
-  Navigate,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-
-//CSS
+import React, { useContext } from 'react';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import './App.css';
-
-
-//Pages & Components
 import { AuthContext } from './Context/AuthContext';
-import Login from './Pages/Auth/Login'
-import Register from './Pages/Auth/Login'
+import Login from './Pages/Auth/Login';
+import Register from './Pages/Auth/Register';
 import AdminLayout from './Layouts/AdminLayout';
+import UserLayout from './Layouts/UserLayout';
 import ProjectDashboard from './Pages/Common/ProjectDashboard';
 
 const App = () => {
-  const user = true
-  // const { user, setUser } = useContext(AuthContext)
-  // const navigate =useNavigate()
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     makeRequest.get('/auth/getuser').then((res) => {
-  //       if (res.status === 200) {
-  //         setUser(res.data);
-  //       }
-  //     });
-  //   }
-  // }, [user]);
+  const { user } = useContext(AuthContext);
 
   const ProtectedRoute = ({ children }) => {
     if (!user) {
       return <Navigate to="/login" />;
+    } else if (user.user_type === 'Admin') {
+      return children;
+    } else if (user.user_type === 'Users') {
+      // return <Navigate to='/user/dashboard'/>;
+      return children;
     }
-    return children;
   };
 
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: '/admin',
       element: (
         <ProtectedRoute>
           <AdminLayout />
@@ -49,26 +32,40 @@ const App = () => {
       ),
       children: [
         {
-          path: "/",
-          element: <ProjectDashboard />
-        }
-      ]
+          path: '/admin/dashboard',
+          element: <ProjectDashboard />,
+        },
+      ],
     },
     {
-      path: "/login",
+      path: '/user',
+      element: (
+        <ProtectedRoute>
+          <UserLayout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: '/user/dashboard',
+          element: <ProjectDashboard />,
+        },
+      ],
+    },
+    {
+      path: '/login',
       element: <Login />,
     },
     {
-      path: "/register",
+      path: '/register',
       element: <Register />,
-    }
+    },
   ]);
 
-  return (   
-      <div className="App">
-        <RouterProvider router={router} />
-      </div>
-  )
-}
+  return (
+    <div className="App">
+      <RouterProvider router={router} />
+    </div>
+  );
+};
 
-export default App
+export default App;
