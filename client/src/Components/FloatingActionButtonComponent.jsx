@@ -6,28 +6,38 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ArticleIcon from '@mui/icons-material/Article';
 import TaskIcon from '@mui/icons-material/Task';
 
-const actions = [
-    { icon: <NewspaperIcon />, name: 'Create Project' },
-    { icon: <TaskIcon />, name: 'Create Task' },
-    { icon: <ArticleIcon />, name: 'Create Subtask' },
-];
+const FloatingActionButtonComponent = ({ toggle, setType }) => {
+    // const [type, setType] = React.useState(null);
 
-const FloatingActionButtonComponent = () => {
+    const handleCreateItemClick = (itemType) => {
+        setType(itemType);
+        // setParentType(itemType)
+        toggle();
+    };
+
     return (
-            <SpeedDial
-                ariaLabel="SpeedDial basic example"
-                sx={{ position: 'fixed', bottom: 30, right: 25 }}
-                icon={<SpeedDialIcon />}
-            >
-                {actions.map((action) => (
-                    <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.name}
-                    />
-                ))}
-            </SpeedDial>
+        <SpeedDial
+            ariaLabel="SpeedDial basic example"
+            sx={{ position: 'fixed', bottom: 30, right: 25 }}
+            icon={<SpeedDialIcon />}
+        >
+            <SpeedDialAction
+                icon={<NewspaperIcon />}
+                tooltipTitle="Create Project"
+                onClick={() => handleCreateItemClick('createproject')}
+            />
+            <SpeedDialAction
+                icon={<TaskIcon />}
+                tooltipTitle="Create Task"
+                onClick={() => handleCreateItemClick('createtask')}
+            />
+            <SpeedDialAction
+                icon={<ArticleIcon />}
+                tooltipTitle="Create Subtask"
+                onClick={() => handleCreateItemClick('createsubtask')}
+            />
+        </SpeedDial>
     );
-}
+};
 
 export default FloatingActionButtonComponent;
