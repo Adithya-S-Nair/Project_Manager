@@ -8,6 +8,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 import authRoute from './routes/authRoute.js';
+import taskRoute from './routes/taskRoute.js';
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Use the routes
 app.use('/pmapi/auth', authRoute);
+app.use('/pmapi/task', taskRoute);
 
 // Listen to port
 app.listen(PORT, () => {
