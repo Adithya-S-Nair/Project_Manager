@@ -139,6 +139,18 @@ const ProjectDashboard = () => {
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
+                  label="Project Start Date"
+                  slots={{ openPickerIcon: DateRangeIcon }}
+                />
+              </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Project End Date"
+                  slots={{ openPickerIcon: DateRangeIcon }}
+                />
+              </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
                   label="Actual Start Date"
                   slots={{ openPickerIcon: DateRangeIcon }}
                 />
@@ -383,6 +395,14 @@ const ProjectDashboard = () => {
                 <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
               </div>
               <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Start Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project End Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                 <label>Actual Start Date:</label>
                 <input type="date" placeholder="" className="input input-bordered" />
               </div>
@@ -476,7 +496,7 @@ const ProjectDashboard = () => {
           </>
         }
 
-{
+        {
           daisyType === "createsubtask" &&
           <>
             <div className='flex justify-between p-5'>

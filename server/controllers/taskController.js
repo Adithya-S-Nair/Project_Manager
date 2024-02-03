@@ -1,6 +1,6 @@
 import { db } from '../connections/mysql.js';
 
-export const createNewTask = (req, res) => {
+export const createNewsubtask = (req, res) => {
     if (!req.userType === 'Admin') {
         return res.status(403).json("This user cannot create a subtask")
     }
@@ -27,7 +27,8 @@ export const createNewTask = (req, res) => {
         plannedBudget,
         actualStartTime,
         actualEndTime,
-        actualBudget]
+        actualBudget
+    ]
 
     db.query(query, [values], (err, data) => {
         if (err) {
