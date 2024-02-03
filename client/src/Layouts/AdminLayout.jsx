@@ -97,7 +97,7 @@ const AdminLayout = () => {
     };
 
     const newCustomerNavigate = () => {
-        navigate('/newcustomer');
+        navigate('/admin/projectdetail');
     };
 
     const newVaNavigate = () => {
@@ -209,7 +209,7 @@ const AdminLayout = () => {
                     <List>
                         <ListItem disablePadding>
                             <ListItemButton
-                                selected={location.pathname === '/newcustomer'}
+                                selected={location.pathname === '/projectdetail'}
                                 onClick={newCustomerNavigate}
                                 sx={{
                                     "&:hover": { backgroundColor: "#596876", color: "#161245" },

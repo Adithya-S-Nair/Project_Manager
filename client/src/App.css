@@ -1,0 +1,11 @@
+canvas.radar {
+    width: 350px !important;
+    height: 350px !important;
+
+}
+
+canvas.line {
+    width: 100px !important;
+    height: 50px !important;
+
+}
