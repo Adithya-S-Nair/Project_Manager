@@ -18,19 +18,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 
-
-
-
-
-// const FlightLandIcon = createSvgIcon(
-//   <path d="M2.5 19h19v2h-19v-2zm16.84-3.15c.8.21 1.62-.26 1.84-1.06.21-.8-.26-1.62-1.06-1.84l-5.31-1.42-2.76-9.02L10.12 2v8.28L5.15 8.95l-.93-2.32-1.45-.39v5.17l16.57 4.44z" />,
-//   'FlightLandIcon',
-// );
-
-function MuiIcon() {
-  return <img src="/static/logo.svg" alt="Date picker opening icon" width={32} />;
-}
-
 const ProjectDashboard = () => {
 
   const blue = {
@@ -111,6 +98,7 @@ const ProjectDashboard = () => {
   };
 
   const [type, setType] = useState(null)
+  const [daisyType, setDaisyType] = useState(null)
   const [drawerState, setDrawerState] = useState({
     anchor: 'right',
     open: false,
@@ -378,6 +366,189 @@ const ProjectDashboard = () => {
           </>
         }
 
+        {
+          daisyType === "createproject" &&
+          <>
+            <div className='flex justify-between p-5'>
+              <h1 className='font-bold '>Project</h1>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </div>
+            <hr />
+
+            <div className='grid grid-cols-1 gap-y-4 p-5'>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Name:</label>
+                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Actual Start Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Actual End Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Description:</label>
+                <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
+              </div>
+            </div>
+
+            <div className='flex justify-center space-x-5 mb-4'>
+              <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
+              <button className="btn btn-active btn-primary">Submit</button>
+            </div>
+          </>
+        }
+
+        {
+          daisyType === "createtask" &&
+          <>
+            <div className='flex justify-between p-5'>
+              <h1 className='font-bold '>Task</h1>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </div>
+            <hr />
+
+            <div className='grid grid-cols-1 gap-y-4 p-5'>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Task Name:</label>
+                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Id:</label>
+                <select className="select select-bordered">
+                  <option selected>hi</option>
+                  <option>Han Solo</option>
+                  <option>Greedo</option>
+                </select>
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Priority:</label>
+                <select className="select select-bordered">
+                  <option selected>hi</option>
+                  <option>Han Solo</option>
+                  <option>Greedo</option>
+                </select>
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Description:</label>
+                <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Planned Start Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Planned End Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Planned Budget:</label>
+                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Actual Start Time:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Actual End Time:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Status:</label>
+                <select className="select select-bordered">
+                  <option selected>hi</option>
+                  <option>Han Solo</option>
+                  <option>Greedo</option>
+                </select>
+              </div>
+            </div>
+
+            <div className='flex justify-center space-x-5 mb-4'>
+              <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
+              <button className="btn btn-active btn-primary">Submit</button>
+            </div>
+          </>
+        }
+
+{
+          daisyType === "createsubtask" &&
+          <>
+            <div className='flex justify-between p-5'>
+              <h1 className='font-bold '>Subtask</h1>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </div>
+            <hr />
+
+            <div className='grid grid-cols-1 gap-y-4 p-5'>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Subtask Name:</label>
+                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Id:</label>
+                <select className="select select-bordered">
+                  <option selected>hi</option>
+                  <option>Han Solo</option>
+                  <option>Greedo</option>
+                </select>
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Priority:</label>
+                <select className="select select-bordered">
+                  <option selected>hi</option>
+                  <option>Han Solo</option>
+                  <option>Greedo</option>
+                </select>
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Project Description:</label>
+                <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Planned Start Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Planned End Date:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Planned Budget:</label>
+                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Actual Start Time:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Actual End Time:</label>
+                <input type="date" placeholder="" className="input input-bordered" />
+              </div>
+              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+                <label>Status:</label>
+                <select className="select select-bordered">
+                  <option selected>hi</option>
+                  <option>Han Solo</option>
+                  <option>Greedo</option>
+                </select>
+              </div>
+            </div>
+
+            <div className='flex justify-center space-x-5 mb-4'>
+              <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
+              <button className="btn btn-active btn-primary">Submit</button>
+            </div>
+          </>
+        }
+
       </>
     </Box >
 
@@ -406,7 +577,7 @@ const ProjectDashboard = () => {
       <div className="flex justify-center items-center">
         <ProjectCard />
       </div>
-      <FloatingActionButtonComponent toggle={() => setDrawerState({ ...drawerState, open: !drawerState.open })} setType={setType} />
+      <FloatingActionButtonComponent toggle={() => setDrawerState({ ...drawerState, open: !drawerState.open })} setType={setType} setDaisyType={setDaisyType} />
       <Drawer
         anchor={drawerState.anchor}
         open={drawerState.open}
