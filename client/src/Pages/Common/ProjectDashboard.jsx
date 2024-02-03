@@ -133,7 +133,7 @@ const ProjectDashboard = () => {
     // onKeyDown={toggleDrawer(true)}
     >
       <>
-        {type == "createproject" &&
+        {type === "createproject" &&
           <>
             <div className='flex justify-between p-5'>
               <h1 className='font-bold '>Project</h1>
@@ -174,7 +174,7 @@ const ProjectDashboard = () => {
           </>
         }
 
-        {type == "createtask" &&
+        {type === "createtask" &&
           <>
             <div className='flex justify-between p-5'>
               <h1 className='font-bold '>Task</h1>
@@ -276,7 +276,7 @@ const ProjectDashboard = () => {
           </>
         }
 
-        {type == "createsubtask" &&
+        {type === "createsubtask" &&
           <>
             <div className='flex justify-between p-5'>
               <h1 className='font-bold '>Subtask</h1>

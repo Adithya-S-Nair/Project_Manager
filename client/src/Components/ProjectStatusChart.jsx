@@ -29,7 +29,7 @@ const ProjectStatusChart = () => {
             show: false, // Hide the legend
         },
         labels: ['Complete', 'Running', 'Pending'],
-        colors: ['rgb(0, 227, 150)', 'rgb(254, 176, 25)', 'rgb(255, 69, 96)'],
+        colors: ['rgb(0, 227, 150)', '#facd48', 'rgb(255, 69, 96)'],
     };
 
     return (

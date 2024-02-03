@@ -7,6 +7,7 @@ import Register from './Pages/Auth/Register';
 import AdminLayout from './Layouts/AdminLayout';
 import UserLayout from './Layouts/UserLayout';
 import ProjectDashboard from './Pages/Common/ProjectDashboard';
+import ProjectDetail from './Pages/Common/ProjectDetail';
 
 const App = () => {
   const { user } = useContext(AuthContext);
@@ -17,7 +18,6 @@ const App = () => {
     } else if (user.user_type === 'Admin') {
       return children;
     } else if (user.user_type === 'Users') {
-      // return <Navigate to='/user/dashboard'/>;
       return children;
     }
   };
@@ -34,6 +34,10 @@ const App = () => {
         {
           path: '/admin/dashboard',
           element: <ProjectDashboard />,
+        },
+        {
+          path: '/admin/projectdetail',
+          element: <ProjectDetail />,
         },
       ],
     },
