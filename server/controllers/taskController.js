@@ -2,7 +2,7 @@ import { db } from '../connections/mysql.js';
 
 export const createNewTask = (req, res) => {
     if (!req.userType === 'Admin') {
-        return res.status(403).json("This user cannot create a subtask")
+        return res.status(403).json("This user cannot create a task")
     }
     const {
         taskName,
@@ -56,19 +56,6 @@ export const getTasksByProjectId = (req, res) => {
 export const updateTask = (req, res) => {
     const taskId = req.params.taskId;
 
-    const {
-        task_name,
-        project_id,
-        Priority,
-        task_description,
-        planned_start_date,
-        planned_end_date,
-        planned_budget,
-        actual_start_time,
-        actual_end_time,
-        actual_budget
-    } = req.body;
-
     const query = `
             UPDATE task
             SET
@@ -83,24 +70,26 @@ export const updateTask = (req, res) => {
             actual_end_time = ?,
             actual_budget = ?
             WHERE
-            task_id = ?`
+            task_id = ?
+            And is_deleted = 0`
 
     const values = [
-        task_name,
-        project_id,
-        Priority,
-        task_description,
-        planned_start_date,
-        planned_end_date,
-        planned_budget,
-        actual_start_time,
-        actual_end_time,
-        actual_budget,
+        re.body.taskName,
+        req.body.projectId,
+        req.body.priority,
+        req.body.taskDescription,
+        req.body.plannedStartDate,
+        req.body.plannedEndDate,
+        req.body.plannedBudget,
+        req.body.actualStartTime,
+        req.body.actualEndTime,
+        req.body.actualBudget,
         taskId
-    ]
+    ];
 
     db.query(query, values, (err, data) => {
         if (err) return res.status(500).json(err);
+        if (data.affectedRows === 0) return res.status(400).json({ msg: "No matching record for updation" })
         return res.status(200).json({ message: "Task updated successfully" });
     })
 }
