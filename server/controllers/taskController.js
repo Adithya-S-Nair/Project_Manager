@@ -1,9 +1,10 @@
 import { db } from '../connections/mysql.js';
+import moment from 'moment';
 
 export const createNewTask = (req, res) => {
     if (!req.userType === 'Admin') {
         return res.status(403).json("This user cannot create a task")
-    }
+    }  
     const {
         taskName,
         projectId,
@@ -14,20 +15,22 @@ export const createNewTask = (req, res) => {
         plannedBudget,
         actualStartTime,
         actualEndTime,
-        actualBudget } = req.body
-    const query = `INSERT INTO task (task_name, project_id, priority, task_description, planned_start_date, planned_end_date, planned_budget, actual_start_time, actual_end_time, actual_budget)
+        actualBudget,
+        status } = req.body
+    const query = `INSERT INTO task (task_name, project_id, priority, task_description, planned_start_date, planned_end_date, planned_budget, actual_start_time, actual_end_time, actual_budget, status)
                     VALUES (?)`
     const values = [
         taskName,
         projectId,
         priority,
         taskDescription,
-        plannedStartDate,
-        plannedEndDate,
+        moment(plannedStartDate).format('YYYY-MM-DD'),
+        moment(plannedEndDate).format('YYYY-MM-DD'),
         plannedBudget,
-        actualStartTime,
-        actualEndTime,
-        actualBudget
+        moment(actualStartTime).format('YYYY-MM-DD'),
+        moment(actualEndTime).format('YYYY-MM-DD'),
+        actualBudget,
+        status
     ]
 
     db.query(query, [values], (err, data) => {
