@@ -52,7 +52,7 @@ function a11yProps(index) {
     };
 }
 
-function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, data, setData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor }) {
+function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
 
     return (
         <>
@@ -78,7 +78,7 @@ function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, a
             </div>
             <div className='flex flex-col md:flex-row gap-4' style={{ width: '100%' }}>
                 <div className="flex-grow md:w-2/3">
-                    <Card className="w-full" style={{ height: '24em' }}>
+                    <Card className="w-full" style={{ height: '28em' }}>
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
@@ -86,6 +86,10 @@ function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, a
                             <hr className='mt-2 mb-2' />
                             <div className="flex justify-between">
                                 <div>
+                                    <div className='mt-6'>
+                                        <span className='font-bold'>Project Manager :</span> Mr. Xyx
+                                        <hr />
+                                    </div>
                                     <div className='mt-6'>
                                         <span className='font-bold'>Project Start Date :</span> {moment(projectData.project_start_date).format('DD-MMM-YYYY')}
                                         <hr />
@@ -111,19 +115,19 @@ function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, a
                                         <hr />
                                     </div>
                                 </div>
-                                <RadarChart data={data} />
+                                <RadarChart data={radarChartData} />
                             </div>
                         </CardContent>
                     </Card>
                 </div>
                 <div className="md:w-1/3">
-                    <Card style={{ width: '100%', height: '24em' }}>
+                    <Card style={{ width: '100%', height: '28em' }}>
                         <CardContent>
                             <h2 className='text-xl font-bold'>Completion Status</h2>
                             <hr className='mt-2 mb-2' />
                             <div className="flex justify-center items-center">
                                 <div className="completion-graph">
-                                    <ProjectStatusChart />
+                                    <ProjectStatusChart data={projectCompletionStatus} />
                                 </div>
                             </div>
                         </CardContent>
@@ -232,7 +236,7 @@ function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, a
     );
 }
 
-function ProjectDetailDaisy({ value, setValue, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, data, setData, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject }) {
+function ProjectDetailDaisy({ value, setValue, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, data, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject }) {
     const [activeTab, setActiveTab] = useState(0);
 
     const changeTab = (tabIndex) => {
@@ -474,7 +478,6 @@ const ProjectDetail = () => {
     const [gridApi, setGridApi] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [chevronRotation, setChevronRotation] = useState(0);
-    const [data, setData] = useState([70, 80, 20, 10, 50])
     const sparklineData = {
         labels: ['January', 'February', 'March', 'April', 'May', 'June'],
         datasets: [
@@ -511,9 +514,31 @@ const ProjectDetail = () => {
             enabled: !!projectData, // Only fetch if projectData is available
         }
     );
-    console.log(pendingTaskCount);
-    if (projectError || pendingTaskError || pendingSubtaskError) {
-        console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError);
+
+    const { data: projectCompletionStatus, error: projectCompletionStatusError, isLoading: projectCompletionStatusLoading } = useQuery(
+        ['projectCompletionStatus', projectId],
+        async () => {
+            const response = await makeRequest.get(`/project/getprojectcompletionstatus/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: radarChartData, error: radarChartError, isLoading: radarChartLoading } = useQuery(
+        ['radarChartData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/project/getradarchartdata/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    if (projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError) {
+        console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError);
         return <div>Error fetching data</div>;
     }
 
@@ -563,7 +588,7 @@ const ProjectDetail = () => {
         }
     };
 
-    if (projectLoading || pendingSubtaskLoading) {
+    if (projectLoading || pendingTaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />
@@ -584,8 +609,7 @@ const ProjectDetail = () => {
                         setAnchorEl={setAnchorEl}
                         chevronRotation={chevronRotation}
                         setChevronRotation={setChevronRotation}
-                        data={data}
-                        setData={setData}
+                        radarChartData={radarChartData}
                         projectData={projectData}
                         pendingTaskCount={pendingTaskCount}
                         pendingSubtaskCount={pendingSubtaskCount}
@@ -597,6 +621,7 @@ const ProjectDetail = () => {
                         navigateToAllProject={navigateToAllProject}
                         getPriorityColor={getPriorityColor}
                         getChartPriorityColor={getChartPriorityColor}
+                        projectCompletionStatus={projectCompletionStatus}
                     />
                 </>
             )
@@ -612,8 +637,6 @@ const ProjectDetail = () => {
                 setAnchorEl={setAnchorEl}
                 chevronRotation={chevronRotation}
                 setChevronRotation={setChevronRotation}
-                data={data}
-                setData={setData}
                 sparklineData={sparklineData}
                 navigate={navigate}
                 handleMenuOpen={handleMenuOpen}

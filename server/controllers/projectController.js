@@ -91,3 +91,45 @@ export const createProject = (req, res) => {
         return res.status(200).json("Project has been Successfully Created");
     });
 }
+
+export const getProjectCompletionStatus = (req, res) => {
+    const query = `SELECT
+                    SUM(CASE WHEN status = 'Pending' AND is_deleted = 0 THEN 1 ELSE 0 END) AS pending_count,
+                    SUM(CASE WHEN status = 'Work In Progress' AND is_deleted = 0 THEN 1 ELSE 0 END) AS workinprogress_count,
+                    SUM(CASE WHEN status = 'On Hold' AND is_deleted = 0 THEN 1 ELSE 0 END) AS hold_count,
+                    SUM(CASE WHEN status = 'Completed' AND is_deleted = 0 THEN 1 ELSE 0 END) AS completed_count,
+                    COUNT(task_id) AS total_count
+                FROM
+                    task
+                WHERE
+                    project_id = 1`
+
+    db.query(query, req.params.projectId, (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" })
+        return res.status(200).json(data[0])
+    })
+}
+
+export const getRadarChartData = (req,res) => {
+    const query = `SELECT
+                task.task_id,
+                task.task_name,
+                COUNT(subtask.subtask_id) AS total_subtasks,
+                COUNT(CASE WHEN subtask.status = 'Completed' AND subtask.is_deleted = 0 THEN subtask.subtask_id END) AS completed_subtasks_count
+                FROM
+                task
+                LEFT JOIN
+                subtask ON task.task_id = subtask.task_id
+                WHERE
+                task.project_id = ?
+                GROUP BY
+                task.task_id, task.task_name
+                ORDER BY
+                task.task_id`
+    db.query(query, [req.params.projectId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" })
+        return res.status(200).json(data)
+    })
+}

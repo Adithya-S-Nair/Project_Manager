@@ -1,8 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-const ProjectStatusChart = () => {
-    const [series, setSeries] = useState([60, 30, 10]); // Adjust these values as needed
+const ProjectStatusChart = ({ data }) => {
+
+    const [series, setSeries] = useState([]);
+
+    useEffect(() => {
+        if (data) {
+            // Extract the relevant keys from data
+            const { completed_count, workinprogress_count, hold_count, pending_count, total_count } = data;
+
+            const percentages = {
+                completed_count: (completed_count / total_count) * 100,
+                workinprogress_count: (workinprogress_count / total_count) * 100,
+                hold_count: (hold_count / total_count) * 100,
+                pending_count: (pending_count / total_count) * 100,
+            };
+
+            setSeries(Object.values(percentages));
+        }
+    }, [data]);
 
     const options = {
         chart: {
@@ -28,33 +45,45 @@ const ProjectStatusChart = () => {
         legend: {
             show: false, // Hide the legend
         },
-        labels: ['Complete', 'Running', 'Pending'],
-        colors: ['rgb(0, 227, 150)', '#facd48', 'rgb(255, 69, 96)'],
+        labels: ['Complete', 'Work In Progress', 'On Hold', 'Pending'],
+        colors: ['rgb(0, 227, 150)', '#60a5fa', '#facd48', 'rgb(255, 69, 96)'],
     };
 
     return (
-        <div className='flex flex-col items-center'>
-            <div className="chart-wrap">
-                <div id="chart">
-                    <ReactApexChart options={options} series={series} type="donut" width={250} />
-                </div>
-            </div>
-            <p className='text-center font-bold mt-2 mb-2'>Balanced</p>
-            <div className='flex gap-4'>
-                <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
-                    <p className="text-green-400 font-bold text-2xl">{series[0]} %</p>
-                    <label className='font-bold'>Completed</label>
-                </div>
-                <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
-                    <p className="text-yellow-400 font-bold text-2xl">{series[1]} %</p>
-                    <label className='font-bold'>Running</label>
-                </div>
-                <div className="flex flex-col items-center gap-1 p-2">
-                    <p className="text-red-400 font-bold text-2xl">{series[2]} %</p>
-                    <label className='font-bold'>Pending</label>
-                </div>
-            </div>
-        </div>
+        <>
+            {(series.length > 0) &&
+                <div className='flex flex-col items-center'>
+                    <div className="chart-wrap">
+                        <div id="chart">
+                            <ReactApexChart options={options} series={series} type="donut" width={250} />
+                        </div>
+                    </div>
+                    <p className='text-center font-bold mt-2 mb-2'>Balanced</p>
+                    <div className='flex justify-center items-center flex-col gap-4'>
+                        <div className="flex gap-4">
+                            <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
+                                <p className="text-green-400 font-bold text-l">{series[0]} %</p>
+                                <label className='font-bold'>Completed</label>
+                            </div>
+                            <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
+                                <p className="text-blue-400 font-bold text-l">{series[1]} %</p>
+                                <label className='font-bold'>Progress</label>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
+                                <p className="text-yellow-400 font-bold text-l">{series[2]} %</p>
+                                <label className='font-bold'>On Hold</label>
+                            </div>
+                            <div className="flex flex-col items-center gap-1 p-2">
+                                <p className="text-red-400 font-bold text-l">{series[3]} %</p>
+                                <label className='font-bold'>Pending</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>}
+        </>
     );
 };
 

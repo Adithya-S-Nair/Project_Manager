@@ -11,21 +11,21 @@ const RadarChart = ({ data }) => {
         const ctx = chartRef.current.getContext('2d');
 
         if (!chartInstance.current) {
+            const labels = data.map((task) => task.task_name);
+            const completionPercentages = data.map(
+                (task) =>
+                    (task.completed_subtasks_count / task.total_subtasks) * 100 || 0
+            );
+
             // Create the Chart instance only once
             chartInstance.current = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: [
-                        'Requirement Gathering',
-                        'Designing',
-                        'Development',
-                        'Testing',
-                        'Deployment',
-                    ],
+                    labels: labels,
                     datasets: [
                         {
                             label: 'Project Progress',
-                            data: data,
+                            data: completionPercentages,
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 2,
@@ -55,13 +55,13 @@ const RadarChart = ({ data }) => {
             });
         } else {
             // Update chart data
-            chartInstance.current.data.datasets[0].data = data;
+            const completionPercentages = data.map(
+                (task) =>
+                    (task.completed_subtasks_count / task.total_subtasks) * 100 || 0
+            );
+            chartInstance.current.data.datasets[0].data = completionPercentages;
             chartInstance.current.update();
         }
-
-        return () => {
-            // Cleanup (if needed)
-        };
     }, [data]);
 
     return <canvas className='radar' ref={chartRef} />;
