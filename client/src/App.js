@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import './App.css';
 import { AuthContext } from './Context/AuthContext';
@@ -8,17 +8,46 @@ import AdminLayout from './Layouts/AdminLayout';
 import UserLayout from './Layouts/UserLayout';
 import ProjectDashboard from './Pages/Common/ProjectDashboard';
 import ProjectDetail from './Pages/Common/ProjectDetail';
+import { makeRequest } from './Axios';
 
 const App = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
 
-  const ProtectedRoute = ({ children }) => {
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await makeRequest.get('/auth/verify');
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!user) {
+      fetchUserDetails();
+    } else {
+      setLoading(false);
+    }
+  }, [user, setUser]);
+
+  const ProtectedRoute = ({ children, layout: Layout }) => {
+    if (loading) {
+      return null; // You can render a loading indicator here if needed
+    }
+
     if (!user) {
       return <Navigate to="/login" />;
-    } else if (user.user_type === 'Admin') {
-      return children;
-    } else if (user.user_type === 'Users') {
-      return children;
+    }
+
+    if (user.user_type === 'Admin' && Layout === AdminLayout) {
+      return children
+    } else if (user.user_type === 'Users' && Layout === UserLayout) {
+      return children
+    } else {
+      return <Navigate to="/login" />; // Redirect to home or handle unauthorized access
     }
   };
 
@@ -26,7 +55,7 @@ const App = () => {
     {
       path: '/admin',
       element: (
-        <ProtectedRoute>
+        <ProtectedRoute layout={AdminLayout}>
           <AdminLayout />
         </ProtectedRoute>
       ),
@@ -36,7 +65,7 @@ const App = () => {
           element: <ProjectDashboard />,
         },
         {
-          path: '/admin/projectdetail',
+          path: '/admin/projectdetail/:projectId',
           element: <ProjectDetail />,
         },
       ],
@@ -44,7 +73,7 @@ const App = () => {
     {
       path: '/user',
       element: (
-        <ProtectedRoute>
+        <ProtectedRoute layout={UserLayout}>
           <UserLayout />
         </ProtectedRoute>
       ),

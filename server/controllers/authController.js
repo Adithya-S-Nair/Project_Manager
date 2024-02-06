@@ -60,42 +60,30 @@ export const login = (req, res) => {
             return res.status(400).json("Wrong password or username");
         }
 
-        // const updateQuery = "UPDATE users SET signin = ? WHERE user_name = ?";
-        // const values = [signInTime, req.body.username]
-        // db.query(updateQuery, values, (err, updateResult) => {
-        //     if (err) {
-        //         console.error(err);
-        //         return res.status(500).json(err);
-        //     }
-
         // Format the signin field using moment
         selectResult.forEach(row => {
             row.registration_time = moment(row.registration_time).format('YYYY-MM-DD HH:mm:ss');
         });
-
-        // const insertQuery = `INSERT INTO logs(user_id, content, log_type) VALUES(?,?,?)`;
-        // const values = [selectResult[0].user_id, `${req.body.username} has been successfully logged in`, "Login"]
-        // db.query(insertQuery, values, (err, data) => {
-        //     if (err) {
-        //         console.error(err);
-        //         return res.status(500).json(err);
-        //     }
-        // })
 
         const token = jwt.sign(
             { user_id: selectResult[0].user_id, user_type: selectResult[0].user_type, email: selectResult[0].user_email },
             process.env.SECRET
         );
 
-        const { user_password, ...others } = selectResult[0];
-
-        // res.cookie("accessToken", token, { httpOnly: true }).status(200).json("user has signed in successfully");
+        const { password, ...others } = selectResult[0];
         res.cookie("accessToken", token, { httpOnly: true }).status(200).json(others);
     });
-    // });
 };
 
-export const getUser = (req, res) => {
+export const logout = (req,res) => {
+    return res
+        .clearCookie("accessToken")
+        .status(200)
+        .json({ message: "Successfully logged out" });
+
+}
+
+export const verify = (req, res) => {
     if (req.userId) {
         return res.status(200).json({ msg: "authorization successful", userId: req.userId, user_type: req.userType })
     }

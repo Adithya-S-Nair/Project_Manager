@@ -152,7 +152,7 @@ const UserLayout = () => {
                                 <MenuIcon className='text-black' />
                             </IconButton>
                             <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
-                                Dashboard
+                                User
                                 {/* <img className='img-fluid' style={{ width: '7em' }} src={TechnodromeLogo} alt="" /> */}
                             </Typography>
                         </Toolbar>

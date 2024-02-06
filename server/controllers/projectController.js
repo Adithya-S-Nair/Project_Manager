@@ -11,16 +11,16 @@ export const getAllProjects = (req, res) => {
         db.query(q, (err, data) => {
 
             if (err) return res.status(500).json(err);
-    
+
             if (data.length == 0) return res.status(409).json("Project Not Found");
-    
+
             data.forEach(row => {
                 row.project_start_date = moment(row.project_start_date).format('DD-MM-YYYY');
                 row.project_end_date = moment(row.project_end_date).format('DD-MM-YYYY');
                 row.actual_start_date = moment(row.actual_start_date).format('DD-MM-YYYY');
                 row.actual_end_date = moment(row.actual_end_date).format('DD-MM-YYYY');
             });
-    
+
             return res.status(200).json(data);
         })
     } else if (userType === "Users" || userType === "users") {
@@ -34,24 +34,34 @@ export const getAllProjects = (req, res) => {
         project_manager pm ON u.user_id = pm.user_account_id
         JOIN
         project p ON pm.project_id = p.project_id
-        WHERE u.user_id = ?` ; 
+        WHERE u.user_id = ?` ;
 
-        db.query(q, [userId] ,(err, data) => {
+        db.query(q, [userId], (err, data) => {
 
             if (err) return res.status(500).json(err);
-    
-            if (data.length == 0) return res.status(409).json("Project Not Found");
-    
+
+            if (data.length == 0) return res.status(404).json("Project Not Found");
+
             data.forEach(row => {
                 row.project_start_date = moment(row.project_start_date).format('DD-MM-YYYY');
                 row.project_end_date = moment(row.project_end_date).format('DD-MM-YYYY');
                 row.actual_start_date = moment(row.actual_start_date).format('DD-MM-YYYY');
                 row.actual_end_date = moment(row.actual_end_date).format('DD-MM-YYYY');
             });
-    
+
             return res.status(200).json(data);
         })
     }
+}
+
+export const getProjectById = (req, res) => {
+    const query = "SELECT * FROM project WHERE project_id = ?"
+    const value = [req.params.projectId]
+    db.query(query, value, (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length == 0) return res.status(404).json("Project Not Found");
+        return res.status(200).json(data[0]);
+    })
 }
 
 export const createProject = (req, res) => {

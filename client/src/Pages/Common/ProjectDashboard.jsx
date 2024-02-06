@@ -378,7 +378,10 @@ const ProjectDashboard = () => {
                   }}
                 />
               </LocalizationProvider>
-              <Textarea className='w-100' aria-label="minimum height" minRows={3} placeholder="Minimum 3 rows"
+              <Textarea
+                className='w-100'
+                aria-label="minimum height"
+                minRows={3} placeholder="Minimum 3 rows"
                 onChange={(e) => setProjectDesc(e.target.value)}
               />
 

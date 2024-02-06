@@ -1,8 +1,19 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { makeRequest } from '../Axios';
+import { AuthContext } from '../Context/AuthContext';
 
 const MenuComponent = ({ anchorEl, open, handleClose }) => {
+    const { user, setUser } = useContext(AuthContext);
+
+    const handleLogout = () => {
+        makeRequest.get('/auth/logout')
+            .then(() => {
+                setUser(null)
+            })
+    }
+
     return (
         <Menu
             id="demo-positioned-menu"
@@ -21,7 +32,7 @@ const MenuComponent = ({ anchorEl, open, handleClose }) => {
             sx={{ marginTop: '2em' }}
         >
             <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
     )
 }

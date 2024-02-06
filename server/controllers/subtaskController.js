@@ -71,8 +71,7 @@ export const getSubtasksByProjectId = (req, res) => {
 }
 
 export const updateSubtask = (req, res) => {
-    const subtaskId = req.params.taskId;
-
+    const subtaskId = req.params.subtaskId;
     const query = `
         UPDATE subtask
         SET
@@ -117,5 +116,28 @@ export const deleteSubtask = (req, res) => {
         if (err) return res.status(500).json(err);
         if (data.affectedRows === 0) return res.status(400).json({ msg: "No data for deletion" })
         return res.status(200).json({ msg: "Task deleted successfully" })
+    })
+}
+
+export const getPendingSubtaskCount = (req, res) => {
+    const query = `SELECT
+                    possible_priorities.Priority,
+                    COALESCE(SUM(CASE WHEN subtask.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
+                FROM
+                    (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+                LEFT JOIN
+                    subtask ON possible_priorities.Priority = subtask.Priority
+                        AND subtask.project_id = ?
+                        AND subtask.is_deleted = 0
+                WHERE
+                    possible_priorities.Priority IN ('High', 'Medium', 'Low')
+                GROUP BY
+                    possible_priorities.Priority
+                ORDER BY
+                    FIELD(possible_priorities.Priority, 'High', 'Medium', 'Low')`
+    db.query(query, [req.params.projectId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" })
+        return res.status(200).json(data)
     })
 }

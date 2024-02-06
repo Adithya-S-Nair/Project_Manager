@@ -97,7 +97,7 @@ const AdminLayout = () => {
     };
 
     const newCustomerNavigate = () => {
-        navigate('/admin/projectdetail');
+        navigate('/admin/projectdetail/1');
     };
 
     const newVaNavigate = () => {
@@ -152,7 +152,7 @@ const AdminLayout = () => {
                                 <MenuIcon className='text-black' />
                             </IconButton>
                             <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
-                                Dashboard
+                                Admin
                                 {/* <img className='img-fluid' style={{ width: '7em' }} src={TechnodromeLogo} alt="" /> */}
                             </Typography>
                         </Toolbar>
@@ -209,7 +209,7 @@ const AdminLayout = () => {
                     <List>
                         <ListItem disablePadding>
                             <ListItemButton
-                                selected={location.pathname === '/projectdetail'}
+                                selected={location.pathname === '/projectdetail/1'}
                                 onClick={newCustomerNavigate}
                                 sx={{
                                     "&:hover": { backgroundColor: "#596876", color: "#161245" },

@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import ProjectStatusChart from '../../Components/ProjectStatusChart';
@@ -14,6 +14,10 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import SparkLineChart from '../../Components/SparkLineChart';
 import { ThemeContext } from '../../Context/ThemeContext'
+import { makeRequest } from '../../Axios';
+import moment from 'moment';
+import { useQuery } from 'react-query';
+import CircularProgress from '@mui/material/CircularProgress';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -48,13 +52,13 @@ function a11yProps(index) {
     };
 }
 
-function ProjectDetailMui({ value, setValue, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, data, setData, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject }) {
+function ProjectDetailMui({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, data, setData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor }) {
 
     return (
         <>
             <div className="mb-5">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={handleMenuOpen}>
-                    <h1 className='text-4xl font-bold leading-7 text-gray-900 sm:truncate sm:text-xl sm:tracking-tight'>Project Name</h1>
+                    <h1 className='text-4xl font-bold leading-7 text-gray-900 sm:truncate sm:text-xl sm:tracking-tight'>{projectData.project_name}</h1>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className={`w-4 h-4 transform ${chevronRotation === 180 ? 'rotate-180' : ''}`}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
@@ -80,30 +84,30 @@ function ProjectDetailMui({ value, setValue, gridApi, setGridApi, anchorEl, setA
                                 <h2 className='text-xl font-bold'>Project Details</h2>
                             </div>
                             <hr className='mt-2 mb-2' />
-                            <div className="flex items-center justify-between">
+                            <div className="flex justify-between">
                                 <div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Project Description :</span> Full Stack Project
+                                        <span className='font-bold'>Project Start Date :</span> {moment(projectData.project_start_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Project Start Date :</span> 03 Jan 2024
+                                        <span className='font-bold'>Project End Date :</span> {moment(projectData.project_end_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Project End Date :</span> 03 Jun 2024
+                                        <span className='font-bold'>Actual Start Date :</span> {moment(projectData.actual_start_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Actual Start Date :</span> 02 Jan 2024
-                                        <hr />
-                                    </div>
-                                    <div className='mt-6'>
-                                        <span className='font-bold'>Actual End Date :</span> On Progress
+                                        <span className='font-bold'>Actual End Date :</span> {moment(projectData.actual_end_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
                                         <span className='font-bold'>Assigned Team :</span> Team 07
+                                        <hr />
+                                    </div>
+                                    <div className='mt-6'>
+                                        <span className='font-bold'>Project Description :</span> {projectData.project_description}
                                         <hr />
                                     </div>
                                 </div>
@@ -136,42 +140,24 @@ function ProjectDetailMui({ value, setValue, gridApi, setGridApi, anchorEl, setA
                     </div>
                     <hr className='mt-2 mb-2' />
                     <div className="flex items-center justify-between p-5">
-                        <Card style={{ width: 'auto' }}>
-                            <CardContent>
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-red-400'>High Priority Task</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-red-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#ef7070'} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card style={{ width: 'auto' }}>
-                            <CardContent>
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-yellow-400'>Medium Priority Task</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-yellow-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#facd48'} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card style={{ width: 'auto' }}>
-                            <CardContent>
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-green-400'>Low Priority Task</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-green-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#66de81'} />
-                                </div>
-                            </CardContent>
-                        </Card>
+                        {pendingTaskCount && pendingTaskCount.map((pendingTaskCount) => (
+                            <Card style={{ width: 'auto' }}>
+                                <CardContent>
+                                    <div className="flex items-center justify-between">
+                                        <h2 className={`text-xl font-bold text-${getPriorityColor(pendingTaskCount.Priority)}`}>
+                                            {`${pendingTaskCount.Priority} Priority Task`}
+                                        </h2>
+                                    </div>
+                                    <hr className='mt-2 mb-2' />
+                                    <div className="flex items-center justify-between">
+                                        <h2 className={`text-4xl font-extrabold text-${getPriorityColor(pendingTaskCount.Priority)}`}>
+                                            {pendingTaskCount.pending_count}
+                                        </h2>
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingTaskCount.Priority)} />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 </CardContent>
             </Card>
@@ -185,42 +171,24 @@ function ProjectDetailMui({ value, setValue, gridApi, setGridApi, anchorEl, setA
                     </div>
                     <hr className='mt-2 mb-2' />
                     <div className="flex items-center justify-between p-5">
-                        <Card style={{ width: 'auto' }}>
-                            <CardContent>
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-red-400'>High Priority Subtask</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-red-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#ef7070'} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card style={{ width: 'auto' }}>
-                            <CardContent>
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-yellow-400'>Medium Priority Subtask</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-yellow-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#facd48'} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card style={{ width: 'auto' }}>
-                            <CardContent>
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-green-400'>Low Priority Subtask</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-green-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#66de81'} />
-                                </div>
-                            </CardContent>
-                        </Card>
+                        {pendingSubtaskCount.map((pendingSubtaskCount) => (
+                            <Card key={pendingSubtaskCount.Priority} style={{ width: 'auto' }}>
+                                <CardContent>
+                                    <div className="flex items-center justify-between">
+                                        <h2 className={`text-xl font-bold text-${getPriorityColor(pendingSubtaskCount.Priority)}`}>
+                                            {`${pendingSubtaskCount.Priority} Priority Subtask`}
+                                        </h2>
+                                    </div>
+                                    <hr className='mt-2 mb-2' />
+                                    <div className="flex items-center justify-between">
+                                        <h2 className={`text-4xl font-extrabold text-${getPriorityColor(pendingSubtaskCount.Priority)}`}>
+                                            {pendingSubtaskCount.pending_count}
+                                        </h2>
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingSubtaskCount.Priority)} />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 </CardContent>
             </Card>
@@ -484,7 +452,7 @@ function ProjectDetailDaisy({ value, setValue, gridApi, setGridApi, anchorEl, se
             <div className='card card-compact shadow-xl mt-5' style={{ width: '100%' }}>
                 <div className='card-body'>
                     <div>
-                        <div role="tablist" className="tabs tabs-lifted" style={{backgroundColor:'transparent'}}>
+                        <div role="tablist" className="tabs tabs-lifted" style={{ backgroundColor: 'transparent' }}>
                             <a role="tab" className={`tab ${activeTab === 0 ? 'tab-active' : ''}`} onClick={() => changeTab(0)}>Tab 1</a>
                             <a role="tab" className={`tab ${activeTab === 1 ? 'tab-active' : ''}`} onClick={() => changeTab(1)}>Tab 2</a>
                             <a role="tab" className={`tab ${activeTab === 2 ? 'tab-active' : ''}`} onClick={() => changeTab(2)}>Tab 3</a>
@@ -500,6 +468,7 @@ function ProjectDetailDaisy({ value, setValue, gridApi, setGridApi, anchorEl, se
 }
 
 const ProjectDetail = () => {
+    const { projectId } = useParams();
     const { theme } = useContext(ThemeContext)
     const [value, setValue] = useState(0);
     const [gridApi, setGridApi] = useState(null);
@@ -515,6 +484,39 @@ const ProjectDetail = () => {
         ],
     };
     const navigate = useNavigate()
+
+    const { data: projectData, error: projectError, isLoading: projectLoading } = useQuery(['project', projectId], async () => {
+        const response = await makeRequest.get(`/project/getproject/${projectId}`);
+        return response.data;
+    });
+
+    const { data: pendingSubtaskCount, error: pendingSubtaskError, isLoading: pendingSubtaskLoading } = useQuery(
+        ['pendingSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getpendingsubtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: pendingTaskCount, error: pendingTaskError, isLoading: pendingTaskLoading } = useQuery(
+        ['pendingTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getpendingtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+    console.log(pendingTaskCount);
+    if (projectError || pendingTaskError || pendingSubtaskError) {
+        console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError);
+        return <div>Error fetching data</div>;
+    }
+
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -535,26 +537,69 @@ const ProjectDetail = () => {
         handleMenuClose()
     }
 
+    const getPriorityColor = (priority) => {
+        switch (priority.toLowerCase()) {
+            case 'high':
+                return 'red-400';
+            case 'medium':
+                return 'yellow-400';
+            case 'low':
+                return 'green-400';
+            default:
+                return 'black'; // Default color or handle other cases
+        }
+    };
+
+    const getChartPriorityColor = (priority) => {
+        switch (priority.toLowerCase()) {
+            case 'high':
+                return '#ef7070';
+            case 'medium':
+                return '#facd48';
+            case 'low':
+                return '#66de81';
+            default:
+                return 'black'; // Default color or handle other cases
+        }
+    };
+
+    if (projectLoading || pendingSubtaskLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
     if (theme === 'theme1') {
         return (
-            <ProjectDetailMui
-                value={value}
-                setValue={setValue}
-                gridApi={gridApi}
-                setGridApi={setGridApi}
-                anchorEl={anchorEl}
-                setAnchorEl={setAnchorEl}
-                chevronRotation={chevronRotation}
-                setChevronRotation={setChevronRotation}
-                data={data}
-                setData={setData}
-                sparklineData={sparklineData}
-                navigate={navigate}
-                handleMenuOpen={handleMenuOpen}
-                handleMenuClose={handleMenuClose}
-                handleChange={handleChange}
-                navigateToAllProject={navigateToAllProject}
-            />
+            projectData && (
+                <>
+                    <ProjectDetailMui
+                        value={value}
+                        setValue={setValue}
+                        gridApi={gridApi}
+                        setGridApi={setGridApi}
+                        anchorEl={anchorEl}
+                        setAnchorEl={setAnchorEl}
+                        chevronRotation={chevronRotation}
+                        setChevronRotation={setChevronRotation}
+                        data={data}
+                        setData={setData}
+                        projectData={projectData}
+                        pendingTaskCount={pendingTaskCount}
+                        pendingSubtaskCount={pendingSubtaskCount}
+                        sparklineData={sparklineData}
+                        navigate={navigate}
+                        handleMenuOpen={handleMenuOpen}
+                        handleMenuClose={handleMenuClose}
+                        handleChange={handleChange}
+                        navigateToAllProject={navigateToAllProject}
+                        getPriorityColor={getPriorityColor}
+                        getChartPriorityColor={getChartPriorityColor}
+                    />
+                </>
+            )
         );
     } else if (theme === 'theme2') {
         return (
