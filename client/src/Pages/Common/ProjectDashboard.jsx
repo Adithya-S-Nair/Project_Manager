@@ -5,169 +5,29 @@ import Drawer from '@mui/material/Drawer';
 import FloatingActionButtonComponent from '../../Components/FloatingActionButtonComponent';
 import PageTitle from '../../Components/PageTitle';
 import Box from '@mui/material/Box';
-import CloseIcon from '@mui/icons-material/Close'; import TextField from '@mui/material/TextField';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
-import { styled } from '@mui/system';
-import Button from '@mui/material/Button';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
 import { makeRequest } from '../../Axios';
 import { AuthContext } from '../../Context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useSnackbar } from '@mui/base/useSnackbar';
-import { ClickAwayListener } from '@mui/base/ClickAwayListener';
-import { css, keyframes } from '@mui/system';
-
-
-
+import ToastComponent from '../../Components/ToastComponent';
+import CreateProjectForm from '../../Components/CreateProjectForm';
+import CreateTaskForm from '../../Components/CreateTaskForm ';
+import CreateSubtaskForm from '../../Components/CreateSubtaskForm';
 
 const ProjectDashboard = () => {
 
-  const blue = {
-    100: '#DAECFF',
-    200: '#b6daff',
-    400: '#3399FF',
-    500: '#007FFF',
-    600: '#0072E5',
-    900: '#003A75',
-  };
+  /* ------------ Toast State ------------ */
 
-  const grey = {
-    50: '#F3F6F9',
-    100: '#E5EAF2',
-    200: '#DAE2ED',
-    300: '#C7D0DD',
-    400: '#B0B8C4',
-    500: '#9DA8B7',
-    600: '#6B7A90',
-    700: '#434D5B',
-    800: '#303740',
-    900: '#1C2025',
-  };
+  const [toastOpen, setToastOpen] = useState({ open: false, msg: "" })
 
-  const snackbarInRight = keyframes`
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-`;
-
-  const CustomSnackbar = styled('div')(
-    ({ theme }) => css`
-    position: fixed;
-    z-index: 5500;
-    display: flex;
-    right: 16px;
-    top: 16px;
-    left: auto;
-    justify-content: start;
-    max-width: 560px;
-    min-width: 300px;
-    background-color:  #33cc33;
-    border-radius: 8px;
-    border: 1px solid #33cc33;
-    box-shadow: ${theme.palette.mode === 'dark'
-        ? `0 4px 8px rgb(0 0 0 / 0.7)`
-        : `0 4px 8px rgb(0 0 0 / 0.1)`};q 
-    padding: 0.75rem;
-    color:  #ffffff;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 500;
-    animation: ${snackbarInRight} 200ms;
-    transition: transform 0.2s ease-out;
-  `,
-  );
-
-  const Textarea = styled(BaseTextareaAutosize)(
-    ({ theme }) => `
-    box-sizing: border-box;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 0.875rem;
-    font-weight: 400;
-    line-height: 1.5;
-    padding: 8px 12px;
-    border-radius: 8px;
-    color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
-    background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
-    border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
-    box-shadow: 0px 2px 2px ${theme.palette.mode === 'dark' ? grey[900] : grey[50]};
-
-    &:hover {
-      border-color: ${blue[400]};
-    }
-
-    &:focus {
-      border-color: ${blue[400]};
-      box-shadow: 0 0 0 3px ${theme.palette.mode === 'dark' ? blue[600] : blue[200]};
-    }
-
-    // firefox
-    &:focus-visible {
-      outline: 0;
-    }
-  `,
-  );
-
-  const [projectId, setProjectId] = React.useState('');
-
-  /* ------------ snackbar ------------ */
-  const [projectCreated, setProjectCreated] = useState(false);
-  const [taskCreated, setTaskCreated] = useState(false);
-
-
-  const handleClose = () => {
-    setProjectCreated(false);
-    setTaskCreated(false)
-  };
-
-  const { getRootProps, onClickAway } = useSnackbar({
-    onClose: handleClose,
-    projectCreated,
-    taskCreated,
-    autoHideDuration: 5000,
-  });
-
-  /* ----------- End of snackbar --------------- */
-
-  const handleChange = (event) => {
-    setProjectId(event.target.value);
-  };
-
-  const [priority, setPriority] = React.useState('');
-
-  const handleChanges = (event) => {
-    setPriority(event.target.value);
-  };
-
-  const [taskStatus, setTaskStatus] = React.useState('');
-
-  const taskStatushandleChange = (event) => {
-    setTaskStatus(event.target.value);
-  };
-
-  const [subtaskStatus, setsubtaskStatus] = React.useState('');
-
-  const subtaskStatushandleChange = (event) => {
-    setsubtaskStatus(event.target.value);
-  };
+  /* ------------ End Of Toast State ------------ */
 
   /* ---------- Creating project by admin ---------------*/
 
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext)
-  const [type, setType] = useState(null)
-  const [daisyType, setDaisyType] = useState(null)
+  const { user } = useContext(AuthContext);
+  const [projectid, setProjectid] = React.useState(0);
+  const [type, setType] = useState(null);
+  const [daisyType, setDaisyType] = useState(null);
+  const [projectDetail, setProjectDetail] = useState([]);
   const [drawerState, setDrawerState] = useState({
     anchor: 'right',
     open: false,
@@ -179,16 +39,19 @@ const ProjectDashboard = () => {
     projectEndDate: "",
     actualStartDate: "",
     actualEndDate: "",
+    projectDescription: ""
   });
-  const [projectDesc, setProjectDesc] = useState("")
 
   const toggleDrawer = (open) => (event) => {
-    console.log('Toggling drawer:', open);
+
+    // console.log('Toggling drawer:', open);
 
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
+
     setDrawerState({ ...drawerState, open });
+
   };
 
   const handleCreateProjectChange = (e) => {
@@ -196,26 +59,13 @@ const ProjectDashboard = () => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   };
-  console.log(projectDesc);
-  // console.log(inputs.projectDescription);
-
-  // const { isLoading, error, data } = useQuery(["admin"], () => {
-  //   makeRequest.get("project/getallprojects")
-  //     .then((res) => {
-  //       console.log(res);
-  //     }).catch((error) => {
-  //       console.log(error);
-  //     })
-  // }
-  // )
 
   const queryClient = useQueryClient()
 
   const createProjectMutation = useMutation((newProjectData) => {
     makeRequest.post("/project/createproject", newProjectData)
       .then((res) => {
-
-        setProjectCreated(true);
+        setToastOpen({ open: true, msg: "project  created successfully" })
         setInputs({
           projectName: "",
           projectStartDate: "",
@@ -224,16 +74,18 @@ const ProjectDashboard = () => {
           actualEndDate: "",
           projectDescription: ""
         })
-        setDrawerState({ anchor: 'right', open: false, })
-        // window.location.reload();
+        // setProjectCreated(true);
+        setDrawerState({ anchor: 'right', open: false, });
 
       }).catch((error) => {
         console.log(error);
       })
   }, {
     onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries(["admin"])
+
+      setProjectid((prev) => prev + 1);
+      queryClient.invalidateQueries(["projectIdAndName"]);
+
     },
   })
 
@@ -241,9 +93,11 @@ const ProjectDashboard = () => {
 
   /* ----------- Creating task by admin ----------------*/
 
+  const [taskid, setTaskid] = useState(0);
+  const [taskDetail, setTaskDetail] = useState([]);
   const [input, setInput] = useState({
     taskName: "",
-    projectId: "",
+    projectName: "",
     priority: "",
     taskDescription: "",
     plannedStartDate: "",
@@ -259,13 +113,24 @@ const ProjectDashboard = () => {
 
   };
 
+  const { isLoading, error, data } = useQuery(["projectIdAndName", projectid], () =>
+
+    makeRequest.get('/project/getprojectidandname')
+      .then((res) => {
+
+        setProjectDetail(res.data);
+      }).catch((err) => {
+        console.log(err);
+      })
+  )
+
   const createTaskMutation = useMutation((newTaskData) => {
     makeRequest.post("/task/createnewtask", newTaskData)
       .then((res) => {
-
+        setToastOpen({ open: true, msg: "Task  created successfully" })
         setInput({
           taskName: "",
-          projectId: "",
+          projectName: "",
           priority: "",
           taskDescription: "",
           plannedStartDate: "",
@@ -276,19 +141,83 @@ const ProjectDashboard = () => {
           actualBudget: "",
           status: ""
         })
-        setTaskCreated(true);
         setDrawerState({ anchor: 'right', open: false, })
-        // window.location.reload();
+      }).catch((error) => {
+        console.log(error);
+      })
+  }, {
+    onSuccess: () => {
+
+      setTaskid((prev) => prev + 1);
+      queryClient.invalidateQueries(["taskIdAndName"])
+    },
+  })
+
+  /* ----------- End of creating task by admin ------------- */
+
+  /* ----------- creating subtask by admin ---------------- */
+
+  const [info, setInfo] = useState({
+    subtaskName: "",
+    projectName: "",
+    taskName: "",
+    priority: "",
+    subtaskDescription: "",
+    plannedStartDate: "",
+    plannedEndDate: "",
+    plannedBudget: "",
+    actualStartTime: "",
+    actualEndTime: "",
+    actualBudget: "",
+    status: ""
+  });
+
+  const handleCreateSubtaskChange = (e) => {
+
+    setInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  };
+
+  const { isloading, err, value } = useQuery(["taskIdAndName", taskid], () =>
+    makeRequest.get('/task/gettaskidandname')
+      .then((res) => {
+        console.log(res.data);
+        setTaskDetail(res.data);
+      }).catch((err) => {
+        console.log(err);
+      })
+  )
+
+  const createSubtaskMutation = useMutation((newSubtaskData) => {
+    makeRequest.post("/subtask/createnewsubtask", newSubtaskData)
+      .then((res) => {
+        setToastOpen({ open: true, msg: "Subtask  created successfully" })
+        setInfo({
+          subtaskName: "",
+          projectName: "",
+          taskName: "",
+          priority: "",
+          subtaskDescription: "",
+          plannedStartDate: "",
+          plannedEndDate: "",
+          plannedBudget: "",
+          actualStartTime: "",
+          actualEndTime: "",
+          actualBudget: "",
+        })
+        setDrawerState({ anchor: 'right', open: false, })
 
       }).catch((error) => {
         console.log(error);
       })
   }, {
     onSuccess: () => {
-      // Invalidate and refetch
+
       queryClient.invalidateQueries(["user"])
     },
   })
+
+  /* ------------ End of creating subtask by admin ------------- */
 
   const handleCreate = () => {
     console.log(type);
@@ -296,551 +225,605 @@ const ProjectDashboard = () => {
       createProjectMutation.mutate(inputs)
     } else if (user.user_type === "Admin" && type === "createtask") {
       createTaskMutation.mutate(input)
+    } else if (user.user_type === "Admin" && type === "createsubtask") {
+      createSubtaskMutation.mutate(info)
     }
-
   }
 
   const list = () => (
+    // <Box
+    //   sx={{ width: drawerState.anchor === 'top' || drawerState.anchor === 'bottom' ? 'auto' : 500 }}
+    //   role="presentation"
+    // // onClick={toggleDrawer(true)}
+    // // onKeyDown={toggleDrawer(true)}
+    // >
+    //   <>
+    //     {type === "createproject" &&
+    //       <>
+    //         <div className='flex justify-between p-5'>
+    //           <h1 className='font-bold '>Project</h1>
+    //           <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
+    //         </div>
+    //         <hr />
+
+    //         <div className='grid grid-cols-1 gap-y-6 p-5'>
+    //           <TextField
+
+    //             id="outlined-password-input"
+    //             label="Project Name"
+    //             name="projectName"
+    //             type="text"
+    //             value={inputs.projectName}
+    //             autoComplete="project-name"
+    //             onChange={(e) => handleCreateProjectChange(e)}
+    //           />
+    //           <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //             <DatePicker
+    //               label="Project Start Date"
+    //               name="projectStartDate"
+    //               slots={{ openPickerIcon: DateRangeIcon }}
+    //               onChange={(date) => {
+    //                 // Format the date and update the state
+    //                 const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //                 handleCreateProjectChange({ target: { name: 'projectStartDate', value: formattedDate } });
+    //               }}
+
+    //             />
+    //           </LocalizationProvider>
+    //           <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //             <DatePicker
+    //               label="Project End Date"
+    //               name="projectEndDate"
+    //               slots={{ openPickerIcon: DateRangeIcon }}
+    //               onChange={(date) => {
+    //                 // Format the date and update the state
+    //                 const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //                 handleCreateProjectChange({ target: { name: 'projectEndDate', value: formattedDate } });
+    //               }}
+
+    //             />
+    //           </LocalizationProvider>
+    //           <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //             <DatePicker
+    //               label="Actual Start Date"
+    //               name="actualStartDate"
+    //               slots={{ openPickerIcon: DateRangeIcon }}
+    //               onChange={(date) => {
+    //                 // Format the date and update the state
+    //                 const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //                 handleCreateProjectChange({ target: { name: 'actualStartDate', value: formattedDate } });
+    //               }}
+
+    //             />
+    //           </LocalizationProvider>
+    //           <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //             <DatePicker
+    //               label="Actual End Date"
+    //               name="actualEndDate"
+    //               slots={{ openPickerIcon: DateRangeIcon }}
+    //               onChange={(date) => {
+    //                 // Format the date and update the state
+    //                 const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //                 handleCreateProjectChange({ target: { name: 'actualEndDate', value: formattedDate } });
+    //               }}
+    //             />
+    //           </LocalizationProvider>
+    //           <TextField
+    //             multiline
+    //             fullWidth
+    //             rows={3}
+    //             name='projectDescription'
+    //             label="Project Description"
+    //             value={inputs.projectDescription}
+    //             onChange={(e) => handleCreateProjectChange(e)}
+    //           />
+    //         </div>
+    //         <div className='flex justify-center space-x-5'>
+    //           <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+    //             Cancel
+    //           </Button>
+    //           <Button variant="contained" size="medium" onClick={handleCreate}>
+    //             Submit
+    //           </Button>
+    //         </div>
+    //       </>
+    //     }
+
+    //     {type === "createtask" &&
+    // <>
+    //   <div className='flex justify-between p-5'>
+    //     <h1 className='font-bold '>Task</h1>
+    //     <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
+    //   </div>
+    //   <hr />
+
+    //   <div className='grid grid-cols-1 gap-y-6 p-5'>
+    //     <TextField
+
+    //       id="outlined-password-input"
+    //       label="Task Name"
+    //       type="text"
+    //       autoComplete="task-name"
+    //       value={input.taskName}
+    //       name='taskName'
+    //       onChange={(e) => { handleCreateTaskChange(e) }}
+    //     />
+    //     <FormControl fullWidth>
+    //       <InputLabel id="demo-simple-select-label">Project Id</InputLabel>
+
+    //       <Select
+    //         labelId="demo-simple-select-label"
+    //         id="demo-simple-select"
+    //         label="Project Name"
+    //         name='projectId'
+    //         value={input.projectId}
+    //         onChange={(e) => { handleCreateTaskChange(e) }}
+
+    //       >{Array.isArray(projectDetail) && projectDetail.map((details) => (
+    //         <MenuItem value={details.project_id}>{details.project_name}</MenuItem>
+    //       ))}
+    //       </Select>
+    //     </FormControl>
+    //     <FormControl fullWidth>
+    //       <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+    //       <Select
+    //         labelId="demo-simple-select-label"
+    //         id="demo-simple-select"
+
+    //         label="priority"
+    //         name='priority'
+    //         value={input.priority}
+    //         onChange={(e) => { handleCreateTaskChange(e) }}
+    //       >
+    //         <MenuItem value={10}>Ten</MenuItem>
+    //         <MenuItem value={20}>Twenty</MenuItem>
+    //         <MenuItem value={30}>Thirty</MenuItem>
+    //       </Select>
+    //     </FormControl>
+    //     <TextField
+    //       multiline
+    //       fullWidth
+    //       rows={3}
+    //       name='taskDescription'
+    //       label="Task Description"
+    //       value={input.projectDescription}
+    //       onChange={(e) => handleCreateTaskChange(e)}
+    //     />
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Planned Start Date"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //         name='plannedStartDate'
+    //         // value={input.plannedStartDate}
+    //         onChange={(date) => {
+    //           // Format the date and update the state
+    //           const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //           handleCreateTaskChange({ target: { name: 'plannedStartDate', value: formattedDate } });
+    //         }}
+    //       />
+    //     </LocalizationProvider>
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Planned End Date"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //         name='plannedEndDate'
+    //         // value={input.plannedEndDate}
+    //         onChange={(date) => {
+    //           // Format the date and update the state
+    //           const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //           handleCreateTaskChange({ target: { name: 'plannedEndDate', value: formattedDate } });
+    //         }} />
+    //     </LocalizationProvider>
+    //     <TextField
+
+    //       id="outlined-password-input"
+    //       label="Planned Budget"
+    //       type="text"
+    //       autoComplete="planned-budget"
+    //       name='plannedBudget'
+    //       value={input.plannedBudget}
+    //       onChange={(e) => { handleCreateTaskChange(e) }}
+    //     />
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Actual Start Time"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //         onChange={(date) => {
+    //           // Format the date and update the state
+    //           const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //           handleCreateTaskChange({ target: { name: 'actualStartTime', value: formattedDate } });
+    //         }}
+    //         name='actualStartTime'
+    //       // value={input.actualStartTime}
+    //       />
+    //     </LocalizationProvider>
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Actual End Time"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //         onChange={(date) => {
+    //           // Format the date and update the state
+    //           const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    //           handleCreateTaskChange({ target: { name: 'actualEndTime', value: formattedDate } });
+    //         }}
+    //         name='actualEndTime'
+    //       // value={input.actualEndTime}
+    //       />
+    //     </LocalizationProvider>
+    //     <TextField
+
+    //       id="outlined-password-input"
+    //       label="Actual Budget"
+    //       type="text"
+    //       autoComplete="actual-budget"
+    //       name='actualBudget'
+    //       value={input.actualBudget}
+    //       onChange={(e) => { handleCreateTaskChange(e) }}
+    //     />
+    //     <FormControl fullWidth>
+    //       <InputLabel id="demo-simple-select-label">Status</InputLabel>
+    //       <Select
+    //         labelId="demo-simple-select-label"
+    //         id="demo-simple-select"
+    //         value={input.status}
+    //         label="status"
+    //         name='status'
+    //         onChange={(e) => { handleCreateTaskChange(e) }}
+    //       >
+    //         <MenuItem value={10}>Ten</MenuItem>
+    //         <MenuItem value={20}>Twenty</MenuItem>
+    //         <MenuItem value={30}>Thirty</MenuItem>
+    //       </Select>
+    //     </FormControl>
+    //   </div>
+    //   <div className='flex justify-center space-x-5 mb-4'>
+    //     <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+    //       Cancel
+    //     </Button>
+    //     <Button variant="contained" size="medium" onClick={handleCreate}>
+    //       Submit
+    //     </Button>
+    //   </div>
+    // </>
+    //     }
+
+    //     {type === "createsubtask" &&
+    // <>
+    //   <div className='flex justify-between p-5'>
+    //     <h1 className='font-bold '>Subtask</h1>
+    //     <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
+    //   </div>
+    //   <hr />
+
+    //   <div className='grid grid-cols-1 gap-y-6 p-5'>
+    //     <TextField
+
+    //       id="outlined-password-input"
+    //       label="Subask Name"
+    //       type="text"
+    //       autoComplete="subtask-name"
+    //     />
+    //     <FormControl fullWidth>
+    //       <InputLabel id="demo-simple-select-label">Project Id</InputLabel>
+    //       <Select
+    //         labelId="demo-simple-select-label"
+    //         id="demo-simple-select"
+    //         value={projectId}
+    //         label="projectId"
+    //         onChange={handleChange}
+    //       >
+    //         <MenuItem value={10}>Ten</MenuItem>
+    //         <MenuItem value={20}>Twenty</MenuItem>
+    //         <MenuItem value={30}>Thirty</MenuItem>
+    //       </Select>
+    //     </FormControl>
+    //     <FormControl fullWidth>
+    //       <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+    //       <Select
+    //         labelId="demo-simple-select-label"
+    //         id="demo-simple-select"
+    //         value={priority}
+    //         label="projectId"
+    //         onChange={handleChanges}
+    //       >
+    //         <MenuItem value={10}>Ten</MenuItem>
+    //         <MenuItem value={20}>Twenty</MenuItem>
+    //         <MenuItem value={30}>Thirty</MenuItem>
+    //       </Select>
+    //     </FormControl>
+    //     <TextField className='w-full' aria-label="minimum height" minRows={3} placeholder="Minimum 3 rows" />
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Planned Start Date"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //       />
+    //     </LocalizationProvider>
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Planned End Date"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //       />
+    //     </LocalizationProvider>
+    //     <TextField
+
+    //       id="outlined-password-input"
+    //       label="Planned Budget"
+    //       type="text"
+    //       autoComplete="planned-budget"
+    //     />
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Actual Start Time"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //       />
+    //     </LocalizationProvider>
+    //     <LocalizationProvider dateAdapter={AdapterDayjs}>
+    //       <DatePicker
+    //         label="Actual End Time"
+    //         slots={{ openPickerIcon: DateRangeIcon }}
+    //       />
+    //     </LocalizationProvider>
+    //     <FormControl fullWidth>
+    //       <InputLabel id="demo-simple-select-label">Status</InputLabel>
+    //       <Select
+    //         labelId="demo-simple-select-label"
+    //         id="demo-simple-select"
+    //         value={subtaskStatus}
+    //         label="status"
+    //         onChange={subtaskStatushandleChange}
+    //       >
+    //         <MenuItem value={10}>Ten</MenuItem>
+    //         <MenuItem value={20}>Twenty</MenuItem>
+    //         <MenuItem value={30}>Thirty</MenuItem>
+    //       </Select>
+    //     </FormControl>
+    //   </div>
+    //   <div className='flex justify-center space-x-5 mb-4'>
+    //     <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+    //       Cancel
+    //     </Button>
+    //     <Button variant="contained" size="medium" >
+    //       Submit
+    //     </Button>
+    //   </div>
+    // </>
+    //     }
+
+    //     {
+    //       daisyType === "createproject" &&
+    //       <>
+    //         <div className='flex justify-between p-5'>
+    //           <h1 className='font-bold '>Project</h1>
+    //           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+    //             <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    //           </svg>
+    //         </div>
+    //         <hr />
+
+    //         <div className='grid grid-cols-1 gap-y-4 p-5'>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Name:</label>
+    //             <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Start Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project End Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Actual Start Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Actual End Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Description:</label>
+    //             <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
+    //           </div>
+    //         </div>
+
+    //         <div className='flex justify-center space-x-5 mb-4'>
+    //           <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
+    //           <button className="btn btn-active btn-primary">Submit</button>
+    //         </div>
+    //       </>
+    //     }
+
+    //     {
+    //       daisyType === "createtask" &&
+    //       <>
+    //         <div className='flex justify-between p-5'>
+    //           <h1 className='font-bold '>Task</h1>
+    //           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+    //             <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    //           </svg>
+    //         </div>
+    //         <hr />
+
+    //         <div className='grid grid-cols-1 gap-y-4 p-5'>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Task Name:</label>
+    //             <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Id:</label>
+    //             <select className="select select-bordered">
+    //               <option selected>hi</option>
+    //               <option>Han Solo</option>
+    //               <option>Greedo</option>
+    //             </select>
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Priority:</label>
+    //             <select className="select select-bordered">
+    //               <option selected>hi</option>
+    //               <option>Han Solo</option>
+    //               <option>Greedo</option>
+    //             </select>
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Description:</label>
+    //             <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Planned Start Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Planned End Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Planned Budget:</label>
+    //             <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Actual Start Time:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Actual End Time:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Status:</label>
+    //             <select className="select select-bordered">
+    //               <option selected>hi</option>
+    //               <option>Han Solo</option>
+    //               <option>Greedo</option>
+    //             </select>
+    //           </div>
+    //         </div>
+
+    //         <div className='flex justify-center space-x-5 mb-4'>
+    //           <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
+    //           <button className="btn btn-active btn-primary">Submit</button>
+    //         </div>
+    //       </>
+    //     }
+
+    //     {
+    //       daisyType === "createsubtask" &&
+    //       <>
+    //         <div className='flex justify-between p-5'>
+    //           <h1 className='font-bold '>Subtask</h1>
+    //           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
+    //             <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    //           </svg>
+    //         </div>
+    //         <hr />
+
+    //         <div className='grid grid-cols-1 gap-y-4 p-5'>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Subtask Name:</label>
+    //             <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Id:</label>
+    //             <select className="select select-bordered">
+    //               <option selected>hi</option>
+    //               <option>Han Solo</option>
+    //               <option>Greedo</option>
+    //             </select>
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Priority:</label>
+    //             <select className="select select-bordered">
+    //               <option selected>hi</option>
+    //               <option>Han Solo</option>
+    //               <option>Greedo</option>
+    //             </select>
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Project Description:</label>
+    //             <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Planned Start Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Planned End Date:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Planned Budget:</label>
+    //             <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Actual Start Time:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Actual End Time:</label>
+    //             <input type="date" placeholder="" className="input input-bordered" />
+    //           </div>
+    //           <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
+    //             <label>Status:</label>
+    //             <select className="select select-bordered">
+    //               <option selected>hi</option>
+    //               <option>Han Solo</option>
+    //               <option>Greedo</option>
+    //             </select>
+    //           </div>
+    //         </div>
+
+    //         <div className='flex justify-center space-x-5 mb-4'>
+    //           <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
+    //           <button className="btn btn-active btn-primary">Submit</button>
+    //         </div>
+    //       </>
+    //     }
+
+    //   </>
+    // </Box >
+
     <Box
       sx={{ width: drawerState.anchor === 'top' || drawerState.anchor === 'bottom' ? 'auto' : 500 }}
       role="presentation"
-    // onClick={toggleDrawer(true)}
-    // onKeyDown={toggleDrawer(true)}
     >
-      <>
-        {type === "createproject" &&
-          <>
-            <div className='flex justify-between p-5'>
-              <h1 className='font-bold '>Project</h1>
-              <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
-            </div>
-            <hr />
-
-            <div className='grid grid-cols-1 gap-y-6 p-5'>
-              <TextField
-
-                id="outlined-password-input"
-                label="Project Name"
-                name="projectName"
-                type="text"
-                value={inputs.projectName}
-                autoComplete="project-name"
-                onChange={(e) => handleCreateProjectChange(e)}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Project Start Date"
-                  name="projectStartDate"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateProjectChange({ target: { name: 'projectStartDate', value: formattedDate } });
-                  }}
-
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Project End Date"
-                  name="projectEndDate"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateProjectChange({ target: { name: 'projectEndDate', value: formattedDate } });
-                  }}
-
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Actual Start Date"
-                  name="actualStartDate"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateProjectChange({ target: { name: 'actualStartDate', value: formattedDate } });
-                  }}
-
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Actual End Date"
-                  name="actualEndDate"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateProjectChange({ target: { name: 'actualEndDate', value: formattedDate } });
-                  }}
-                />
-              </LocalizationProvider>
-              <Textarea
-                className='w-100'
-                aria-label="minimum height"
-                minRows={3} placeholder="Minimum 3 rows"
-                onChange={(e) => setProjectDesc(e.target.value)}
-              />
-
-            </div>
-            <div className='flex justify-center space-x-5'>
-              <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
-                Cancel
-              </Button>
-              <Button variant="contained" size="medium" onClick={handleCreate}>
-                Submit
-              </Button>
-            </div>
-          </>
-        }
-
-        {type === "createtask" &&
-          <>
-            <div className='flex justify-between p-5'>
-              <h1 className='font-bold '>Task</h1>
-              <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
-            </div>
-            <hr />
-
-            <div className='grid grid-cols-1 gap-y-6 p-5'>
-              <TextField
-
-                id="outlined-password-input"
-                label="Task Name"
-                type="text"
-                autoComplete="task-name"
-                value={input.taskName}
-                name='taskName'
-                onChange={(e) => { handleCreateTaskChange(e) }}
-              />
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Project Id</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="projectId"
-                  name='projectId'
-                  value={input.projectId}
-                  onChange={(e) => { handleCreateTaskChange(e) }}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Priority</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-
-                  label="priority"
-                  name='priority'
-                  value={input.priority}
-                  onChange={(e) => { handleCreateTaskChange(e) }}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <Textarea className='w-full' aria-label="minimum height" minRows={3} placeholder="Minimum 3 rows" />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Planned Start Date"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  name='plannedStartDate'
-                  // value={input.plannedStartDate}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateTaskChange({ target: { name: 'plannedStartDate', value: formattedDate } });
-                  }}
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Planned End Date"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  name='plannedEndDate'
-                  // value={input.plannedEndDate}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateTaskChange({ target: { name: 'plannedEndDate', value: formattedDate } });
-                  }} />
-              </LocalizationProvider>
-              <TextField
-
-                id="outlined-password-input"
-                label="Planned Budget"
-                type="text"
-                autoComplete="planned-budget"
-                name='plannedBudget'
-                value={input.plannedBudget}
-                onChange={(e) => { handleCreateTaskChange(e) }}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Actual Start Time"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateTaskChange({ target: { name: 'actualStartTime', value: formattedDate } });
-                  }}
-                  name='actualStartTime'
-                // value={input.actualStartTime}
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Actual End Time"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                  onChange={(date) => {
-                    // Format the date and update the state
-                    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                    handleCreateTaskChange({ target: { name: 'actualEndTime', value: formattedDate } });
-                  }}
-                  name='actualEndTime'
-                // value={input.actualEndTime}
-                />
-              </LocalizationProvider>
-              <TextField
-
-                id="outlined-password-input"
-                label="Actual Budget"
-                type="text"
-                autoComplete="actual-budget"
-                name='actualBudget'
-                value={input.actualBudget}
-                onChange={(e) => { handleCreateTaskChange(e) }}
-              />
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={input.status}
-                  label="status"
-                  name='status'
-                  onChange={(e) => { handleCreateTaskChange(e) }}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-            <div className='flex justify-center space-x-5 mb-4'>
-              <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
-                Cancel
-              </Button>
-              <Button variant="contained" size="medium" onClick={handleCreate}>
-                Submit
-              </Button>
-            </div>
-          </>
-        }
-
-        {type === "createsubtask" &&
-          <>
-            <div className='flex justify-between p-5'>
-              <h1 className='font-bold '>Subtask</h1>
-              <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
-            </div>
-            <hr />
-
-            <div className='grid grid-cols-1 gap-y-6 p-5'>
-              <TextField
-
-                id="outlined-password-input"
-                label="Subask Name"
-                type="text"
-                autoComplete="subtask-name"
-              />
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Project Id</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={projectId}
-                  label="projectId"
-                  onChange={handleChange}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Priority</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={priority}
-                  label="projectId"
-                  onChange={handleChanges}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <Textarea className='w-full' aria-label="minimum height" minRows={3} placeholder="Minimum 3 rows" />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Planned Start Date"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Planned End Date"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                />
-              </LocalizationProvider>
-              <TextField
-
-                id="outlined-password-input"
-                label="Planned Budget"
-                type="text"
-                autoComplete="planned-budget"
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Actual Start Time"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Actual End Time"
-                  slots={{ openPickerIcon: DateRangeIcon }}
-                />
-              </LocalizationProvider>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={subtaskStatus}
-                  label="status"
-                  onChange={subtaskStatushandleChange}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-            <div className='flex justify-center space-x-5 mb-4'>
-              <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
-                Cancel
-              </Button>
-              <Button variant="contained" size="medium" >
-                Submit
-              </Button>
-            </div>
-          </>
-        }
-
-        {
-          daisyType === "createproject" &&
-          <>
-            <div className='flex justify-between p-5'>
-              <h1 className='font-bold '>Project</h1>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-            </div>
-            <hr />
-
-            <div className='grid grid-cols-1 gap-y-4 p-5'>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Name:</label>
-                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Start Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project End Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Actual Start Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Actual End Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Description:</label>
-                <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
-              </div>
-            </div>
-
-            <div className='flex justify-center space-x-5 mb-4'>
-              <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
-              <button className="btn btn-active btn-primary">Submit</button>
-            </div>
-          </>
-        }
-
-        {
-          daisyType === "createtask" &&
-          <>
-            <div className='flex justify-between p-5'>
-              <h1 className='font-bold '>Task</h1>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-            </div>
-            <hr />
-
-            <div className='grid grid-cols-1 gap-y-4 p-5'>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Task Name:</label>
-                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Id:</label>
-                <select className="select select-bordered">
-                  <option selected>hi</option>
-                  <option>Han Solo</option>
-                  <option>Greedo</option>
-                </select>
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Priority:</label>
-                <select className="select select-bordered">
-                  <option selected>hi</option>
-                  <option>Han Solo</option>
-                  <option>Greedo</option>
-                </select>
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Description:</label>
-                <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Planned Start Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Planned End Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Planned Budget:</label>
-                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Actual Start Time:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Actual End Time:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Status:</label>
-                <select className="select select-bordered">
-                  <option selected>hi</option>
-                  <option>Han Solo</option>
-                  <option>Greedo</option>
-                </select>
-              </div>
-            </div>
-
-            <div className='flex justify-center space-x-5 mb-4'>
-              <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
-              <button className="btn btn-active btn-primary">Submit</button>
-            </div>
-          </>
-        }
-
-        {
-          daisyType === "createsubtask" &&
-          <>
-            <div className='flex justify-between p-5'>
-              <h1 className='font-bold '>Subtask</h1>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-            </div>
-            <hr />
-
-            <div className='grid grid-cols-1 gap-y-4 p-5'>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Subtask Name:</label>
-                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Id:</label>
-                <select className="select select-bordered">
-                  <option selected>hi</option>
-                  <option>Han Solo</option>
-                  <option>Greedo</option>
-                </select>
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Priority:</label>
-                <select className="select select-bordered">
-                  <option selected>hi</option>
-                  <option>Han Solo</option>
-                  <option>Greedo</option>
-                </select>
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Project Description:</label>
-                <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"></textarea>
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Planned Start Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Planned End Date:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Planned Budget:</label>
-                <input type="text" placeholder="Enter Project Name" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Actual Start Time:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Actual End Time:</label>
-                <input type="date" placeholder="" className="input input-bordered" />
-              </div>
-              <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
-                <label>Status:</label>
-                <select className="select select-bordered">
-                  <option selected>hi</option>
-                  <option>Han Solo</option>
-                  <option>Greedo</option>
-                </select>
-              </div>
-            </div>
-
-            <div className='flex justify-center space-x-5 mb-4'>
-              <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
-              <button className="btn btn-active btn-primary">Submit</button>
-            </div>
-          </>
-        }
-
-      </>
-    </Box >
+      {type === "createproject" && (
+        <CreateProjectForm
+          setDrawerState={setDrawerState}
+          handleCreateProjectChange={handleCreateProjectChange}
+          handleCreate={handleCreate}
+          inputs={inputs}
+        />
+      )}
+      {isLoading
+        ? "loading"
+        : type === "createtask"
+          ? (
+            <CreateTaskForm
+              setDrawerState={setDrawerState}
+              handleCreateTaskChange={handleCreateTaskChange}
+              handleCreate={handleCreate}
+              input={input}
+              projectDetail={projectDetail}
+            />
+          )
+          : error
+      }
+      {isloading
+        ? "loading"
+        : type === "createsubtask"
+          ? (
+            <CreateSubtaskForm
+              setDrawerState={setDrawerState}
+              handleCreateSubtaskChange={handleCreateSubtaskChange}
+              handleCreate={handleCreate}
+              info={info}
+              projectDetail={projectDetail}
+              taskDetail={taskDetail}
+            />)
+          : err
+      }
+    </Box>
 
   );
 
@@ -863,6 +846,7 @@ const ProjectDashboard = () => {
 
   return (
     <>
+
       <PageTitle titleText={'Project Dashboard'} titleIcon={titleIcon} />
       <div className="flex justify-center items-center">
         <ProjectCard />
@@ -875,18 +859,11 @@ const ProjectDashboard = () => {
       >
         {list()}
       </Drawer>
-      {projectCreated ? (
-        <ClickAwayListener onClickAway={onClickAway}>
-          <CustomSnackbar {...getRootProps()}>Project has been created.</CustomSnackbar>
-        </ClickAwayListener>
-      ) : null
+      {
+        toastOpen.open &&
+        <ToastComponent toastOpen={toastOpen} />
       }
-      {taskCreated ? (
-        <ClickAwayListener onClickAway={onClickAway}>
-          <CustomSnackbar {...getRootProps()}>Project task has been created.</CustomSnackbar>
-        </ClickAwayListener>
-      ) : null
-      }
+
     </>
   );
 };

@@ -24,17 +24,17 @@ export const getAllProjects = (req, res) => {
             return res.status(200).json(data);
         })
     } else if (userType === "Users" || userType === "users") {
-        const q = `SELECT
-        u.user_id,
-            u.user_name,
-            p.*
+        const q = `  SELECT
+        project.project_id, project.project_name
         FROM
-        users u
+        project
         JOIN
-        project_manager pm ON u.user_id = pm.user_account_id
+        assigned ON assigned.project_id = project.project_id
         JOIN
-        project p ON pm.project_id = p.project_id
-        WHERE u.user_id = ?` ;
+        employee ON employee.employee_id = assigned.employee_id
+        JOIN
+        users ON users.user_id = employee.user_account_id
+        WHERE users.user_id = ?` ;
 
         db.query(q, [userId], (err, data) => {
 
@@ -55,13 +55,34 @@ export const getAllProjects = (req, res) => {
 }
 
 export const getProjectById = (req, res) => {
-    const query = "SELECT * FROM project WHERE project_id = ?"
-    const value = [req.params.projectId]
-    db.query(query, value, (err, data) => {
-        if (err) return res.status(500).json(err);
-        if (data.length == 0) return res.status(404).json("Project Not Found");
-        return res.status(200).json(data[0]);
-    })
+    if (req.userType === 'Admin') {
+        const query = "SELECT * FROM project WHERE project_id = ?"
+        const value = [req.params.projectId]
+        db.query(query, value, (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length == 0) return res.status(404).json("Project Not Found");
+            return res.status(200).json(data[0]);
+        })
+    } else {
+        const query = `SELECT
+                        project.*
+                    FROM
+                        project
+                    JOIN
+                        assigned ON assigned.project_id = project.project_id
+                    JOIN
+                        employee ON employee.employee_id = assigned.employee_id
+                    JOIN
+                        users ON users.user_id = employee.user_account_id
+                    WHERE
+                        users.user_id = ? AND project.project_id = ?`
+        const values = [req.userId, req.params.projectId]
+        db.query(query, values, (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length == 0) return res.status(404).json("Project Not Found");
+            return res.status(200).json(data[0]);
+        })
+    }
 }
 
 export const createProject = (req, res) => {
@@ -102,7 +123,7 @@ export const getProjectCompletionStatus = (req, res) => {
                 FROM
                     task
                 WHERE
-                    project_id = 1`
+                    project_id = ?`
 
     db.query(query, req.params.projectId, (err, data) => {
         if (err) return res.status(500).json(err);
@@ -111,7 +132,7 @@ export const getProjectCompletionStatus = (req, res) => {
     })
 }
 
-export const getRadarChartData = (req,res) => {
+export const getRadarChartData = (req, res) => {
     const query = `SELECT
                 task.task_id,
                 task.task_name,
@@ -133,3 +154,68 @@ export const getRadarChartData = (req,res) => {
         return res.status(200).json(data)
     })
 }
+
+export const getProjectIdAndName = (req, res) => {
+
+    const q = "SELECT project_id,project_name FROM project";
+
+    db.query(q, (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+
+        return res.status(200).json(data)
+    })
+}
+
+export const getGaugeProjectCompletionStatus = (req, res) => {
+    const { userId, userType } = req;
+
+    if (userType === "Admin" || userType === "admin") {
+        const query = `SELECT
+            project.project_id,
+            project.project_name,
+            SUM(CASE WHEN task.status = 'Completed' AND task.is_deleted = 0 THEN 1 ELSE 0 END) AS completed_count,
+            COUNT(task.task_id) AS total_count
+        FROM
+            task
+        JOIN
+            project ON task.project_id = project.project_id
+        GROUP BY
+            project.project_id, project.project_name`;
+
+        db.query(query, (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+            return res.status(200).json(data);
+        });
+    } else if (userType === "Users" || userType === "users") {
+        const query = `SELECT
+            project.project_id,
+            project.project_name,
+            SUM(CASE WHEN task.status = 'Completed' AND task.is_deleted = 0 THEN 1 ELSE 0 END) AS completed_count,
+            COUNT(task.task_id) AS total_count
+        FROM
+            task
+        JOIN
+            project ON task.project_id = project.project_id
+        JOIN
+            assigned ON assigned.project_id = project.project_id
+        JOIN
+            employee ON employee.employee_id = assigned.employee_id
+        JOIN
+            users ON users.user_id = employee.user_account_id
+        WHERE
+            users.user_id = ?
+        GROUP BY
+            project.project_id, project.project_name`;
+
+        db.query(query, [userId], (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length === 0) return res.status(404).json("Project Not Found");
+            return res.status(200).json(data);
+        });
+    }
+};

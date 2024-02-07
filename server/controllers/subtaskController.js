@@ -1,8 +1,12 @@
 import { db } from '../connections/mysql.js';
+import moment from 'moment';
 
 export const createNewSubtask = (req, res) => {
+
+    console.log(req.body.projectId);
     const {
         subtaskName,
+        projectId,
         taskId,
         priority,
         subtaskDescription,
@@ -11,9 +15,10 @@ export const createNewSubtask = (req, res) => {
         plannedBudget,
         actualStartTime,
         actualEndTime,
-        actualBudget
+        actualBudget,
+        status
     } = req.body;
-
+   
     const query = `
         INSERT INTO subtask (
             subtask_name,
@@ -25,7 +30,9 @@ export const createNewSubtask = (req, res) => {
             planned_budget,
             actual_start_time,
             actual_end_time,
-            actual_budget
+            actual_budget,
+            project_id,
+            status
         ) VALUES (?)`
 
     const values = [
@@ -33,20 +40,22 @@ export const createNewSubtask = (req, res) => {
         taskId,
         priority,
         subtaskDescription,
-        plannedStartDate,
-        plannedEndDate,
+        moment(plannedStartDate).format('YYYY-MM-DD'),
+        moment(plannedEndDate).format('YYYY-MM-DD'),
         plannedBudget,
-        actualStartTime,
-        actualEndTime,
-        actualBudget
+        moment(actualStartTime).format('YYYY-MM-DD'),
+        moment(actualEndTime).format('YYYY-MM-DD'),
+        actualBudget,
+        projectId,
+        status
     ]
 
     db.query(query, [values], (err, data) => {
         if (err) {
             console.error(err);
-            return res.status(500).json({ error: "Error creating task" });
+            return res.status(500).json({ error: "Error creating subtask" });
         }
-        return res.status(201).json({ message: "Task created successfully" });
+        return res.status(201).json({ message: "Subask created successfully" });
     })
 }
 
