@@ -11,11 +11,13 @@ import authRoute from './routes/authRoute.js';
 import projectRoute from './routes/projectRoute.js';
 import taskRoute from './routes/taskRoute.js';
 import subtaskRoute from './routes/subtaskRoute.js';
+import userRoute from './routes/userRoute.js';
+import employeeRoute from './routes/employeeRoute.js';
 
 const app = express();
 
-app.use((req,res,next)=>{
-    res.header("Access-Control-Allow-Credentials",true);
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", true);
     next();
 })
 app.use(express.json())
@@ -32,6 +34,8 @@ app.use('/pmapi/auth', authRoute);
 app.use('/pmapi/project', projectRoute);
 app.use('/pmapi/task', taskRoute);
 app.use('/pmapi/subtask', subtaskRoute);
+app.use('/pmapi/user', userRoute);
+app.use('/pmapi/employee', employeeRoute);
 
 // Listen to port
 app.listen(PORT, () => {

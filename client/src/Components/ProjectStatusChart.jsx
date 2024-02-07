@@ -4,6 +4,7 @@ import ReactApexChart from 'react-apexcharts';
 const ProjectStatusChart = ({ data }) => {
 
     const [series, setSeries] = useState([]);
+    const [percentages, setPercentages] = useState([]);
 
     useEffect(() => {
         if (data) {
@@ -17,7 +18,15 @@ const ProjectStatusChart = ({ data }) => {
                 pending_count: (pending_count / total_count) * 100,
             };
 
+            const percentagesDisplay = {
+                completed_count: ((completed_count / total_count) * 100).toFixed(2),
+                workinprogress_count: ((workinprogress_count / total_count) * 100).toFixed(2),
+                hold_count: ((hold_count / total_count) * 100).toFixed(2),
+                pending_count: ((pending_count / total_count) * 100).toFixed(2),
+            };
+
             setSeries(Object.values(percentages));
+            setPercentages(Object.values(percentagesDisplay))
         }
     }, [data]);
 
@@ -62,21 +71,21 @@ const ProjectStatusChart = ({ data }) => {
                     <div className='flex justify-center items-center flex-col gap-4'>
                         <div className="flex gap-4">
                             <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
-                                <p className="text-green-400 font-bold text-l">{series[0]} %</p>
+                                <p className="text-green-400 font-bold text-l">{percentages[0]} %</p>
                                 <label className='font-bold'>Completed</label>
                             </div>
                             <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
-                                <p className="text-blue-400 font-bold text-l">{series[1]} %</p>
+                                <p className="text-blue-400 font-bold text-l">{percentages[1]} %</p>
                                 <label className='font-bold'>Progress</label>
                             </div>
                         </div>
                         <div className="flex gap-4">
                             <div className="flex flex-col items-center gap-1 border-r border-solid border-black-500 pr-2 p-2">
-                                <p className="text-yellow-400 font-bold text-l">{series[2]} %</p>
+                                <p className="text-yellow-400 font-bold text-l">{percentages[2]} %</p>
                                 <label className='font-bold'>On Hold</label>
                             </div>
                             <div className="flex flex-col items-center gap-1 p-2">
-                                <p className="text-red-400 font-bold text-l">{series[3]} %</p>
+                                <p className="text-red-400 font-bold text-l">{percentages[3]} %</p>
                                 <label className='font-bold'>Pending</label>
                             </div>
                         </div>

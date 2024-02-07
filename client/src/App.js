@@ -9,6 +9,7 @@ import UserLayout from './Layouts/UserLayout';
 import ProjectDashboard from './Pages/Common/ProjectDashboard';
 import ProjectDetail from './Pages/Common/ProjectDetail';
 import { makeRequest } from './Axios';
+import AllUsers from './Pages/Admin/AllUsers';
 
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -68,6 +69,10 @@ const App = () => {
           path: '/admin/projectdetail/:projectId',
           element: <ProjectDetail />,
         },
+        {
+          path: '/admin/allusers/',
+          element: <AllUsers />,
+        }
       ],
     },
     {
