@@ -177,22 +177,34 @@ const ProjectDetail = () => {
         );
     } else if (theme === 'theme2') {
         return (
-            <ProjectDetailDaisyUI
-                value={value}
-                setValue={setValue}
-                gridApi={gridApi}
-                setGridApi={setGridApi}
-                anchorEl={anchorEl}
-                setAnchorEl={setAnchorEl}
-                chevronRotation={chevronRotation}
-                setChevronRotation={setChevronRotation}
-                sparklineData={sparklineData}
-                navigate={navigate}
-                handleMenuOpen={handleMenuOpen}
-                handleMenuClose={handleMenuClose}
-                handleChange={handleChange}
-                navigateToAllProject={navigateToAllProject}
-            />
+            projectData && (
+                <>
+                    <ProjectDetailDaisyUI
+                        value={value}
+                        setValue={setValue}
+                        gridApi={gridApi}
+                        setGridApi={setGridApi}
+                        anchorEl={anchorEl}
+                        setAnchorEl={setAnchorEl}
+                        chevronRotation={chevronRotation}
+                        setChevronRotation={setChevronRotation}
+                        projectData={projectData}
+                        pendingTaskCount={pendingTaskCount}
+                        pendingSubtaskCount={pendingSubtaskCount}
+                        sparklineData={sparklineData}
+                        taskData={taskData}
+                        radarChartData={radarChartData}
+                        navigate={navigate}
+                        handleMenuOpen={handleMenuOpen}
+                        handleMenuClose={handleMenuClose}
+                        handleChange={handleChange}
+                        navigateToAllProject={navigateToAllProject}
+                        getPriorityColor={getPriorityColor}
+                        getChartPriorityColor={getChartPriorityColor}
+                        projectCompletionStatus={projectCompletionStatus}
+                    />
+                </>
+            )
         );
     } else {
         // Handle unsupported theme

@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-const GuageChart = ({ gaugeData }) => {
-  const gaugepercent = gaugeData ? Math.ceil((gaugeData.completed_count / gaugeData.total_count) * 100 ) : 0;
+const GaugeChart = ({ gaugeData }) => {
+  const gaugePercent = gaugeData ? Math.ceil((gaugeData.completed_count / gaugeData.total_count) * 100) : 0;
 
   const [chartData, setChartData] = useState({
-    series: [gaugepercent],
+    series: [gaugePercent],
     options: {
       chart: {
         height: 350,
@@ -15,6 +15,26 @@ const GuageChart = ({ gaugeData }) => {
         radialBar: {
           hollow: {
             size: '70%',
+          },
+          track: {
+            background: '#E0E0E0', // Track color
+          },
+          dataLabels: {
+            showOn: 'always',
+            name: {
+              offsetY: -10,
+              show: true,
+              color: '#3d9bf7',
+              fontSize: '17px',
+            },
+            value: {
+              color: '#111',
+              fontSize: '36px',
+              show: true,
+            },
+          },
+          fill: {
+            colors: ['#4CAF50'], // Green fill color
           },
         },
       },
@@ -32,4 +52,4 @@ const GuageChart = ({ gaugeData }) => {
   );
 };
 
-export default GuageChart;
+export default GaugeChart;

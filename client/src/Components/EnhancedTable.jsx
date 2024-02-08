@@ -23,6 +23,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { visuallyHidden } from '@mui/utils';
 import { useQuery } from 'react-query';
 import { makeRequest } from '../Axios';
+import { ThemeContext } from '../Context/ThemeContext';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -53,6 +54,7 @@ function stableSort(array, comparator) {
 }
 
 function EnhancedTableHead(props) {
+    const { theme } = React.useContext(ThemeContext)
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headerData } =
         props;
     const createSortHandler = (property) => (event) => {
@@ -63,15 +65,24 @@ function EnhancedTableHead(props) {
         <TableHead>
             <TableRow>
                 <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all desserts',
-                        }}
-                    />
+                    {theme === 'theme1' ?
+                        <Checkbox
+                            color="primary"
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                            inputProps={{
+                                'aria-label': 'select all desserts',
+                            }}
+                        /> :
+                        <input
+                            type="checkbox"
+                            className="checkbox ms-2"
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                        />
+                    }
                 </TableCell>
                 {headerData.map((headCell) => (
                     <TableCell
@@ -201,6 +212,7 @@ EnhancedTableToolbar.propTypes = {
 };
 
 function EnhancedTable({ headerData, rowData }) {
+    const { theme } = React.useContext(ThemeContext)
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
@@ -304,13 +316,16 @@ function EnhancedTable({ headerData, rowData }) {
                                         sx={{ cursor: 'pointer' }}
                                     >
                                         <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                }}
-                                            />
+                                            {theme === 'theme1' ?
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': labelId,
+                                                    }}
+                                                /> :
+                                                <input type="checkbox" className="checkbox ms-2" checked={isItemSelected} />
+                                            }
                                         </TableCell>
                                         {headerData.map((headCell) => (
                                             <TableCell

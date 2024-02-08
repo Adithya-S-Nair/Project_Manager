@@ -13,6 +13,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import SparkLineChart from './SparkLineChart';
 import moment from 'moment';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import EditModal from './EditModal'
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -48,7 +51,10 @@ function a11yProps(index) {
 }
 
 const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
-
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const handleEditModalOpen = () => setEditModalOpen(true);
+    const handleEditModalClose = () => setEditModalOpen(false);
+    console.log(editModalOpen);
     const [taskColumns, setTaskColumns] = useState([
         { colId: '0_1', field: 'task_name', headerName: 'Task Name', hide: false },
         { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
@@ -90,6 +96,13 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
+                                <Tooltip title="Edit Project Details">
+                                    <IconButton aria-label="Edit" onClick={handleEditModalOpen}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 font-bold">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                        </svg>
+                                    </IconButton>
+                                </Tooltip>
                             </div>
                             <hr className='mt-2 mb-2' />
                             <div className="flex justify-between">
@@ -242,6 +255,13 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                     </Box>
                 </CardContent>
             </Card>
+            {projectData &&
+                <EditModal
+                    open={editModalOpen}
+                    handleClose={handleEditModalClose}
+                    projectData={projectData}
+                />
+            }
         </>
     )
 }

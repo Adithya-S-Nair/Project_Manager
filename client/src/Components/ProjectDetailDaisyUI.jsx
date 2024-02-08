@@ -3,8 +3,9 @@ import ProjectStatusChart from './ProjectStatusChart';
 import RadarChart from './RadarChart'
 import DatagridComponent from './DatagridComponent';
 import SparkLineChart from './SparkLineChart';
+import moment from 'moment';
 
-function ProjectDetailDaisyUI({ value, setValue, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, data, sparklineData, navigate, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject }) {
+function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
     const [activeTab, setActiveTab] = useState(0);
 
     const changeTab = (tabIndex) => {
@@ -70,53 +71,63 @@ function ProjectDetailDaisyUI({ value, setValue, gridApi, setGridApi, anchorEl, 
             </div>
             <div className='flex flex-col md:flex-row gap-4' style={{ width: '100%' }}>
                 <div className="flex-grow md:w-2/3">
-                    <div className="card card-compact w-full shadow-xl" style={{ height: '24em' }}>
+                    <div className="card card-compact w-full shadow-xl" style={{ height: '28em' }}>
                         <div className="card-body">
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
+                                <div className="tooltip bg-white" data-tip="Edit Project Details">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 cursor-pointer">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                    </svg>
+
+                                </div>
                             </div>
                             <hr className='mt-2 mb-2' />
                             <div className="flex justify-between">
                                 <div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Project Description :</span> Full Stack Project
+                                        <span className='font-bold'>Project Manager :</span> Mr. Xyx
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Project Start Date :</span> 03 Jan 2024
+                                        <span className='font-bold'>Project Start Date :</span> {moment(projectData.project_start_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Project End Date :</span> 03 Jun 2024
+                                        <span className='font-bold'>Project End Date :</span> {moment(projectData.project_end_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Actual Start Date :</span> 02 Jan 2024
+                                        <span className='font-bold'>Actual Start Date :</span> {moment(projectData.actual_start_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
-                                        <span className='font-bold'>Actual End Date :</span> On Progress
+                                        <span className='font-bold'>Actual End Date :</span> {moment(projectData.actual_end_date).format('DD-MMM-YYYY')}
                                         <hr />
                                     </div>
                                     <div className='mt-6'>
                                         <span className='font-bold'>Assigned Team :</span> Team 07
                                         <hr />
                                     </div>
+                                    <div className='mt-6'>
+                                        <span className='font-bold'>Project Description :</span> {projectData.project_description}
+                                        <hr />
+                                    </div>
                                 </div>
-                                <RadarChart data={data} />
+                                <RadarChart data={radarChartData} />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="md:w-1/3">
-                    <div className="card card-compact w-full shadow-xl" style={{ height: '24em' }}>
+                    <div className="card card-compact w-full shadow-xl" style={{ height: '28em' }}>
                         <div className='card-body'>
                             <h2 className='text-xl font-bold'>Completion Status</h2>
                             <hr className='mt-2 mb-2' />
                             <div className="flex justify-center items-center">
                                 <div className="completion-graph">
-                                    <ProjectStatusChart />
+                                    <ProjectStatusChart data={projectCompletionStatus} />
                                 </div>
                             </div>
                         </div>

@@ -1,7 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import Chart from 'chart.js/auto';
+import { ThemeContext } from '../Context/ThemeContext';
 
 const RadarChart = ({ data }) => {
+    const theme = useContext(ThemeContext)
+    const borderColor = theme==='theme1'?'rgba(75, 192, 192, 1)':'#85ffc2'
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -27,7 +30,7 @@ const RadarChart = ({ data }) => {
                             label: 'Project Progress',
                             data: completionPercentages,
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderColor: borderColor,
                             borderWidth: 2,
                             pointRadius: 5,
                         },
