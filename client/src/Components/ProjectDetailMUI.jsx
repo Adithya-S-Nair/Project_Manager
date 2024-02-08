@@ -258,6 +258,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
             {projectData &&
                 <EditModal
                     open={editModalOpen}
+                    setOpen={setEditModalOpen}
                     handleClose={handleEditModalClose}
                     projectData={projectData}
                 />
