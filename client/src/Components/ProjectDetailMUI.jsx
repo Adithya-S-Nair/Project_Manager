@@ -16,6 +16,7 @@ import moment from 'moment';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import EditModal from './EditModal'
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -50,12 +51,17 @@ function a11yProps(index) {
     };
 }
 
-const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
+const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const handleEditModalOpen = () => setEditModalOpen(true);
     const handleEditModalClose = () => setEditModalOpen(false);
-    console.log(editModalOpen);
+    const [selectedTask, setSelectedTask] = useState(null);
     const [taskColumns, setTaskColumns] = useState([
+        {
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 50
+        },
         { colId: '0_1', field: 'task_name', headerName: 'Task Name', hide: false },
         { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
         { colId: '2_1', field: 'task_description', headerName: 'Task Description', hide: false },
@@ -67,6 +73,25 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
         { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
         { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
     ])
+
+    const [subtaskColumns, setSubtaskColumns] = useState([
+        { colId: '0_1', field: 'subtask_name', headerName: 'Subtask Name', hide: false },
+        { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
+        { colId: '2_1', field: 'subtask_description', headerName: 'Subtask Description', hide: false },
+        { colId: '3_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
+        { colId: '4_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
+        { colId: '5_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
+        { colId: '6_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
+        { colId: '7_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
+        { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
+        { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
+    ])
+
+    const handleSelectedTask = (task) => {
+        console.log(task);
+        setSelectedTask(task);
+    };
+    console.log(selectedTask);
 
     return (
         <>
@@ -222,20 +247,33 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                 <CardContent>
                     <Box sx={{ width: '100%' }}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                                <Tab label="Show All" {...a11yProps(0)} />
-                                <Tab label="Task" {...a11yProps(1)} />
-                                <Tab label="Sub Task" {...a11yProps(2)} />
-                            </Tabs>
+                            <div className='flex items-center justify-between'>
+                                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+
+                                    <Tab label="Show All" {...a11yProps(0)} />
+                                    <Tab label="Task" {...a11yProps(1)} />
+                                    <Tab label="Sub Task" {...a11yProps(2)} />
+
+                                </Tabs>
+                                <div>
+                                    <MoreVertIcon />
+                                </div>
+                            </div>
                         </Box>
                         <CustomTabPanel value={value} index={0}>
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
+                                data={taskData}
+                                columnDefs={taskColumns}
+                                handleSelectedTask={handleSelectedTask}
                             />
+
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
+                                data={subtaskData}
+                                columnDefs={subtaskColumns}
                             />
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
@@ -250,6 +288,8 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
+                                data={subtaskData}
+                                columnDefs={subtaskColumns}
                             />
                         </CustomTabPanel>
                     </Box>
@@ -267,4 +307,4 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     )
 }
 
-export default ProjectDetailMUI
+export default ProjectDetailMUI;

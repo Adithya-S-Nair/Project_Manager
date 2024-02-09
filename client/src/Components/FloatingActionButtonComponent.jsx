@@ -9,25 +9,21 @@ import { useContext } from 'react';
 import { ThemeContext } from '../Context/ThemeContext';
 
 const FloatingActionButtonComponent = ({ toggle, setType, setDaisyType }) => {
-    // const [type, setType] = React.useState(null);
-
-    const { theme } = useContext(ThemeContext)
 
     const handleCreateItemClick = (itemType) => {
         setType(itemType);
-        // setParentType(itemType)
         toggle();
     };
 
-    const handleItemClick = (itemType) => {
-        setDaisyType(itemType);
-        // setParentType(itemType)
-        toggle();
-    };
+    // const handleItemClick = (itemType) => {
+    //     setDaisyType(itemType);
+    //     // setParentType(itemType)
+    //     toggle();
+    // };
 
     return (
         <>
-            {theme === "theme1" ? (
+            {/* {theme === "theme1" ? ( */}
                 <SpeedDial
                     ariaLabel="SpeedDial basic example"
                     sx={{ position: 'fixed', bottom: 30, right: 25 }}
@@ -49,8 +45,8 @@ const FloatingActionButtonComponent = ({ toggle, setType, setDaisyType }) => {
                         onClick={() => handleCreateItemClick('createsubtask')}
                     />
                 </SpeedDial>
-            ) : (
-                <SpeedDial
+            {/* ) : ( */}
+                {/* <SpeedDial
                     ariaLabel="SpeedDial basic example"
                     sx={{ position: 'fixed', bottom: 30, right: 25 }}
                     icon={<SpeedDialIcon />}
@@ -71,7 +67,7 @@ const FloatingActionButtonComponent = ({ toggle, setType, setDaisyType }) => {
                         onClick={() => handleItemClick('createsubtask')}
                     />
                 </SpeedDial>
-            )}
+            )} */}
         </>
     )
 }

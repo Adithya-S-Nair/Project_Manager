@@ -1,18 +1,45 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import MenuButton from '@mui/material/Button';
 import { makeRequest } from '../Axios';
 import { AuthContext } from '../Context/AuthContext';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { ThemeContext } from '../Context/ThemeContext';
 
-const MenuComponent = ({ anchorEl, open, handleClose }) => {
+const MenuComponent = ({ anchorEl, open, handleClose, isForwardIcon, setIsForwardIcon, firstThemeClick, openSubMenu, setOpenSubMenu }) => {
     const { user, setUser } = useContext(AuthContext);
+    const { theme, setTheme } = useContext(ThemeContext);
+    // State to track first theme click
 
     const handleLogout = () => {
         makeRequest.get('/auth/logout')
             .then(() => {
-                setUser(null)
-            })
-    }
+                setUser(null);
+            });
+    };
+
+    const handleThemeClick = (themes) => {
+        console.log(`Selected theme: ${themes}`);
+        setTheme(themes)
+        handleClose();
+    };
+
+
+    const handleThemeMenuClick = (event) => {
+        setSubMenuAnchor(event.currentTarget);
+        // console.log(firstThemeClick);
+        if (firstThemeClick) {
+            setOpenSubMenu(!openSubMenu);
+            console.log(openSubMenu);
+        }
+        setIsForwardIcon(!isForwardIcon);
+    };
+
+    const [subMenuAnchor, setSubMenuAnchor] = useState(null);
 
     return (
         <Menu
@@ -30,11 +57,39 @@ const MenuComponent = ({ anchorEl, open, handleClose }) => {
                 horizontal: 'right',
             }}
             sx={{ marginTop: '2em' }}
+        // onClick={handleThemeSetting}
         >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem>
+                <AccountCircleIcon className='me-2' />
+                Profile</MenuItem>
+            <MenuItem onClick={handleThemeMenuClick}>
+                {isForwardIcon ? <KeyboardArrowLeftIcon className='me-1' /> : <KeyboardArrowRightIcon className='me-1' />}
+                Theme Settings</MenuItem>
+            <div style={{ marginRight: '4em' }}>
+                <Menu
+                    style={{ transform: 'translate(-175px, 0)' }}
+                    id="sub-menu"
+                    anchorEl={subMenuAnchor}
+                    open={openSubMenu}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    sx={{ marginTop: '1em' }}
+                >
+                    <MenuItem onClick={() => handleThemeClick('theme1')}>Theme 1</MenuItem>
+                    <MenuItem onClick={() => handleThemeClick('theme2')}>Theme 2</MenuItem>
+                </Menu>
+            </div>
+            <MenuItem onClick={handleLogout}>
+                <LogoutIcon className='me-2' />
+                Logout</MenuItem>
         </Menu>
-    )
-}
+    );
+};
 
-export default MenuComponent
+export default MenuComponent;

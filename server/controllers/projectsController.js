@@ -59,6 +59,14 @@ export const getProjectById = (req, res) => {
         const query = "SELECT * FROM project WHERE project_id = ?"
         const value = [req.params.projectId]
         db.query(query, value, (err, data) => {
+
+            data.forEach(row => {
+                row.project_start_date = moment(row.project_start_date).format('YYYY-MM-DD');
+                row.project_end_date = moment(row.project_end_date).format('YYYY-MM-DD');
+                row.actual_start_date = moment(row.actual_start_date).format('YYYY-MM-DD');
+                row.actual_end_date = moment(row.actual_end_date).format('YYYY-MM-DD');
+            });
+
             if (err) return res.status(500).json(err);
             if (data.length == 0) return res.status(404).json("Project Not Found");
             return res.status(200).json(data[0]);
@@ -219,3 +227,39 @@ export const getGaugeProjectCompletionStatus = (req, res) => {
         });
     }
 };
+
+export const updateProjectDetail = (req, res) => {
+
+    const {
+        project_name,
+        project_start_date,
+        project_end_date,
+        actual_start_date,
+        actual_end_date,
+        project_description,
+    } = req.body;
+    
+    const projectId = req.params.projectId;
+    console.log(project_name);
+
+    const query = `UPDATE project 
+                   SET project_name = ?, project_start_date = ?, project_end_date = ?, actual_start_date = ?,
+                   actual_end_date = ?, project_description = ?
+                   WHERE project_id = ?`;
+
+    const values = [
+        project_name, 
+        project_start_date,
+        project_end_date,
+        actual_start_date,
+        actual_end_date,
+        project_description,
+        projectId
+    ];
+
+    db.query(query, values, (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json("Project Not Found");
+        return res.status(200).json("project updated successfully");
+    });
+}

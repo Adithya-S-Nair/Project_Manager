@@ -88,12 +88,20 @@ const AdminLayout = () => {
     const [listOpen, setListOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const menuOpen = Boolean(anchorEl);
+    const [isForwardIcon, setIsForwardIcon] = React.useState(false);
+    const [firstThemeClick, setFirstThemeClick] = React.useState(true);
+    const [openSubMenu, setOpenSubMenu] = React.useState(false);
+
     // const { setUser } = React.useContext(AuthContext)
     const handleClicked = (event) => {
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
         setAnchorEl(null);
+        // setFirstThemeClick(true)
+        setIsForwardIcon(false)
+        setOpenSubMenu(false)
+        console.log(openSubMenu);
     };
 
     const newCustomerNavigate = () => {
@@ -174,6 +182,12 @@ const AdminLayout = () => {
                             anchorEl={anchorEl}
                             open={menuOpen}
                             handleClose={handleClose}
+                            isForwardIcon={isForwardIcon}
+                            setIsForwardIcon={setIsForwardIcon}
+                            firstThemeClick={firstThemeClick}
+                            setFirstThemeClick={setFirstThemeClick}
+                            openSubMenu={openSubMenu}
+                            setOpenSubMenu={setOpenSubMenu}
                         />
                     </div>
 

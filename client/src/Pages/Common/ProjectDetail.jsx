@@ -85,6 +85,18 @@ const ProjectDetail = () => {
         }
     );
 
+    const { data: subtaskData, error: subtaskDataError, isLoading: subtaskDataLoading } = useQuery(
+        ['subtaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getprojectsubtask/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+
     if (projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError) {
         console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError);
         return <div>Error fetching data</div>;
@@ -163,6 +175,7 @@ const ProjectDetail = () => {
                         pendingSubtaskCount={pendingSubtaskCount}
                         sparklineData={sparklineData}
                         taskData={taskData}
+                        subtaskData={subtaskData}
                         navigate={navigate}
                         handleMenuOpen={handleMenuOpen}
                         handleMenuClose={handleMenuClose}
