@@ -29,7 +29,7 @@ const GaugeChart = ({ gaugeData }) => {
             },
             value: {
               color: '#111',
-              fontSize: '36px',
+              fontSize: '20px',
               show: true,
             },
           },

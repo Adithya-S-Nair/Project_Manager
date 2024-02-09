@@ -53,7 +53,23 @@ function a11yProps(index) {
 
 const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const handleEditModalOpen = () => setEditModalOpen(true);
+    const [modalEditType, setModalEditType] = useState("")
+
+    const [anchorEls, setAnchorEls] = React.useState(null);
+    const open = Boolean(anchorEls);
+    const handleClick = (event) => {
+        setAnchorEls(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEls(null);
+    };
+
+
+    const handleEditModalOpen = () => {
+        setModalEditType("project")
+        setEditModalOpen(true)
+    };
+
     const handleEditModalClose = () => setEditModalOpen(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [taskColumns, setTaskColumns] = useState([
@@ -256,7 +272,23 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
 
                                 </Tabs>
                                 <div>
-                                    <MoreVertIcon />
+                                    <IconButton onClick={handleClick}>
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                    <Menu
+                                        id="basic-menu"
+                                        anchorEl={anchorEls}
+                                        open={open}
+                                        onClose={handleClose}
+                                        MenuListProps={{
+                                            'aria-labelledby': 'basic-button',
+                                        }}
+                                    >
+                                        <MenuItem onClick={handleClose}>Assigned Tasks</MenuItem>
+                                        <MenuItem onClick={handleClose}>Edit Tasks</MenuItem>
+                                        <MenuItem onClick={handleClose}>Delete Tasks</MenuItem>
+                                    </Menu>
+
                                 </div>
                             </div>
                         </Box>
@@ -298,6 +330,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
             {projectData &&
                 <EditModal
                     open={editModalOpen}
+                    editType={modalEditType}
                     setOpen={setEditModalOpen}
                     handleClose={handleEditModalClose}
                     projectData={projectData}
