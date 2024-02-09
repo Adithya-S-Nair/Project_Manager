@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-// Define auth routes
+// Define subtask routes
 router.post('/createnewsubtask', checkAuth, createNewSubtask)
 router.get('/getprojectsubtask/:projectId', checkAuth, getSubtasksByProjectId)
 router.patch('/updatesubtask/:subtaskId', checkAuth, updateSubtask)

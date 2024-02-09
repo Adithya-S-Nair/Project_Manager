@@ -10,6 +10,7 @@ import ProjectDashboard from './Pages/Common/ProjectDashboard';
 import ProjectDetail from './Pages/Common/ProjectDetail';
 import { makeRequest } from './Axios';
 import AllUsers from './Pages/Admin/AllUsers';
+import TestForm from './Pages/Admin/TestForm';
 
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -72,7 +73,11 @@ const App = () => {
         {
           path: '/admin/allusers/',
           element: <AllUsers />,
-        }
+        },
+        {
+          path: '/admin/testform',
+          element: <TestForm />,
+        },
       ],
     },
     {

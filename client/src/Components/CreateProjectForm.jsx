@@ -20,10 +20,8 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                     <CloseIcon onClick={() => setDrawerState({ anchor: 'right', open: false, })} />
                 </div>
                 <hr />
-
                 <div className='grid grid-cols-1 gap-y-6 p-5'>
                     <TextField
-
                         id="outlined-password-input"
                         label="Project Name"
                         name="projectName"

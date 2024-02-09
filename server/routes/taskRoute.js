@@ -4,7 +4,7 @@ import { createNewTask, getTasksByProjectId, updateTask, deleteTask, getPendingT
 
 const router = express.Router();
 
-// Define auth routes
+// Define task routes
 router.post('/createnewtask', checkAuth, createNewTask)
 router.get('/getprojecttask/:projectId', checkAuth, getTasksByProjectId)
 router.patch('/updatetask/:taskId', checkAuth, updateTask)

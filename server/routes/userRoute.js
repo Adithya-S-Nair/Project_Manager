@@ -4,7 +4,7 @@ import { getAllUsers } from '../controllers/userController.js';
 
 const router = express.Router();
 
-// Define auth routes
+// Define user routes
 router.get('/getallusers', checkAuth, getAllUsers)
 
 export default router;
