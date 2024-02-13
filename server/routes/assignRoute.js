@@ -4,6 +4,6 @@ import { assignTask } from '../controllers/assignController.js';
 
 const router = express.Router();
 
-router.get('/assigntask', checkAuth, assignTask)
+router.post('/assigntask', checkAuth, assignTask)
 
 export default router;

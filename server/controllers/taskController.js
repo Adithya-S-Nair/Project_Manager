@@ -58,7 +58,7 @@ export const getTasksByProjectId = (req, res) => {
 
 export const updateTask = (req, res) => {
     const taskId = req.params.taskId;
-
+    console.log(req.body);
     const query = `
             UPDATE task
             SET
@@ -71,22 +71,24 @@ export const updateTask = (req, res) => {
             planned_budget = ?,
             actual_start_time = ?,
             actual_end_time = ?,
-            actual_budget = ?
+            actual_budget = ?,
+            status = ?
             WHERE
             task_id = ?
             And is_deleted = 0`
 
     const values = [
-        re.body.taskName,
-        req.body.projectId,
+        req.body.task_name,
+        req.body.project_id,
         req.body.priority,
-        req.body.taskDescription,
-        req.body.plannedStartDate,
-        req.body.plannedEndDate,
-        req.body.plannedBudget,
-        req.body.actualStartTime,
-        req.body.actualEndTime,
-        req.body.actualBudget,
+        req.body.task_description,
+        req.body.planned_start_date,
+        req.body.planned_end_date,
+        req.body.planned_budget,
+        req.body.actual_start_time,
+        req.body.actual_end_time,
+        req.body.actual_budget,
+        req.body.status,
         taskId
     ];
 
@@ -143,3 +145,90 @@ export const getTaskIdAndName = (req, res) => {
         return res.status(200).json(data)
     })
 }
+
+// export const getTaskNameById = (req, res) => {
+//     const taskIds = req.body;
+//     const taskNames = taskIds.map((taskId) => {
+//         const query = `SELECT task_id,task_name from task where task_id = ?`;
+//         db.query(query, taskId, (err, data) => {
+//             if (err) return res.status(500).json(err);
+
+//             if (data.length === 0) {
+//                 return res.status(404).json({ msg: "No task name found" });
+//             }
+
+//             return res.status(200).json(data)
+//         })
+
+//     })
+// }
+
+export const getTaskNameById = (req, res) => {
+    const taskIds = req.body;
+    console.log(taskIds);
+    const promises = taskIds.map((taskId) => {
+        return new Promise((resolve, reject) => {
+            const query = `SELECT task_id, task_name from task where task_id = ?`;
+            db.query(query, taskId, (err, data) => {
+                if (err) return reject(err);
+
+                if (data.length === 0) {
+                    return reject({ msg: `No task name found for task ID ${taskId}` });
+                }
+
+                resolve(data[0]); // Resolve with the task name
+            });
+        });
+    });
+
+    // Wait for all promises to resolve
+    Promise.all(promises)
+        .then((taskNames) => {
+            res.status(200).json(taskNames);
+        })
+        .catch((error) => {
+            res.status(500).json(error); // Send an error response if any query fails
+        });
+};
+
+export const getTask = (req, res) => {
+    const { taskId } = req.params;
+    const query = `SELECT * FROM task WHERE task_id = ?`;
+
+    db.query(query, [taskId], (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data[0])
+    })
+}
+
+export const deleteMultipleTask = (req, res) => {
+    const taskIds = req.params.taskIds.split(',');
+    console.log("taskId is:"+taskIds);
+    if (!Array.isArray(taskIds) || taskIds.length === 0) {
+        return res.status(400).json({ error: 'Invalid task IDs provided' });
+    }
+
+    const query = `UPDATE task 
+        SET is_deleted = 1
+        WHERE task_id IN (?)`;
+
+    db.query(query, [taskIds], (error, results) => {
+        if (error) {
+            console.error('Error deleting tasks:', error);
+            return res.status(500).json({ error: 'An error occurred while deleting tasks' });
+        }
+
+        res.status(200).json({ message: 'Tasks deleted successfully' });
+    });
+};

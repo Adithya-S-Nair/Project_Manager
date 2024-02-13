@@ -1,6 +1,6 @@
 import express from 'express';
 import checkAuth from '../middlewares/checkAuth.js';
-import { createNewTask, getTasksByProjectId, updateTask, deleteTask, getPendingTaskCount,getTaskIdAndName } from '../controllers/taskController.js';
+import { createNewTask, getTasksByProjectId, updateTask, deleteTask, getPendingTaskCount,getTaskIdAndName,getTaskNameById,getTask,deleteMultipleTask } from '../controllers/taskController.js';
 
 const router = express.Router();
 
@@ -11,6 +11,9 @@ router.patch('/updatetask/:taskId', checkAuth, updateTask)
 router.delete('/deletetask/:taskId', checkAuth, deleteTask)
 router.get('/getpendingtaskcount/:projectId', checkAuth, getPendingTaskCount)
 router.get('/gettaskidandname', checkAuth, getTaskIdAndName)
+router.post('/getTaskNameById', checkAuth, getTaskNameById)
+router.get('/gettask/:taskId', checkAuth, getTask)
+router.delete('/deletemultipletask/:taskIds', checkAuth, deleteMultipleTask)
 
 
 export default router;

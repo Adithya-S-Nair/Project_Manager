@@ -1,14 +1,14 @@
 import { db } from '../connections/mysql.js';
 
 export const assignTask = (req, res) => {
-    const { employeeId, selectedTask } = req.body;
+    const { employeeId, taskNames } = req.body;
     const queries = [];
-    for (const task of selectedTask) {
-        const sql = 'INSERT INTO your_table_name (employee_id, task_id) VALUES (?, ?)';
+    for (const task of taskNames) {
+        const sql = 'INSERT INTO assigned(employee_id, task_id) VALUES (?, ?)';
         const values = [employeeId, task.task_id];
 
         queries.push(new Promise((resolveQuery, rejectQuery) => {
-            connection.query(sql, values, (err, results) => {
+            db.query(sql, values, (err, results) => {
                 if (err) {
                     rejectQuery(err);
                 } else {
@@ -27,3 +27,4 @@ export const assignTask = (req, res) => {
             res.status(500).json({ error: 'Internal Server Error', message: error.message });
         });
 };
+

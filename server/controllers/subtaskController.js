@@ -18,7 +18,7 @@ export const createNewSubtask = (req, res) => {
         actualBudget,
         status
     } = req.body;
-   
+
     const query = `
         INSERT INTO subtask (
             subtask_name,
@@ -149,4 +149,33 @@ export const getPendingSubtaskCount = (req, res) => {
         if (data.length === 0) return res.status(404).json({ msg: "No data found" })
         return res.status(200).json(data)
     })
+}
+
+export const getSubtaskNameById = (req, res) => {
+    const subtaskIds = req.body;
+    console.log(req.body);
+    // console.log(subtaskIds);
+    const promises = subtaskIds.map((subtaskId) => {
+        return new Promise((resolve, reject) => {
+            const query = `SELECT subtask_id, subtask_name from subtask where subtask_id = ?`;
+            db.query(query, subtaskId, (err, data) => {
+                if (err) return reject(err);
+
+                if (data.length === 0) {
+                    return reject({ msg: `No task name found for task ID ${subtaskId}` });
+                }
+
+                resolve(data[0]); // Resolve with the task name
+            });
+        });
+    });
+
+    // Wait for all promises to resolve
+    Promise.all(promises)
+        .then((taskNames) => {
+            res.status(200).json(taskNames);
+        })
+        .catch((error) => {
+            res.status(500).json(error); // Send an error response if any query fails
+        });
 }

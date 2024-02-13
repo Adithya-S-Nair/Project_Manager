@@ -96,12 +96,16 @@ const ProjectDetail = () => {
         }
     );
 
+    const { data: updateTaskData, error: updateTaskError, isLoading: updateTaskLoading } = useQuery(['project', projectId], async () => {
+        // const response = await makeRequest.get(`/task/updatetaskdata/${project.projectid}`);
+        // return response.data;
+    });
 
-    if (projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError) {
-        console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError);
+
+    if (projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
+        console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
         return <div>Error fetching data</div>;
     }
-
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -148,7 +152,7 @@ const ProjectDetail = () => {
         }
     };
 
-    if (projectLoading || pendingTaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading) {
+    if (projectLoading || pendingTaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading || updateTaskLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />

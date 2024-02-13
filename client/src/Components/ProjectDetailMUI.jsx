@@ -15,8 +15,9 @@ import SparkLineChart from './SparkLineChart';
 import moment from 'moment';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import EditModal from './EditModal'
+import EditModalMUI from './EditModalMUI'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { makeRequest } from '../Axios';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -51,11 +52,13 @@ function a11yProps(index) {
     };
 }
 
-const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
+const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [modalEditType, setModalEditType] = useState("")
-
     const [anchorEls, setAnchorEls] = React.useState(null);
+    const [taskNames, setTaskNames] = useState(null);
+    const [employeeName, setEmployeeName] = useState(null);
+    const [tableData, setTableData] = useState(null);
     const open = Boolean(anchorEls);
     const handleClick = (event) => {
         setAnchorEls(event.currentTarget);
@@ -65,12 +68,6 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     };
 
 
-    const handleEditModalOpen = () => {
-        setModalEditType("project")
-        setEditModalOpen(true)
-    };
-
-    const handleEditModalClose = () => setEditModalOpen(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [taskColumns, setTaskColumns] = useState([
         {
@@ -91,6 +88,11 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     ])
 
     const [subtaskColumns, setSubtaskColumns] = useState([
+        {
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 50
+        },
         { colId: '0_1', field: 'subtask_name', headerName: 'Subtask Name', hide: false },
         { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
         { colId: '2_1', field: 'subtask_description', headerName: 'Subtask Description', hide: false },
@@ -103,11 +105,73 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
         { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
     ])
 
-    const handleSelectedTask = (task) => {
+    const handleSelectedTask = (task, selectedNodes) => {
         console.log(task);
         setSelectedTask(task);
+        // console.log(selectedNodes[0]);
+        setTableData(selectedNodes[0])
+
     };
     console.log(selectedTask);
+    const taskId = tableData ? Object.keys(tableData) : null;
+
+    if (taskId) {
+        console.log(taskId[0]);
+
+    }
+    // console.log(projectTaskId);
+    const handleEditModalOpen = (type) => {
+        setModalEditType(type)
+
+        if (type === "assignedTask") {
+            makeRequest.post(`/task/getTaskNameById`, selectedTask)
+                .then((res) => {
+                    setTaskNames(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
+
+            makeRequest.get('/employee/getallemployees')
+                .then((res) => {
+                    setEmployeeName(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
+        } else if (type === "editTask") {
+
+        } else if (type === "deleteTask") {
+            makeRequest.post(`/task/getTaskNameById`, selectedTask)
+                .then((res) => {
+                    setTaskNames(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
+        } else if (type == "assignedSubtask") {
+            console.log(selectedTask);
+            makeRequest.post(`/subtask/getsubtasknamebyid`, selectedTask)
+                .then((res) => {
+                    console.log("hii");
+                    setTaskNames(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
+
+            makeRequest.get('/employee/getallemployees')
+                .then((res) => {
+                    setEmployeeName(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
+
+        }
+        console.log(modalEditType);
+        setEditModalOpen(true);
+    };
+    console.log(selectedTask);
+    console.log(taskNames);
+
+    const handleEditModalClose = () => setEditModalOpen(false);
+
 
     return (
         <>
@@ -138,7 +202,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
                                 <Tooltip title="Edit Project Details">
-                                    <IconButton aria-label="Edit" onClick={handleEditModalOpen}>
+                                    <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("project") }}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 font-bold">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                         </svg>
@@ -266,33 +330,72 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <div className='flex items-center justify-between'>
                                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
 
-                                    <Tab label="Show All" {...a11yProps(0)} />
+                                    {/* <Tab label="Show All" {...a11yProps(0)} /> */}
                                     <Tab label="Task" {...a11yProps(1)} />
                                     <Tab label="Sub Task" {...a11yProps(2)} />
 
                                 </Tabs>
                                 <div>
-                                    <IconButton onClick={handleClick}>
-                                        <MoreVertIcon />
-                                    </IconButton>
-                                    <Menu
-                                        id="basic-menu"
-                                        anchorEl={anchorEls}
-                                        open={open}
-                                        onClose={handleClose}
-                                        MenuListProps={{
-                                            'aria-labelledby': 'basic-button',
-                                        }}
-                                    >
-                                        <MenuItem onClick={handleClose}>Assigned Tasks</MenuItem>
-                                        <MenuItem onClick={handleClose}>Edit Tasks</MenuItem>
-                                        <MenuItem onClick={handleClose}>Delete Tasks</MenuItem>
-                                    </Menu>
+                                    {taskId && taskId[0] === "task_id"
+                                        ?
+                                        <>
 
+                                            <IconButton onClick={handleClick}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+
+                                            < Menu
+                                                id="basic-menu"
+                                                anchorEl={anchorEls}
+                                                open={open}
+                                                onClose={handleClose}
+                                                MenuListProps={{
+                                                    'aria-labelledby': 'basic-button',
+                                                }}
+                                            >
+                                                <MenuItem onClick={() => { handleEditModalOpen("assignedTask") }}>Assigned Tasks</MenuItem>
+                                                {selectedTask && selectedTask.length <= 1 &&
+                                                    <MenuItem onClick={() => { handleEditModalOpen("editTask") }}>Edit Tasks</MenuItem>
+                                                }
+                                                <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete Tasks</MenuItem>
+                                            </Menu>
+
+                                        </>
+                                        :
+                                        null
+                                    }
+                                    {taskId && taskId[0] === "subtask_id"
+                                        ?
+                                        <>
+
+                                            <IconButton onClick={handleClick}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+
+                                            < Menu
+                                                id="basic-menu"
+                                                anchorEl={anchorEls}
+                                                open={open}
+                                                onClose={handleClose}
+                                                MenuListProps={{
+                                                    'aria-labelledby': 'basic-button',
+                                                }}
+                                            >
+                                                <MenuItem onClick={() => { handleEditModalOpen("assignedSubtask") }}>Assigned Subtasks</MenuItem>
+                                                {selectedTask && selectedTask.length <= 1 &&
+                                                    <MenuItem onClick={() => { handleEditModalOpen("editSubtask") }}>Edit Subtasks</MenuItem>
+                                                }
+                                                <MenuItem onClick={() => { handleEditModalOpen("deleteSubtask") }}>Delete Subtasks</MenuItem>
+                                            </Menu>
+
+                                        </>
+                                        :
+                                        null
+                                    }
                                 </div>
                             </div>
                         </Box>
-                        <CustomTabPanel value={value} index={0}>
+                        {/* <CustomTabPanel value={value} index={0}>
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
@@ -301,39 +404,80 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                 handleSelectedTask={handleSelectedTask}
                             />
 
+                        </CustomTabPanel> */}
+                        <CustomTabPanel value={value} index={0}>
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
-                                data={subtaskData}
-                                columnDefs={subtaskColumns}
+                                data={taskData}
+                                columnDefs={taskColumns}
+                                handleSelectedTask={handleSelectedTask}
+
                             />
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
-                                data={taskData}
-                                columnDefs={taskColumns}
-                            />
-                        </CustomTabPanel>
-                        <CustomTabPanel value={value} index={2}>
-                            <DatagridComponent
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
                                 data={subtaskData}
                                 columnDefs={subtaskColumns}
+                                handleSelectedTask={handleSelectedTask}
+
                             />
                         </CustomTabPanel>
                     </Box>
                 </CardContent>
-            </Card>
+            </Card >
             {projectData &&
-                <EditModal
+                <EditModalMUI
                     open={editModalOpen}
                     editType={modalEditType}
                     setOpen={setEditModalOpen}
                     handleClose={handleEditModalClose}
                     projectData={projectData}
+                />
+            }
+            {
+                taskNames &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTask={taskNames}
+                    employeeName={employeeName}
+                />
+            }
+            {
+                modalEditType === "editTask" &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTask={selectedTask}
+                />
+            }
+            {
+                modalEditType === "deleteTask" && selectedTask && taskNames &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTaskId={selectedTask}
+                    selectedTaskNames={taskNames}
+                />
+            }
+            {
+                modalEditType === "deleteTask" && selectedTask && taskNames &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTask={taskNames}
+                    employeeName={employeeName}
                 />
             }
         </>

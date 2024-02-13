@@ -263,3 +263,18 @@ export const updateProjectDetail = (req, res) => {
         return res.status(200).json("project updated successfully");
     });
 }
+
+export const getProjectName = (req,res) =>{
+    const {taskId} = req.params;
+    const query = `SELECT project.project_name,task.project_id 
+    from task
+    INNER JOIN project
+    ON task.project_id = project.project_id
+    WHERE task_id = ?`;
+
+    db.query(query, taskId, (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json("Project Not Found");
+        return res.status(200).json(data);
+    });
+}
