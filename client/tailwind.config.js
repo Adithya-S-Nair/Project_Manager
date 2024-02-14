@@ -10,6 +10,9 @@ const config = {
         'lg': '1200px',
         'xl': '1440px',
       },
+      colors: {
+        primary: 'white', // Change this to your desired base color
+      },
     },
   },
   plugins: [require("daisyui")],

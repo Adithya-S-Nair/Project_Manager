@@ -9,3 +9,7 @@ canvas.line {
     height: 50px !important;
 
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Change the icon color */
+  }

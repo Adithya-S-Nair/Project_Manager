@@ -1,16 +1,148 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProjectStatusChart from './ProjectStatusChart';
 import RadarChart from './RadarChart'
 import DatagridComponent from './DatagridComponent';
 import SparkLineChart from './SparkLineChart';
 import moment from 'moment';
+import IconButton from '@mui/material/IconButton';
+import EditModalDaisyUI from './EditModalDaisyUI';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { makeRequest } from '../Axios';
 
-function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
+function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
     const [activeTab, setActiveTab] = useState(0);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [employeeList, setEmployeeList] = useState([])
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    const [modalEditType, setModalEditType] = useState("")
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [filteredtaskData, setFilteredTaskData] = useState(taskData)
+    const [taskColumns, setTaskColumns] = useState([
+        {
+            colId: '0_1',
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 50
+        },
+        { colId: '1_1', field: 'task_name', headerName: 'Task Name', hide: false },
+        {
+            colId: '2_1',
+            field: 'Priority',
+            headerName: 'Priority',
+            hide: false,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['High', 'Medium', 'Low'],
+            },
+        },
+        { colId: '3_1', field: 'task_description', headerName: 'Task Description', hide: false },
+        { colId: '4_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
+        { colId: '5_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
+        { colId: '6_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
+        { colId: '7_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
+        { colId: '8_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
+        { colId: '9_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
+        {
+            colId: '10_1',
+            field: 'status',
+            headerName: 'Status',
+            hide: false,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['On Hold', 'Work In Progress', 'Pending', 'Completed'], // Specify the options for the select box
+            },
+        },
+        {
+            colId: '11_1',
+            field: 'employee_name',
+            headerName: 'Assigned Employee',
+            hide: false,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: [],
+            },
+        },
+    ])
+
+    const [subtaskColumns, setSubtaskColumns] = useState([
+        { colId: '0_1', field: 'subtask_name', headerName: 'Subtask Name', hide: false },
+        { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
+        { colId: '2_1', field: 'subtask_description', headerName: 'Subtask Description', hide: false },
+        { colId: '3_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
+        { colId: '4_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
+        { colId: '5_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
+        { colId: '6_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
+        { colId: '7_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
+        { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
+        { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
+    ])
+
+    useEffect(() => {
+        makeRequest.get('/employee/getallemployees')
+            .then((res) => {
+                setEmployeeList(res.data);
+
+                // Update taskColumns after fetching employeeList
+                setTaskColumns(prevColumns => {
+                    return prevColumns.map(column => {
+                        if (column.field === 'employee_name') {
+                            return {
+                                ...column,
+                                cellEditorParams: {
+                                    values: res.data.map(employee => employee.employee_name),
+                                },
+                            };
+                        }
+                        return column;
+                    });
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
+
+
+    const handleSaveChanges = () => {
+
+    }
+
+    const handleKeyInput = (e) => {
+        const key = e.target.value;
+
+        const filteredtaskData = taskData.filter((item) => {
+            return Object.values(item).some(
+                (field) =>
+                    field &&
+                    field.toString().toLowerCase().includes(key.toLocaleLowerCase())
+            );
+        })
+
+        setFilteredTaskData(filteredtaskData);
+    };
+
+
+    const handleSelectedTask = (task) => {
+        console.log(task);
+        setSelectedTask(task);
+    };
 
     const changeTab = (tabIndex) => {
         console.log(tabIndex);
         setActiveTab(tabIndex);
+    };
+
+    const handleEditModalOpen = () => {
+        setModalEditType("project")
+        setEditModalOpen(true)
     };
 
     const renderTabContent = () => {
@@ -21,29 +153,17 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                         <DatagridComponent
                             gridApi={gridApi}
                             setGridApi={setGridApi}
-                        />
-                        <DatagridComponent
-                            gridApi={gridApi}
-                            setGridApi={setGridApi}
+                            data={filteredtaskData}
+                            columnDefs={taskColumns}
+                            type='task'
+                            handleSelectedTask={handleSelectedTask}
                         />
                     </>
                 );
             case 1:
                 return (
                     <>
-                        <DatagridComponent
-                            gridApi={gridApi}
-                            setGridApi={setGridApi}
-                        />
-                    </>
-                );
-            case 2:
-                return (
-                    <>
-                        <DatagridComponent
-                            gridApi={gridApi}
-                            setGridApi={setGridApi}
-                        />
+
                     </>
                 );
             default:
@@ -76,10 +196,11 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
                                 <div className="tooltip bg-white" data-tip="Edit Project Details">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 cursor-pointer">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                    </svg>
-
+                                    <IconButton aria-label="Edit" onClick={handleEditModalOpen}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 cursor-pointer">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                        </svg>
+                                    </IconButton>
                                 </div>
                             </div>
                             <hr className='mt-2 mb-2' />
@@ -235,17 +356,52 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
             <div className='card card-compact shadow-xl mt-5' style={{ width: '100%' }}>
                 <div className='card-body'>
                     <div>
-                        <div role="tablist" className="tabs tabs-lifted" style={{ backgroundColor: 'transparent' }}>
-                            <a role="tab" className={`tab ${activeTab === 0 ? 'tab-active' : ''}`} onClick={() => changeTab(0)}>Tab 1</a>
-                            <a role="tab" className={`tab ${activeTab === 1 ? 'tab-active' : ''}`} onClick={() => changeTab(1)}>Tab 2</a>
-                            <a role="tab" className={`tab ${activeTab === 2 ? 'tab-active' : ''}`} onClick={() => changeTab(2)}>Tab 3</a>
+                        <div className='flex items-center justify-between'>
+                            <div role="tablist" className="tabs tabs-bordered bg-white">
+                                <a role="tab" className={`tab ${activeTab === 0 ? 'tab-active text-black' : ''}`} onClick={() => changeTab(0)}>Tasks</a>
+                                <a role="tab" className={`tab ${activeTab === 1 ? 'tab-active text-black' : ''}`} onClick={() => changeTab(1)}>Sub Tasks</a>
+                            </div>
+                            <div className="flex items-center gap-5">
+                                <input onChange={handleKeyInput} type="text" placeholder="Type to search" className="input input-bordered w-full max-w-xs bg-white h-10" />
+                                <div>
+                                    <div className="tooltip bg-white" data-tip="More">
+                                        <IconButton aria-label="Edit" onClick={handleClick} className='cursor-pointer'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                                            </svg>
+                                        </IconButton>
+                                    </div>
+                                    <Menu
+                                        id="basic-menu"
+                                        anchorEl={anchorEl}
+                                        open={open}
+                                        onClose={handleClose}
+                                        MenuListProps={{
+                                            'aria-labelledby': 'basic-button',
+                                        }}
+                                    >
+                                        <MenuItem onClick={handleSaveChanges}>Save Changes</MenuItem>
+                                        <MenuItem onClick={handleClose}>Delete</MenuItem>
+                                    </Menu>
+                                </div>
+                            </div>
                         </div>
-                        <div>
+                        <hr className='mt-4' />
+                        <div className='mt-4'>
                             {renderTabContent()}
                         </div>
                     </div>
                 </div>
             </div>
+            {projectData &&
+                <EditModalDaisyUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    // handleClose={handleEditModalClose}
+                    projectData={projectData}
+                />
+            }
         </>
     );
 }

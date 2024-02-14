@@ -112,7 +112,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                     <div className='grid grid-cols-1 gap-y-4 p-5'>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Project Name:</label>
-                            <input type="text" placeholder="Enter Project Name" className="input input-bordered" name="projectName" value={inputs.projectName} onChange={(e) => handleCreateProjectChange(e)}/>
+                            <input type="text" placeholder="Enter Project Name" className="input input-bordered" name="projectName" value={inputs.projectName} onChange={(e) => handleCreateProjectChange(e)} />
 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
@@ -139,7 +139,8 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
                                     handleCreateProjectChange({ target: { name: 'projectEndDate', value: formattedDate } });
                                 }}
-                            />                        </div>
+                            />
+                        </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Actual Start Date:</label>
                             <input
@@ -151,7 +152,8 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
                                     handleCreateProjectChange({ target: { name: 'actualStartDate', value: formattedDate } });
                                 }}
-                            />                        </div>
+                            />
+                        </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Actual End Date:</label>
                             <input

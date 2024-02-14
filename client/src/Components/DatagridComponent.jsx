@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { makeRequest } from '../Axios'
 
-const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, taskId }) => {
+const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type }) => {
 
     const onGridReady = (params) => {
         setGridApi(params.api);
@@ -30,20 +31,30 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
             handleSelectedTask([], []);
         }
     }
-    
+
+
+    const handleCellValueChanged = (event) => {
+        if (type === 'task') {
+            const { data } = event.node;
+            console.log(data);
+            makeRequest.patch(`/task/updatetask/${data.task_id}`, data)
+        }
+    }
 
     const defaultColDef = {
         sortable: true,
         filter: true,
+        editable: true
     };
 
     const gridOptions = {
         pagination: true,
-        paginationPageSize: 10, // Adjust the number of rows per page as needed
+        paginationPageSize: 10,
         suppressAutoSize: true,
         rowSelection: 'multiple',
         suppressRowClickSelection: true,
-        onSelectionChanged: handleSelectionChanged
+        onSelectionChanged: handleSelectionChanged,
+        onCellValueChanged: handleCellValueChanged,
     };
 
     return (

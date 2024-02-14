@@ -43,7 +43,31 @@ export const createNewTask = (req, res) => {
 }
 
 export const getTasksByProjectId = (req, res) => {
-    const query = "SELECT * FROM task WHERE project_id = ? AND is_deleted = 0"
+    const query = `SELECT
+                t.task_id ,
+                t.task_name,
+                t.project_id,
+                t.Priority,
+                t.task_description,
+                t.planned_start_date,
+                t.planned_end_date,
+                t.planned_budget,
+                t.actual_start_time,
+                t.actual_end_time,
+                t.actual_budget,
+                t.status,
+                e.employee_name
+                FROM
+                task t
+                LEFT JOIN
+                assigned a ON t.task_id = a.task_id
+                LEFT JOIN
+                employee e ON a.employee_id = e.employee_id
+                LEFT JOIN
+                users u ON e.user_account_id = u.user_id
+                WHERE
+                t.is_deleted = 0`
+
     const value = [req.params.projectId]
     db.query(query, value, (err, data) => {
         if (err) return res.status(500).json(err);
@@ -58,7 +82,20 @@ export const getTasksByProjectId = (req, res) => {
 
 export const updateTask = (req, res) => {
     const taskId = req.params.taskId;
-    console.log(req.body);
+
+    if (req.body.employee_name) {
+        const employeeName = req.body.employee_name;
+
+        const existingAssignment = db.query('SELECT * FROM assigned WHERE task_id = ?', [taskId]);
+
+        if (existingAssignment.length > 0) {
+            db.query('UPDATE assigned SET employee_id = (SELECT employee_id FROM employee WHERE employee_name = ?) WHERE task_id = ?', [employeeName, taskId]);
+        } else {
+            db.query('INSERT INTO assigned (project_id, task_id, employee_id) VALUES (?, ?, (SELECT employee_id FROM employee WHERE employee_name = ?))',
+                [req.body.project_id, taskId, employeeName]); // replace projectId and roleId with the appropriate values
+        }
+    }
+
     const query = `
             UPDATE task
             SET
@@ -80,13 +117,13 @@ export const updateTask = (req, res) => {
     const values = [
         req.body.task_name,
         req.body.project_id,
-        req.body.priority,
+        req.body.Priority,
         req.body.task_description,
-        req.body.planned_start_date,
-        req.body.planned_end_date,
+        moment(req.body.planned_start_date).format('YYYY-MM-DD'),
+        moment(req.body.planned_end_date).format('YYYY-MM-DD'),
         req.body.planned_budget,
-        req.body.actual_start_time,
-        req.body.actual_end_time,
+        moment(req.body.actual_start_time).format('YYYY-MM-DD'),
+        moment(req.body.actual_end_time).format('YYYY-MM-DD'),
         req.body.actual_budget,
         req.body.status,
         taskId
@@ -214,7 +251,7 @@ export const getTask = (req, res) => {
 
 export const deleteMultipleTask = (req, res) => {
     const taskIds = req.params.taskIds.split(',');
-    console.log("taskId is:"+taskIds);
+    console.log("taskId is:" + taskIds);
     if (!Array.isArray(taskIds) || taskIds.length === 0) {
         return res.status(400).json({ error: 'Invalid task IDs provided' });
     }
