@@ -8,7 +8,6 @@ const router = express.Router();
 router.post('/createnewtask', checkAuth, createNewTask)
 router.get('/getprojecttask/:projectId', checkAuth, getTasksByProjectId)
 router.patch('/updatetask/:taskId', checkAuth, updateTask)
-router.patch('/updatetaskinline/:taskId', checkAuth, updateTask)
 router.delete('/deletetask/:taskId', checkAuth, deleteTask)
 router.get('/getpendingtaskcount/:projectId', checkAuth, getPendingTaskCount)
 router.get('/gettaskidandname', checkAuth, getTaskIdAndName)
