@@ -213,6 +213,21 @@ export const getSubtaskById = (req, res) => {
 export const updateSubtaskById = (req, res) => {
 
     const subtaskId = req.params.subtaskId;
+
+    if (req.body.assigned_employee_name) {
+        const employeeName = req.body.assigned_employee_name;
+        console.log(`employee name - ${employeeName}`);
+        db.query('SELECT * FROM assigned WHERE subtask_id = ?', [subtaskId], (err, existingAssignment) => {
+            console.log(existingAssignment.length);
+            if (existingAssignment.length > 0) {
+                db.query('UPDATE assigned SET employee_id = (SELECT employee_id FROM employee WHERE employee_name = ?) WHERE subtask_id = ?', [employeeName, subtaskId]);
+            } else {
+                db.query('INSERT INTO assigned (subtask_id, employee_id, project_id) VALUES (?, (SELECT employee_id FROM employee WHERE employee_name = ?), ?)',
+                    [subtaskId, employeeName, req.body.project_id]); // replace projectId and roleId with the appropriate values
+            }
+        });
+    }
+
     console.log(subtaskId);
     console.log(req.body);
     const query = `
@@ -240,11 +255,11 @@ export const updateSubtaskById = (req, res) => {
         req.body.task_id,
         req.body.Priority,
         req.body.subtask_description,
-        req.body.planned_start_date,
-        req.body.planned_end_date,
+        moment(req.body.planned_start_date).format('YYYY-MM-DD'),
+        moment(req.body.planned_end_date).format('YYYY-MM-DD'),
         req.body.planned_budget,
-        req.body.actual_start_time,
-        req.body.actual_end_time,
+        moment(req.body.actual_start_time).format('YYYY-MM-DD'),
+        moment(req.body.actual_end_time).format('YYYY-MM-DD'),
         req.body.actual_budget,
         req.body.status,
         subtaskId
@@ -257,9 +272,9 @@ export const updateSubtaskById = (req, res) => {
     })
 }
 
-export const deleteMultipleSubtask = (req,res) =>{
+export const deleteMultipleSubtask = (req, res) => {
     const subtaskIds = req.params.subtaskIds.split(',');
-    console.log("subtaskId is:"+subtaskIds);
+    console.log("subtaskId is:" + subtaskIds);
     if (!Array.isArray(subtaskIds) || subtaskIds.length === 0) {
         return res.status(400).json({ error: 'Invalid task IDs provided' });
     }

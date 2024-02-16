@@ -6,11 +6,17 @@ import { makeRequest } from '../Axios'
 
 const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type }) => {
 
-    const [dataType, setDataType] = useState(type);
 
-    useEffect(() => {
-        setDataType(type)
-    }, [type])
+    const handleCellValueChanged = (event) => {
+        const { data } = event.node;
+        console.log(data);
+        if (!data.subtask_id) {
+            makeRequest.patch(`/task/updatetask/${data.task_id}`, data)
+        } else {
+            makeRequest.patch(`/subtask/updatesubtaskbyid/${data.subtask_id}`, data)
+        }
+    }
+
 
     const onGridReady = (params) => {
         setGridApi(params.api);
@@ -37,13 +43,6 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
     }
 
 
-    const handleCellValueChanged = (event) => {
-        if (dataType === 'task') {
-            const { data } = event.node;
-            console.log(data);
-            makeRequest.patch(`/task/updatetask/${data.task_id}`, data)
-        }
-    }
 
     const defaultColDef = {
         sortable: true,

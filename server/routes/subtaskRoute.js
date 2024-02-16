@@ -17,7 +17,7 @@ const router = express.Router();
 // Define subtask routes
 router.post('/createnewsubtask', checkAuth, createNewSubtask)
 router.get('/getprojectsubtask/:projectId', checkAuth, getSubtasksByProjectId)
-router.patch('/updatesubtask/:subtaskId', checkAuth, updateSubtask)
+// router.patch('/updatesubtask/:subtaskId', checkAuth, updateSubtask)
 router.delete('/deletesubtask/:subtaskId', checkAuth, deleteSubtask)
 router.get('/getpendingsubtaskcount/:projectId', checkAuth, getPendingSubtaskCount)
 router.post('/getsubtasknamebyid', checkAuth, getSubtaskNameById)

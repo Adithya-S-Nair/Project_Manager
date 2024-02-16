@@ -165,7 +165,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
 
     const handleKeyInput = (e) => {
         const key = e.target.value;
-
+        
         const filteredtaskData = taskData.filter((item) => {
             return Object.values(item).some(
                 (field) =>
@@ -194,7 +194,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
     };
 
     const renderTabContent = () => {
-        console.log(activeTab);
+        // console.log(activeTab);
         switch (activeTab) {
             case 0:
 
@@ -221,7 +221,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                             type="subtaskdatagrid"
                             handleSelectedTask={handleSelectedTask}
                         />
-                    {console.log("finished")}
+                    {/* {console.log("finished")} */}
                     </>
 
                 );
