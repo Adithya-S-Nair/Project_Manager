@@ -60,13 +60,22 @@ export const createNewSubtask = (req, res) => {
 }
 
 export const getSubtasksByProjectId = (req, res) => {
-    const query = `SELECT subtask.*
-                    FROM subtask
-                    JOIN task ON subtask.task_id = task.task_id
-                    JOIN project ON task.project_id = project.project_id
-                    WHERE project.project_id = ?
-                    AND subtask.is_deleted = 0;
-                    `
+    const query = `SELECT 
+                        subtask.*,
+                        employee.employee_name AS assigned_employee_name
+                    FROM 
+                        subtask
+                    JOIN 
+                        task ON subtask.task_id = task.task_id
+                    JOIN 
+                        project ON task.project_id = project.project_id
+                    LEFT JOIN 
+                        assigned ON subtask.subtask_id = assigned.subtask_id
+                    LEFT JOIN 
+                        employee ON assigned.employee_id = employee.employee_id
+                    WHERE 
+                        project.project_id = 1
+                        AND subtask.is_deleted = 0`
     const value = [req.params.projectId]
     db.query(query, value, (err, data) => {
         if (err) return res.status(500).json(err);

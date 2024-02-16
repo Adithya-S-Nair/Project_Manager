@@ -10,7 +10,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { makeRequest } from '../Axios';
 
-function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
+function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
     const [activeTab, setActiveTab] = useState(0);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -73,16 +73,50 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
     ])
 
     const [subtaskColumns, setSubtaskColumns] = useState([
-        { colId: '0_1', field: 'subtask_name', headerName: 'Subtask Name', hide: false },
-        { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
-        { colId: '2_1', field: 'subtask_description', headerName: 'Subtask Description', hide: false },
-        { colId: '3_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
-        { colId: '4_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
-        { colId: '5_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
-        { colId: '6_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
-        { colId: '7_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
-        { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
-        { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
+        {
+            colId: '0_1',
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 50
+        },
+        { colId: '1_1', field: 'subtask_name', headerName: 'Subtask Name', hide: false },
+        {
+            colId: '2_1',
+            field: 'Priority',
+            headerName: 'Priority',
+            hide: false,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['High', 'Medium', 'Low'],
+            },
+        },
+        { colId: '3_1', field: 'subtask_description', headerName: 'Subtask Description', hide: false },
+        { colId: '4_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
+        { colId: '5_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
+        { colId: '6_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
+        { colId: '7_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
+        { colId: '8_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
+        { colId: '9_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
+        {
+            colId: '10_1',
+            field: 'status',
+            headerName: 'Status',
+            hide: false,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['On Hold', 'Work In Progress', 'Pending', 'Completed'], // Specify the options for the select box
+            },
+        },
+        {
+            colId: '11_1',
+            field: 'assigned_employee_name',
+            headerName: 'Assigned Employee Name',
+            hide: false,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: [], // Specify the options for the select box
+            },
+        },
     ])
 
     useEffect(() => {
@@ -94,6 +128,20 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                 setTaskColumns(prevColumns => {
                     return prevColumns.map(column => {
                         if (column.field === 'employee_name') {
+                            return {
+                                ...column,
+                                cellEditorParams: {
+                                    values: res.data.map(employee => employee.employee_name),
+                                },
+                            };
+                        }
+                        return column;
+                    });
+                });
+
+                setSubtaskColumns(prevColumns => {
+                    return prevColumns.map(column => {
+                        if (column.field === 'assigned_employee_name') {
                             return {
                                 ...column,
                                 cellEditorParams: {
@@ -146,8 +194,10 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
     };
 
     const renderTabContent = () => {
+        console.log(activeTab);
         switch (activeTab) {
             case 0:
+
                 return (
                     <>
                         <DatagridComponent
@@ -155,7 +205,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                             setGridApi={setGridApi}
                             data={filteredtaskData}
                             columnDefs={taskColumns}
-                            type='task'
+                            type="task"
                             handleSelectedTask={handleSelectedTask}
                         />
                     </>
@@ -163,9 +213,20 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
             case 1:
                 return (
                     <>
-
+                        <DatagridComponent
+                            gridApi={gridApi}
+                            setGridApi={setGridApi}
+                            data={subtaskData}
+                            columnDefs={subtaskColumns}
+                            type="subtaskdatagrid"
+                            handleSelectedTask={handleSelectedTask}
+                        />
+                    {console.log("finished")}
                     </>
+
                 );
+
+            
             default:
                 return null;
         }

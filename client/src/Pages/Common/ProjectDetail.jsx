@@ -210,6 +210,7 @@ const ProjectDetail = () => {
                         pendingSubtaskCount={pendingSubtaskCount}
                         sparklineData={sparklineData}
                         taskData={taskData}
+                        subtaskData={subtaskData}
                         radarChartData={radarChartData}
                         navigate={navigate}
                         handleMenuOpen={handleMenuOpen}

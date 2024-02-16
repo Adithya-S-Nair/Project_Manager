@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { makeRequest } from '../Axios'
 
 const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type }) => {
+
+    const [dataType, setDataType] = useState(type);
+
+    useEffect(() => {
+        setDataType(type)
+    }, [type])
 
     const onGridReady = (params) => {
         setGridApi(params.api);
@@ -32,7 +38,7 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
 
 
     const handleCellValueChanged = (event) => {
-        if (type === 'task') {
+        if (dataType === 'task') {
             const { data } = event.node;
             console.log(data);
             makeRequest.patch(`/task/updatetask/${data.task_id}`, data)

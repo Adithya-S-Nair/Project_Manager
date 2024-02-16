@@ -135,7 +135,7 @@ function EnhancedTableToolbar(props) {
     const handleMenuAction = (action) => {
         if (action === 'appointEmployee') {
             selected && selected.map((userId) => {
-                makeRequest.get(`/employee/appointemployee/${userId}`)
+                makeRequest.post(`/employee/appointemployee/${userId}`)
             })
         }
         handleMenuClose();
