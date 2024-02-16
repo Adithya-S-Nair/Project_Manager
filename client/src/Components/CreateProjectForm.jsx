@@ -91,7 +91,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                         onChange={(e) => handleCreateProjectChange(e)}
                     />
                 </div>
-                <div className='flex justify-center space-x-5'>
+                <div className='flex justify-center space-x-5 mb-4'>
                     <Button variant="contained" size="medium" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>
                         Cancel
                     </Button>
@@ -176,7 +176,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                         </div>
                     </div>
 
-                    <div className='flex justify-center mb-4'>
+                    <div className='flex justify-center space-x-5 mb-4'>
                         <button className="btn btn-active btn-primary" onClick={() => setDrawerState({ anchor: 'right', open: false, })}>Cancel</button>
                         <button className="btn btn-active btn-primary" onClick={handleCreate}>Submit</button>
                     </div>

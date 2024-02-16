@@ -19,6 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { makeRequest } from '../Axios';
 import { useQuery } from 'react-query';
+import ToastComponent from './ToastComponent';
 
 const style = {
     position: 'absolute',
@@ -44,9 +45,11 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     let modalContent;
     const [employeeId, setEmployeeId] = React.useState('');
     const [projectId, setProjectId] = React.useState('');
-    const [formData, setFormData] = useState(projectData ? { ...projectData } : {});
+    const [formData, setFormData] = useState( { ...projectData } );
     const [taskFormData, setTaskFormData] = useState();
     const [subtaskFormData, setSubtaskFormData] = useState();
+    const [toastOpen, setToastOpen] = useState({ open: false, msg: "" })
+
 
     const status = {
         workinprogress: "Work in Progress",
@@ -60,10 +63,11 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         low: "Low"
     }
 
-    console.log(selectedSubtaskId);
-    console.log(selectedSubtaskNames);
-    console.log(projectData);
-    console.log("*(*(*(*(*" + selectedTask);
+    // console.log(selectedSubtaskId);
+    // console.log(selectedSubtaskNames);
+    // console.log(projectData);
+    // console.log("*(*(*(*(*" + selectedTask);
+    console.log(formData);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -88,7 +92,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
 
         makeRequest.patch(`/project/updateprojectdetail/${projectData.project_id}`, formData)
             .then((response) => {
-
+                setToastOpen({ open: true, msg: "Project Updated Successfully" })
                 console.log('Project updated successfully:', response)
                 handleClose();
 
@@ -111,7 +115,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         employeeId: employeeId,
         taskNames: selectedTask
     }
-    
+
     var assignedProjectdata = null
     if (projectData) {
         assignedProjectdata = {
@@ -124,6 +128,8 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     const handleEmployeeSubmit = () => {
         makeRequest.post(`/assign/assigntask`, data)
             .then(response => {
+                setToastOpen({ open: true, msg: "Task Asssigned Successfully" })
+
                 console.log('Data sent successfully:', response.data);
             })
             .catch(error => {
@@ -164,6 +170,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     const handleEditTask = () => {
         makeRequest.patch(`/task/updatetask/${selectedTask}`, taskFormData)
             .then((res) => {
+                setToastOpen({ open: true, msg: "Task Updated Successfully" })
                 console.log("task updated successfully");
             }).catch((error) => {
                 console.log("task updating error:", error);
@@ -174,6 +181,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         console.log(selectedTaskId);
         makeRequest.delete(`/task/deletemultipletask/${selectedTaskId}`)
             .then((res) => {
+                setToastOpen({ open: true, msg: "Task Deleted Successfully" })
                 console.log("deleted successfully");
             }).catch((error) => {
                 console.log("error in deleting");
@@ -183,6 +191,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     const handleEmployeeSubtaskSubmit = () => {
         makeRequest.post(`/assign/assignsubtask`, data)
             .then(response => {
+                setToastOpen({ open: true, msg: "Subtask Assigned Successfully" })
                 console.log('Data sent successfully:', response.data);
             })
             .catch(error => {
@@ -229,6 +238,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         console.log(selectedTask);
         makeRequest.patch(`/subtask/updatesubtaskbyid/${selectedTask}`, subtaskFormData)
             .then((res) => {
+                setToastOpen({ open: true, msg: "Subtask Updated Successfully" })
                 console.log("subtask updated successfully");
             }).catch((error) => {
                 console.log("subtask updating error:", error);
@@ -239,6 +249,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         console.log(selectedTaskId);
         makeRequest.delete(`/subtask/deletemultiplesubtask/${selectedSubtaskId}`)
             .then((res) => {
+                setToastOpen({ open: true, msg: "Subtask Deleted Successfully" })
                 console.log("deleted successfully");
             }).catch((error) => {
                 console.log("error in deleting");
@@ -249,6 +260,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     const handleEmployeeProjectSubmit = () => {
         makeRequest.post(`/assign/assignproject`, assignedProjectdata)
             .then(response => {
+                setToastOpen({ open: true, msg: "Project Assigned Successfully" })
                 console.log('Data sent successfully:', response.data);
             })
             .catch(error => {
@@ -347,7 +359,8 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                 name='project_description'
                                 label="Project Description"
                                 value={formData.project_description}
-                            // onChange={(e) => handleCreateProjectChange(e)}
+                                onChange={handleChange}
+                             // onChange={(e) => handleCreateProjectChange(e)}
                             />
                         </div>
                         <br />
@@ -967,16 +980,23 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     }
 
     return (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <Box sx={style}>
-                {modalContent}
-            </Box>
-        </Modal>
+        <>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    {modalContent}
+
+                </Box>
+            </Modal>
+            {
+                toastOpen.open &&
+                <ToastComponent toastOpen={toastOpen} />
+            }
+        </>
     )
 }
 

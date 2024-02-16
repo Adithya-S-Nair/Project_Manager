@@ -96,10 +96,19 @@ const ProjectCard = () => {
                     console.log(err);
                 })
         }
+    }, [projectData])
 
-    }, [])
 
-    const { isloading, err, data } = useQuery(["gaugeproject", projectData], () => {
+    // const { isloading: projectDataLoading, err: projectErrorLoading, data: projectInfo} = useQuery(["projectData",projectData], async () => {
+    //     console.log("hiiiiiii");
+    //     const response = await makeRequest.get('/project/getallprojects')
+    //     setProjectData(response.data)
+    //     return response.data;
+    // },{
+    //     staleTime: Infinity, // Keep data fresh indefinitely
+    // });
+
+    const { isloading, err, data } = useQuery(["gaugeproject"], () => {
         if (user.user_type === "Admin") {
             makeRequest.get('/project/getgaugeprojectcompletionstatus')
                 .then((res) => {
@@ -117,6 +126,9 @@ const ProjectCard = () => {
                     console.log(err);
                 });
         }
+    },
+    {
+        enabled: !!projectData, // Only fetch if projectData is available
     });
 
     //   const [gaugeData, setGaugeData] = useState([]);
@@ -127,10 +139,16 @@ const ProjectCard = () => {
         navigate(`/admin/projectdetail/${projectId}`)
     }
 
+    // if (projectDataLoading) {
+    //     return (
+    //         <>Loading</>
+    //     )
+    // }
+
     return (
         <div>
             <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 mx-auto text-center`}>
-                {projectData.map((project, index) => (
+                {projectData && projectData.map((project, index) => (
                     <div onClick={() => handleNavigate(project.project_id)} key={project.project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
                         <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]} />
                     </div>

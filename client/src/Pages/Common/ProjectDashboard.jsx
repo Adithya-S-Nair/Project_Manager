@@ -79,7 +79,6 @@ const ProjectDashboard = () => {
         })
         // setProjectCreated(true);
         setDrawerState({ anchor: 'right', open: false, });
-
       }).catch((error) => {
         console.log(error);
       })
@@ -87,7 +86,7 @@ const ProjectDashboard = () => {
     onSuccess: () => {
 
       setProjectid((prev) => prev + 1);
-      queryClient.invalidateQueries(["projectIdAndName"]);
+      queryClient.invalidateQueries(["projectIdAndName", "projectData"]);
 
     },
   })

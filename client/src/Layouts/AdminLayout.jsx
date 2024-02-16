@@ -113,7 +113,7 @@ const AdminLayout = () => {
     };
 
     const allusers = () => {
-        navigate('/alluser');
+        navigate('/admin/allusers');
     };
 
     const uploadNavigate = () => {
@@ -416,7 +416,7 @@ const AdminLayout = () => {
                                 </ListItem>
                                 <ListItem disablePadding>
                                     <ListItemButton
-                                        selected={location.pathname === '/allusers'}
+                                        selected={location.pathname === '/admin/allusers'}
                                         onClick={allusers}
                                         sx={{
                                             "&:hover": { backgroundColor: "#596876", color: "#161245" },

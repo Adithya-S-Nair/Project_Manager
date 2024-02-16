@@ -10,6 +10,6 @@ canvas.line {
 
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Change the icon color */
-  }
+/* input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  } */
