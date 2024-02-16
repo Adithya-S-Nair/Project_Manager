@@ -136,6 +136,12 @@ function EnhancedTableToolbar(props) {
         if (action === 'appointEmployee') {
             selected && selected.map((userId) => {
                 makeRequest.post(`/employee/appointemployee/${userId}`)
+                    .then(() => {
+                        props.setToastOpen({
+                            open: true,
+                            msg: 'Employee appointed successfully'
+                        })
+                    })
             })
         }
         handleMenuClose();
@@ -211,7 +217,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-function EnhancedTable({ headerData, rowData }) {
+function EnhancedTable({ headerData, rowData, setToastOpen }) {
     const { theme } = React.useContext(ThemeContext)
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
@@ -283,7 +289,7 @@ function EnhancedTable({ headerData, rowData }) {
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar selected={selected} numSelected={selected.length} />
+                <EnhancedTableToolbar selected={selected} numSelected={selected.length} setToastOpen={setToastOpen} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}

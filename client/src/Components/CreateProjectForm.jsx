@@ -120,7 +120,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(inputs.projectStartDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();

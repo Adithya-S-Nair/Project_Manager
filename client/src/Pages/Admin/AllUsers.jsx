@@ -3,9 +3,14 @@ import TableComponent from '../../Components/TableComponent'
 import { useQuery } from 'react-query';
 import { makeRequest } from '../../Axios';
 import EnhancedTable from '../../Components/EnhancedTable';
+import ToastComponent from '../../Components/ToastComponent'
 
 const AllUsers = () => {
     const [gridApi, setGridApi] = useState(null);
+    const [toastOpen, setToastOpen] = useState({
+        open: false,
+        msg: ''
+    });
     // const [userColumn, setUserColumn] = useState([
     //     { colId: '0_1', field: 'first_name', headerName: 'First Name', hide: false },
     //     { colId: '1_1', field: 'last_name', headerName: 'Last Name', hide: false },
@@ -43,7 +48,9 @@ const AllUsers = () => {
             <EnhancedTable
                 headerData={userColumn}
                 rowData={usersData}
+                setToastOpen={setToastOpen}
             />
+            {toastOpen.open && <ToastComponent toastOpen={toastOpen} />}
         </div>
     )
 }
