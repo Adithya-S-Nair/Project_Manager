@@ -13,6 +13,9 @@ const config = {
       colors: {
         primary: 'white', // Change this to your desired base color
       },
+      fontFamily: {
+        'sans': ['Roboto', 'Open Sans', 'ui-sans-serif', 'system-ui'],
+      },
     },
   },
   plugins: [require("daisyui")],

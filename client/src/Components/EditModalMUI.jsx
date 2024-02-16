@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
@@ -38,13 +38,15 @@ const style = {
     overflowY: 'scroll'
 };
 
-const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames }) => {
+// selectedTasks={taskNames}
+const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks }) => {
 
     let modalContent;
     const [employeeId, setEmployeeId] = React.useState('');
     const [projectId, setProjectId] = React.useState('');
-    const [formData, setFormData] = useState({ ...projectData });
+    const [formData, setFormData] = useState(projectData ? { ...projectData } : {});
     const [taskFormData, setTaskFormData] = useState();
+    const [subtaskFormData, setSubtaskFormData] = useState();
 
     const status = {
         workinprogress: "Work in Progress",
@@ -58,8 +60,11 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         low: "Low"
     }
 
-    console.log(selectedTaskNames);
-    console.log(selectedTaskId);
+    console.log(selectedSubtaskId);
+    console.log(selectedSubtaskNames);
+    console.log(projectData);
+    console.log("*(*(*(*(*" + selectedTask);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -106,6 +111,15 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         employeeId: employeeId,
         taskNames: selectedTask
     }
+    
+    var assignedProjectdata = null
+    if (projectData) {
+        assignedProjectdata = {
+            employeeId: employeeId,
+            projectId: projectData.project_id
+        }
+    }
+
 
     const handleEmployeeSubmit = () => {
         makeRequest.post(`/assign/assigntask`, data)
@@ -117,7 +131,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
             });
     }
 
-    // console.log(selectedTask);
+
     const { data: editTaskData, error: editTaskDataError, isLoading: editTaskDataLoading } = useQuery(
         ['taskData', selectedTask],
         async () => {
@@ -150,7 +164,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     const handleEditTask = () => {
         makeRequest.patch(`/task/updatetask/${selectedTask}`, taskFormData)
             .then((res) => {
-                console.log("project updated successfully");
+                console.log("task updated successfully");
             }).catch((error) => {
                 console.log("task updating error:", error);
             })
@@ -166,14 +180,80 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
             })
     }
 
-    const handleEmployeeSubtaskSubmit = () =>{
-        makeRequest.post(`/assign/assigntask`, data)
-        .then(response => {
-            console.log('Data sent successfully:', response.data);
-        })
-        .catch(error => {
-            console.error('Error sending data:', error);
-        });
+    const handleEmployeeSubtaskSubmit = () => {
+        makeRequest.post(`/assign/assignsubtask`, data)
+            .then(response => {
+                console.log('Data sent successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error sending data:', error);
+            });
+    }
+
+    const { data: editSubtaskData, error: editSubtaskDataError, isLoading: editSubtaskDataLoading } = useQuery(
+        ['subtaskdata', selectedTask],
+        async () => {
+            console.log(selectedTask);
+            const response = await makeRequest.get(`/subtask/getsubtask/${selectedTask}`);
+            console.log(response.data);
+            setSubtaskFormData(response.data);
+            return response.data;
+        }
+    );
+
+    const handleSubtaskChange = (e) => {
+        const { name, value } = e.target;
+        setSubtaskFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+
+    const { data: editSubtaskProjectName, error: editSubtaskProjectNameError, isLoading: editSubtaskProjectNameLoading } = useQuery(
+        ['subtaskprojectName', selectedTask],
+        async () => {
+            const response = await makeRequest.get(`/project/getprojectidandname`);
+            return response.data;
+        }
+    );
+
+    const { data: editSubtaskTaskName, error: editSubtaskTaskNameError, isLoading: editSubtaskTaskNameLoading } = useQuery(
+        ['subtasktaskName', selectedTask],
+        async () => {
+            const response = await makeRequest.get(`/task/gettaskidandname`);
+            return response.data;
+        }
+    );
+
+    const handleEditSubtask = () => {
+        console.log(selectedTask);
+        makeRequest.patch(`/subtask/updatesubtaskbyid/${selectedTask}`, subtaskFormData)
+            .then((res) => {
+                console.log("subtask updated successfully");
+            }).catch((error) => {
+                console.log("subtask updating error:", error);
+            })
+    }
+
+    const handleSubtaskDelete = () => {
+        console.log(selectedTaskId);
+        makeRequest.delete(`/subtask/deletemultiplesubtask/${selectedSubtaskId}`)
+            .then((res) => {
+                console.log("deleted successfully");
+            }).catch((error) => {
+                console.log("error in deleting");
+            })
+    }
+
+    console.log(assignedProjectdata);
+    const handleEmployeeProjectSubmit = () => {
+        makeRequest.post(`/assign/assignproject`, assignedProjectdata)
+            .then(response => {
+                console.log('Data sent successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error sending data:', error);
+            });
     }
 
     console.log(editType);
@@ -282,6 +362,55 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     </Typography>
                 </>
             )
+            break;
+        case "assignedProject":
+            modalContent = (
+                <>
+                    <div className="flex items-center justify-between mb-2">
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Assign Project To Employee
+                        </Typography>
+                        <Tooltip title="Close">
+                            <IconButton onClick={() => { setOpen(!open) }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <hr />
+                    <div className='grid grid-cols-1 gap-y-6 mt-6'>
+                        <TextField
+                            disabled
+                            id="outlined-password-input"
+                            label="Project Name"
+                            name="project_name"
+                            type="text"
+                            value={projectData.project_name}
+                            autoComplete="project-name"
+                        />
+                    </div>
+                    <div className='mt-5'>
+                        <FormControl fullWidth >
+                            <InputLabel id="demo-simple-select-label">Employee Names</InputLabel>
+                            <Select
+
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={employeeId}
+                                label="Employee Names"
+                                onChange={handleChangeEmployeeNames}
+                            >
+                                {employeeName && employeeName.map((employee) => (
+                                    <MenuItem key={employee.employee_id} value={employee.employee_id}>{employee.employee_name}</MenuItem>
+                                ))}
+
+                            </Select>
+                        </FormControl>
+                    </div>
+                    <div className='flex justify-center mt-4'>
+                        <Button variant="contained" onClick={handleEmployeeProjectSubmit}>Save</Button>
+                    </div>
+                </>
+            );
             break;
         case "assignedTask":
             modalContent = (
@@ -585,6 +714,246 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     </div>
                     <div className='flex justify-center mt-4'>
                         <Button variant="contained" onClick={handleEmployeeSubtaskSubmit}>Save</Button>
+                    </div>
+                </>
+            );
+            break;
+        case "editSubtask":
+            modalContent = (
+                <>
+                    {editSubtaskData &&
+                        <>
+                            <div className="flex items-center justify-between mb-2">
+                                <Typography id="modal-modal-title" variant="h6" component="h2">
+                                    Edit Subtask Details
+                                </Typography>
+                                <Tooltip title="Close">
+                                    <IconButton onClick={() => { setOpen(!open) }}>
+                                        <CloseIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                            <hr />
+                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                <div className='grid grid-cols-1 gap-y-6'>
+                                    <TextField
+                                        id="outlined-password-input"
+                                        label="subtask Name"
+                                        name="subtask_name"
+                                        type="text"
+                                        value={subtaskFormData.subtask_name}
+                                        onChange={handleSubtaskChange}
+
+                                    // onChange={(e) => handleCreateProjectChange(e)}
+                                    />
+                                    <div className='mt-7'>
+                                        <FormControl fullWidth >
+                                            <InputLabel id="demo-simple-select-label">Project Names</InputLabel>
+                                            <Select
+
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={subtaskFormData.project_id}
+                                                label="Project Names"
+                                                name='project_id'
+                                                onChange={handleSubtaskChange}
+                                            >
+                                                {editSubtaskProjectName && editSubtaskProjectName.map((project) => (
+                                                    <MenuItem
+                                                        key={project.project_id}
+                                                        value={project.project_id}
+                                                    >
+                                                        {project.project_name}
+                                                    </MenuItem>
+                                                ))}
+
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className='mt-7'>
+                                        <FormControl fullWidth >
+                                            <InputLabel id="demo-simple-select-label">Task Names</InputLabel>
+                                            <Select
+
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={subtaskFormData.task_id}
+                                                label="Task Names"
+                                                name='task_id'
+                                                onChange={handleSubtaskChange}
+                                            >
+                                                {editSubtaskTaskName && editSubtaskTaskName.map((task) => (
+                                                    <MenuItem
+                                                        key={task.task_id}
+                                                        value={task.task_id}
+                                                    >
+                                                        {task.task_name}
+                                                    </MenuItem>
+                                                ))}
+
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Planned Start Date"
+                                                name="planned_start_date"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(subtaskFormData.planned_start_date)}
+                                                onChange={(date) => setSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    planned_start_date: date.format('YYYY-MM-DD')
+                                                }))}
+                                            />
+                                        </LocalizationProvider>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Planned End Date"
+                                                name="planned_end_date"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(subtaskFormData.planned_end_date)}
+                                                onChange={(date) => setSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    planned_end_date: date.format('YYYY-MM-DD')
+                                                }))}
+
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Actual Start Time"
+                                                name="actual_start_time"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(subtaskFormData.actual_start_time)}
+                                                onChange={(date) => setSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    actual_start_time: date.format('YYYY-MM-DD')
+                                                }))}
+
+                                            />
+                                        </LocalizationProvider>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Actual End Time"
+                                                name="actual_end_time"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(subtaskFormData.actual_end_time)}
+                                                onChange={(date) => setSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    actual_end_time: date.format('YYYY-MM-DD')
+                                                }))}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+
+                                                label="priority"
+                                                name='priority'
+                                                value={subtaskFormData.Priority}
+                                                onChange={(e) => { handleSubtaskChange(e) }}
+                                            >
+                                                <MenuItem value={priority.high}>High</MenuItem>
+                                                <MenuItem value={priority.medium}>Medium</MenuItem>
+                                                <MenuItem value={priority.low}>Low</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={subtaskFormData.status}
+                                                label="status"
+                                                name='status'
+                                                onChange={(e) => handleSubtaskChange(e)}
+                                            >
+                                                <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
+                                                <MenuItem value={status.pending}>Pending</MenuItem>
+                                                <MenuItem value={status.onhold}>On Hold</MenuItem>
+                                                <MenuItem value={status.completed}>Completed</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className="flex gap-6 justify-between">
+                                        <TextField
+                                            fullWidth
+                                            id="outlined-password-input"
+                                            label="Planned Budget"
+                                            name="planned_budget"
+                                            type="text"
+                                            value={subtaskFormData.planned_budget}
+                                            autoComplete="planned-budget"
+                                            onChange={handleSubtaskChange}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            id="outlined-password-input"
+                                            label="Actual Budget"
+                                            name="actual_budget"
+                                            type="text"
+                                            value={subtaskFormData.actual_budget}
+                                            autoComplete="actual-budget"
+                                            onChange={handleSubtaskChange}
+                                        />
+                                    </div>
+                                    <TextField
+                                        multiline
+                                        fullWidth
+                                        rows={3}
+                                        name='subtask_description'
+                                        label="Project Description"
+                                        value={subtaskFormData.subtask_description}
+                                        onChange={handleSubtaskChange}
+                                    />
+                                </div>
+                                <br />
+                                <div className='flex justify-center space-x-5'>
+                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" size="medium" onClick={handleEditSubtask}>
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </Typography>
+
+                        </>
+                    }
+                </>
+            );
+            break;
+        case "deleteSubtask":
+            modalContent = (
+                <>
+                    <div className="flex items-center justify-between mb-2">
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Delete Subtasks From Project
+                        </Typography>
+                        <Tooltip title="Close">
+                            <IconButton onClick={() => { setOpen(!open) }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <hr />
+                    <div className='grid grid-cols-2 justify-content-between mt-4 gap-3 '>
+                        {selectedSubtaskNames && selectedSubtaskNames.map((subtask) => (
+                            <Tooltip key={subtask.subtask_id} title={subtask.subtask_name}>
+                                <Chip label={subtask.subtask_name} variant="outlined" onDelete={handleDeleteTask} />
+                            </Tooltip>
+                        ))}
+                    </div>
+
+                    <div className='flex justify-center mt-4'>
+                        <Button variant="contained" onClick={handleSubtaskDelete}>Delete Subtasks</Button>
                     </div>
                 </>
             );

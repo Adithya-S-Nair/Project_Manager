@@ -201,6 +201,7 @@ export const getTaskIdAndName = (req, res) => {
 // }
 
 export const getTaskNameById = (req, res) => {
+    console.log(req.body);
     const taskIds = req.body;
     console.log(taskIds);
     const promises = taskIds.map((taskId) => {

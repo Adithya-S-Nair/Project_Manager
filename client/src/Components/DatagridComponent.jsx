@@ -25,9 +25,7 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
                 handleSelectedTask(selectedData, selectedNodes);
             }
         } else {
-            // Reset selectedNodes to an empty array
-            const selectedNodes = event.columnApi.api.deselectAll();
-            // const selectedData = selectedNodes;
+            // const selectedNodes = event.columnApi.api.deselectAll();
             handleSelectedTask([], []);
         }
     }

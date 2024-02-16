@@ -23,10 +23,6 @@ const EditModalDaisyUI = ({ open, setOpen, handleClose, projectData, editType })
         modalRef.current.addEventListener('close', handleClose);
         document.addEventListener('keydown', handleEscape);
 
-        return () => {
-            modalRef.current.removeEventListener('close', handleClose);
-            document.removeEventListener('keydown', handleEscape);
-        };
     }, [handleClose]);
 
     switch (editType) {

@@ -11,7 +11,7 @@ const ProjectStatusChart = ({ data }) => {
             // Extract the relevant keys from data
             const { completed_count, workinprogress_count, hold_count, pending_count, total_count } = data;
 
-            const percentages = {
+            const percentages = {  
                 completed_count: (completed_count / total_count) * 100,
                 workinprogress_count: (workinprogress_count / total_count) * 100,
                 hold_count: (hold_count / total_count) * 100,

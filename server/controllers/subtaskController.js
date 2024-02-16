@@ -179,3 +179,92 @@ export const getSubtaskNameById = (req, res) => {
             res.status(500).json(error); // Send an error response if any query fails
         });
 }
+
+export const getSubtaskById = (req, res) => {
+    const { subtaskId } = req.params;
+    const query = `SELECT * FROM subtask WHERE subtask_id = ?`;
+
+    db.query(query, [subtaskId], (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data[0])
+    })
+}
+
+export const updateSubtaskById = (req, res) => {
+
+    const subtaskId = req.params.subtaskId;
+    console.log(subtaskId);
+    console.log(req.body);
+    const query = `
+            UPDATE subtask
+            SET
+            subtask_name = ?,
+            project_id = ?,
+            task_id = ?,
+            Priority = ?,
+            subtask_description = ?,
+            planned_start_date = ?,
+            planned_end_date = ?,
+            planned_budget = ?,
+            actual_start_time = ?,
+            actual_end_time = ?,
+            actual_budget = ?,
+            status = ?
+            WHERE
+            subtask_id = ?
+            AND is_deleted = 0`
+
+    const values = [
+        req.body.subtask_name,
+        req.body.project_id,
+        req.body.task_id,
+        req.body.Priority,
+        req.body.subtask_description,
+        req.body.planned_start_date,
+        req.body.planned_end_date,
+        req.body.planned_budget,
+        req.body.actual_start_time,
+        req.body.actual_end_time,
+        req.body.actual_budget,
+        req.body.status,
+        subtaskId
+    ];
+
+    db.query(query, values, (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.affectedRows === 0) return res.status(400).json({ msg: "No matching record for updation" })
+        return res.status(200).json({ message: "Subtask updated successfully" });
+    })
+}
+
+export const deleteMultipleSubtask = (req,res) =>{
+    const subtaskIds = req.params.subtaskIds.split(',');
+    console.log("subtaskId is:"+subtaskIds);
+    if (!Array.isArray(subtaskIds) || subtaskIds.length === 0) {
+        return res.status(400).json({ error: 'Invalid task IDs provided' });
+    }
+
+    const query = `UPDATE subtask 
+        SET is_deleted = 1
+        WHERE subtask_id IN (?)`;
+
+    db.query(query, [subtaskIds], (error, results) => {
+        if (error) {
+            console.error('Error deleting subtasks:', error);
+            return res.status(500).json({ error: 'An error occurred while deleting subtasks' });
+        }
+
+        res.status(200).json({ message: 'Subtasks deleted successfully' });
+    });
+}

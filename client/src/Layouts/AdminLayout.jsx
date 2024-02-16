@@ -33,6 +33,10 @@ import Button from '@mui/material/Button';
 import MenuComponent from '../Components/MenuComponent';
 import { makeRequest } from '../Axios';
 import { AuthContext } from '../Context/AuthContext';
+import { useContext } from 'react';
+import { ThemeContext, ThemeContextProvider } from '../Context/ThemeContext';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import GroupIcon from '@mui/icons-material/Group';
 
 const drawerWidth = 240;
 
@@ -91,7 +95,7 @@ const AdminLayout = () => {
     const [isForwardIcon, setIsForwardIcon] = React.useState(false);
     const [firstThemeClick, setFirstThemeClick] = React.useState(true);
     const [openSubMenu, setOpenSubMenu] = React.useState(false);
-
+    const { theme: colorTheme } = useContext(ThemeContext)
     // const { setUser } = React.useContext(AuthContext)
     const handleClicked = (event) => {
         setAnchorEl(event.currentTarget);
@@ -104,12 +108,12 @@ const AdminLayout = () => {
         console.log(openSubMenu);
     };
 
-    const newCustomerNavigate = () => {
-        navigate('/admin/projectdetail/1');
+    const projectDashboard = () => {
+        navigate('/admin/dashboard');
     };
 
-    const newVaNavigate = () => {
-        navigate('/newva');
+    const allusers = () => {
+        navigate('/alluser');
     };
 
     const uploadNavigate = () => {
@@ -147,109 +151,112 @@ const AdminLayout = () => {
         <div>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <AppBar position="fixed" open={open} sx={{ backgroundColor: 'white' }}>
-                    <div className='flex justify-between items-center'>
-                        <Toolbar>
-                            <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                onClick={handleDrawerOpen}
-                                edge="start"
-                                sx={{ mr: 2, ...(open && { display: 'none' }) }}
-                            >
-                                <MenuIcon className='text-black' />
-                            </IconButton>
-                            <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
-                                Admin
-                                {/* <img className='img-fluid' style={{ width: '7em' }} src={TechnodromeLogo} alt="" /> */}
-                            </Typography>
-                        </Toolbar>
-                        <Button
-                            id="demo-positioned-button"
-                            aria-controls={menuOpen ? 'demo-positioned-menu' : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={menuOpen ? 'true' : undefined}
-                            onClick={handleClicked}
-                            className='text-white'
+                {colorTheme === "theme1"
+                    ?
+                    <>
+                        < AppBar position="fixed" open={open} sx={{ backgroundColor: 'white' }}>
+                            <div className='flex justify-between items-center'>
+                                <Toolbar>
+                                    <IconButton
+                                        color="inherit"
+                                        aria-label="open drawer"
+                                        onClick={handleDrawerOpen}
+                                        edge="start"
+                                        sx={{ mr: 2, ...(open && { display: 'none' }) }}
+                                    >
+                                        <MenuIcon className='text-black' />
+                                    </IconButton>
+                                    <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
+                                        Admin
+                                        {/* <img className='img-fluid' style={{ width: '7em' }} src={TechnodromeLogo} alt="" /> */}
+                                    </Typography>
+                                </Toolbar>
+                                <Button
+                                    id="demo-positioned-button"
+                                    aria-controls={menuOpen ? 'demo-positioned-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={menuOpen ? 'true' : undefined}
+                                    onClick={handleClicked}
+                                    className='text-white'
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-black">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+
+
+                                </Button>
+                                <MenuComponent
+                                    anchorEl={anchorEl}
+                                    open={menuOpen}
+                                    handleClose={handleClose}
+                                    isForwardIcon={isForwardIcon}
+                                    setIsForwardIcon={setIsForwardIcon}
+                                    firstThemeClick={firstThemeClick}
+                                    setFirstThemeClick={setFirstThemeClick}
+                                    openSubMenu={openSubMenu}
+                                    setOpenSubMenu={setOpenSubMenu}
+                                />
+                            </div>
+
+                        </AppBar>
+                        <Drawer
+                            sx={{
+                                width: drawerWidth,
+                                flexShrink: 0,
+
+                                '& .MuiDrawer-paper': {
+                                    width: drawerWidth,
+                                    boxSizing: 'border-box',
+                                    background: 'linear-gradient(110deg, rgba(62,83,122,1) 10%, rgba(38,45,63,1) 58%)'
+
+                                },
+                            }}
+                            variant="persistent"
+                            anchor="left"
+                            open={open}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-black">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            </svg>
-
-
-                        </Button>
-                        <MenuComponent
-                            anchorEl={anchorEl}
-                            open={menuOpen}
-                            handleClose={handleClose}
-                            isForwardIcon={isForwardIcon}
-                            setIsForwardIcon={setIsForwardIcon}
-                            firstThemeClick={firstThemeClick}
-                            setFirstThemeClick={setFirstThemeClick}
-                            openSubMenu={openSubMenu}
-                            setOpenSubMenu={setOpenSubMenu}
-                        />
-                    </div>
-
-
-                </AppBar>
-                <Drawer
-                    sx={{
-                        width: drawerWidth,
-                        flexShrink: 0,
-
-                        '& .MuiDrawer-paper': {
-                            width: drawerWidth,
-                            boxSizing: 'border-box',
-                            background: 'linear-gradient(110deg, rgba(62,83,122,1) 0%, rgba(38,45,63,1) 58%)'
-                        },
-                    }}
-                    variant="persistent"
-                    anchor="left"
-                    open={open}
-                >
-                    <div className='flex justify-between items-center p-3'>
-                        <div className="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
-                            </svg>
-                            <p className='font-bold text-white'>Project Manager</p>
-                        </div>
-                        <IconButton className='text-white' onClick={handleDrawerClose}>
-                            {theme.direction === 'ltr' ? <ChevronLeftIcon className='text-white' /> : <ChevronRightIcon className='text-white' />}
-                        </IconButton>
-                    </div>
-                    <Divider />
-                    <List>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                selected={location.pathname === '/projectdetail/1'}
-                                onClick={newCustomerNavigate}
-                                sx={{
-                                    "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                    "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
-                                }}>
-                                <ListItemIcon>
-                                    <PersonAddAltIcon className='text-white' />
-                                </ListItemIcon>
-                                <ListItemText className='text-white' primary='New Customer' />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton
-                                selected={location.pathname === '/newva'}
-                                onClick={newVaNavigate}
-                                sx={{
-                                    "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                    "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
-                                }}>
-                                <ListItemIcon>
-                                    <AccountBalanceIcon className='text-white' />
-                                </ListItemIcon>
-                                <ListItemText className='text-white' primary='New VA' />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
+                            <div className='flex justify-between items-center p-3'>
+                                <div className="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+                                    </svg>
+                                    <p className='font-bold text-white'>Project Manager</p>
+                                </div>
+                                <IconButton className='text-white' onClick={handleDrawerClose}>
+                                    {theme.direction === 'ltr' ? <ChevronLeftIcon className='text-white' /> : <ChevronRightIcon className='text-white' />}
+                                </IconButton>
+                            </div>
+                            <Divider />
+                            <List>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        selected={location.pathname === '/admin/dashboard'}
+                                        onClick={projectDashboard}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                        }}>
+                                        <ListItemIcon>
+                                            <DashboardIcon className='text-white' />
+                                        </ListItemIcon>
+                                        <ListItemText className='text-white' primary='Project Dashboard' />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        selected={location.pathname === '/allusers'}
+                                        onClick={allusers}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                        }}>
+                                        <ListItemIcon>
+                                            <GroupIcon className='text-white' />
+                                        </ListItemIcon>
+                                        <ListItemText className='text-white' primary='All Users' />
+                                    </ListItemButton>
+                                </ListItem>
+                                {/* <ListItem disablePadding>
                             <ListItemButton
                                 selected={location.pathname === '/upload'}
                                 onClick={uploadNavigate}
@@ -262,9 +269,9 @@ const AdminLayout = () => {
                                 </ListItemIcon>
                                 <ListItemText className='text-white' primary='Upload' />
                             </ListItemButton>
-                        </ListItem>
-                    </List>
-                    <List
+                        </ListItem> */}
+                            </List>
+                            {/* <List
                         sx={{ width: '100%', maxWidth: 360, bgcolor: 'transparent' }}
                         component="nav"
                         aria-labelledby="nested-list-subheader"
@@ -304,16 +311,192 @@ const AdminLayout = () => {
                                     </ListItemIcon>
                                     <ListItemText className='text-white' primary="Collection" />
                                 </ListItemButton>
+                            </List> 
+                        </Collapse> 
+                    </List> */}
+                        </Drawer>
+                        <Main open={open} style={{ minHeight: '100vh' }}>
+                            <DrawerHeader />
+                            <Outlet />
+                        </Main>
+                    </>
+                    :
+                    <>
+                        < AppBar position="fixed" open={open} sx={{ backgroundColor: 'white' }}>
+                            <div className='flex justify-between items-center'>
+                                <Toolbar>
+                                    <IconButton
+                                        color="inherit"
+                                        aria-label="open drawer"
+                                        onClick={handleDrawerOpen}
+                                        edge="start"
+                                        sx={{ mr: 2, ...(open && { display: 'none' }) }}
+                                    >
+                                        <MenuIcon className='text-black' />
+                                    </IconButton>
+                                    <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
+                                        Admin
+                                        {/* <img className='img-fluid' style={{ width: '7em' }} src={TechnodromeLogo} alt="" /> */}
+                                    </Typography>
+                                </Toolbar>
+                                <Button
+                                    id="demo-positioned-button"
+                                    aria-controls={menuOpen ? 'demo-positioned-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={menuOpen ? 'true' : undefined}
+                                    onClick={handleClicked}
+                                    className='text-white'
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-black">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+
+
+                                </Button>
+                                <MenuComponent
+                                    anchorEl={anchorEl}
+                                    open={menuOpen}
+                                    handleClose={handleClose}
+                                    isForwardIcon={isForwardIcon}
+                                    setIsForwardIcon={setIsForwardIcon}
+                                    firstThemeClick={firstThemeClick}
+                                    setFirstThemeClick={setFirstThemeClick}
+                                    openSubMenu={openSubMenu}
+                                    setOpenSubMenu={setOpenSubMenu}
+                                />
+                            </div>
+
+                        </AppBar>
+                        <Drawer
+                            sx={{
+                                width: drawerWidth,
+                                flexShrink: 0,
+
+                                '& .MuiDrawer-paper': {
+                                    width: drawerWidth,
+                                    boxSizing: 'border-box',
+                                    // background: 'linear-gradient(110deg, rgba(67,206,162,1) 0%, rgba(24,90,157,1) 58%)'
+                                    background: '#5cd4d0'
+                                    // background: '#185a9d'
+                                    // background: '#f1f214'
+                                    // background: '#9bff00'
+
+                                },
+                            }}
+                            variant="persistent"
+                            anchor="left"
+                            open={open}
+                        >
+                            <div className='flex justify-between items-center p-3'>
+                                <div className="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+                                    </svg>
+                                    <p className='font-bold text-white'>Project Manager</p>
+                                </div>
+                                <IconButton className='text-white' onClick={handleDrawerClose}>
+                                    {theme.direction === 'ltr' ? <ChevronLeftIcon className='text-white' /> : <ChevronRightIcon className='text-white' />}
+                                </IconButton>
+                            </div>
+                            <Divider />
+                            <List>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        selected={location.pathname === '/admin/dashboard'}
+                                        onClick={projectDashboard}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                        }}>
+                                        <ListItemIcon>
+                                            <DashboardIcon className='text-white' />
+                                        </ListItemIcon>
+                                        <ListItemText className='text-white' primary='Project Dashboard' />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        selected={location.pathname === '/allusers'}
+                                        onClick={allusers}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                        }}>
+                                        <ListItemIcon>
+                                            <GroupIcon className='text-white' />
+                                        </ListItemIcon>
+                                        <ListItemText className='text-white' primary='All Users' />
+                                    </ListItemButton>
+                                </ListItem>
+                                {/* <ListItem disablePadding>
+                            <ListItemButton
+                                selected={location.pathname === '/upload'}
+                                onClick={uploadNavigate}
+                                sx={{
+                                    "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                    "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                }}>
+                                <ListItemIcon>
+                                    <UploadIcon className='text-white' />
+                                </ListItemIcon>
+                                <ListItemText className='text-white' primary='Upload' />
+                            </ListItemButton>
+                        </ListItem> */}
                             </List>
-                        </Collapse>
-                    </List>
-                </Drawer>
-                <Main open={open} style={{ minHeight: '100vh' }}>
-                    <DrawerHeader />
-                    <Outlet />
-                </Main>
+                            {/* <List
+                        sx={{ width: '100%', maxWidth: 360, bgcolor: 'transparent' }}
+                        component="nav"
+                        aria-labelledby="nested-list-subheader"
+                    >
+
+                        <ListItemButton onClick={handleClick} sx={{ "&:hover": { backgroundColor: "#596876", color: "#161245" } }}>
+                            <ListItemIcon>
+                                <InboxIcon className='text-white' />
+                            </ListItemIcon>
+                            <ListItemText className='text-white' primary="Reports" />
+                            {listOpen ? <ExpandLess className='text-white' /> : <ExpandMore className='text-white' />}
+                        </ListItemButton>
+                        <Collapse in={listOpen} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItemButton
+                                    onClick={() => navigate('/listva')}
+                                    selected={location.pathname === '/listva'}
+                                    sx={{
+                                        "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                        "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" },
+                                        pl: 4
+                                    }}>
+                                    <ListItemIcon>
+                                        <RecentActorsIcon className='text-white' />
+                                    </ListItemIcon>
+                                    <ListItemText className='text-white' primary="List VA" />
+                                </ListItemButton>
+                                <ListItemButton sx={{ "&:hover": { backgroundColor: "#596876", color: "#161245" }, pl: 4 }}>
+                                    <ListItemIcon>
+                                        <ReceiptIcon className='text-white' />
+                                    </ListItemIcon>
+                                    <ListItemText className='text-white' primary="List Invoice" />
+                                </ListItemButton>
+                                <ListItemButton sx={{ "&:hover": { backgroundColor: "#596876", color: "#161245" }, pl: 4 }}>
+                                    <ListItemIcon>
+                                        <AppsIcon className='text-white' />
+                                    </ListItemIcon>
+                                    <ListItemText className='text-white' primary="Collection" />
+                                </ListItemButton>
+                            </List> 
+                        </Collapse> 
+                    </List> */}
+                        </Drawer>
+                        <Main open={open} style={{ minHeight: '100vh' }} className='font-sans'>
+                            <DrawerHeader />
+
+                            <Outlet />
+
+                        </Main>
+                    </>
+                }
             </Box>
-        </div>
+        </div >
     );
 };
 

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -31,7 +32,7 @@ const item = {
 
 const GuageChartMemoized = React.memo(GuageChart);
 
-const MUICard = React.memo(({ project,gaugeData }) => {
+const MUICard = React.memo(({ project, gaugeData }) => {
     return (
         <Card sx={{ width: '18em' }}>
             <div>
@@ -49,7 +50,7 @@ const MUICard = React.memo(({ project,gaugeData }) => {
     );
 });
 
-const DaisyUICard = React.memo(({ project,gaugeData }) => {
+const DaisyUICard = React.memo(({ project, gaugeData }) => {
     return (
         <motion.div
             className="card w-[18em] shadow-xl"
@@ -61,7 +62,7 @@ const DaisyUICard = React.memo(({ project,gaugeData }) => {
                 <GuageChartMemoized gaugeData={gaugeData} />
             </motion.div>
             <motion.div className="card-body" variants={item}>
-                <h2 className="font-bold text-center">{project.project_name}</h2>
+                <h2 className="font-bold text-center font-smooch-sans">{project.project_name}</h2>
                 {/* <p>{project.project_description}</p> */}
             </motion.div>
         </motion.div>
@@ -72,7 +73,8 @@ const ProjectCard = () => {
     const { user } = useContext(AuthContext)
     const { theme } = useContext(ThemeContext)
     const [projectData, setProjectData] = useState([]);
-    const [gaugeData, setGaugeData] = useState([]); 
+    const [gaugeData, setGaugeData] = useState([]);
+    const navigate = useNavigate();
     const queryClient = useQueryClient()
 
     useEffect(() => {
@@ -106,7 +108,7 @@ const ProjectCard = () => {
                 .catch((err) => {
                     console.log(err);
                 });
-        } else if(user.user_type === "Users"){
+        } else if (user.user_type === "Users") {
             makeRequest.get('/project/getgaugeprojectcompletionstatus')
                 .then((res) => {
                     setGaugeData(res.data);
@@ -116,17 +118,21 @@ const ProjectCard = () => {
                 });
         }
     });
-    
-//   const [gaugeData, setGaugeData] = useState([]);
+
+    //   const [gaugeData, setGaugeData] = useState([]);
 
     const CardComponent = theme === 'theme1' ? MUICard : DaisyUICard;
+
+    const handleNavigate = (projectId) => {
+        navigate(`/admin/projectdetail/${projectId}`)
+    }
 
     return (
         <div>
             <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 mx-auto text-center`}>
                 {projectData.map((project, index) => (
-                    <div key={project.Project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
-                        <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]}/>
+                    <div onClick={() => handleNavigate(project.project_id)} key={project.project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
+                        <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]} />
                     </div>
                 ))}
             </div>

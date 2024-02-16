@@ -194,7 +194,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                     <div className="card card-compact w-full shadow-xl" style={{ height: '28em' }}>
                         <div className="card-body">
                             <div className="flex items-center justify-between">
-                                <h2 className='text-xl font-bold'>Project Details</h2>
+                                <h2 className='text-xl font-bold '>Project Details</h2>
                                 <div className="tooltip bg-white" data-tip="Edit Project Details">
                                     <IconButton aria-label="Edit" onClick={handleEditModalOpen}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 cursor-pointer">
