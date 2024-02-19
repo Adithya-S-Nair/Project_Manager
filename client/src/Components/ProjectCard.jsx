@@ -34,7 +34,7 @@ const GuageChartMemoized = React.memo(GuageChart);
 
 const MUICard = React.memo(({ project, gaugeData }) => {
     return (
-        <Card sx={{ width: '18em' }}>
+        <Card className='cursor-pointer' sx={{ width: '18em' }}>
             <div>
                 <GuageChartMemoized gaugeData={gaugeData} />
             </div>
@@ -53,7 +53,7 @@ const MUICard = React.memo(({ project, gaugeData }) => {
 const DaisyUICard = React.memo(({ project, gaugeData }) => {
     return (
         <motion.div
-            className="card w-[18em] shadow-xl"
+            className="card w-[18em] shadow-xl cursor-pointer"
             variants={container}
             initial="hidden"
             animate="visible"
@@ -127,9 +127,9 @@ const ProjectCard = () => {
                 });
         }
     },
-    {
-        enabled: !!projectData, // Only fetch if projectData is available
-    });
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        });
 
     //   const [gaugeData, setGaugeData] = useState([]);
 

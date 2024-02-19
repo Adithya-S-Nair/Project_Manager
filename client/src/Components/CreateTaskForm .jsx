@@ -198,7 +198,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                     <div className='grid grid-cols-1 gap-y-4 p-5'>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Task Name:</label>
-                            <input type="text" placeholder="Enter Task Name" className="input input-bordered"
+                            <input type="text" placeholder="Enter Task Name" className="input input-bordered bg-white"
                                 value={input.taskName}
                                 name='taskName'
                                 onChange={(e) => { handleCreateTaskChange(e) }}
@@ -206,7 +206,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Project Name:</label>
-                            <select className="select select-bordered"
+                            <select className="select select-bordered bg-white"
                                 label="Project Name"
                                 name='projectId'
                                 value={input.projectId}
@@ -220,7 +220,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Priority:</label>
-                            <select className="select select-bordered accordion"
+                            <select className="select select-bordered accordion bg-white"
                                 name='priority'
                                 value={input.priority}
                                 onChange={(e) => { handleCreateTaskChange(e) }}>
@@ -233,7 +233,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Project Description:</label>
-                            <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"
+                            <textarea className="textarea textarea-bordered bg-white" placeholder="Describe About Your Project"
                                 name='taskDescription'
                                 label="Task Description"
                                 value={input.projectDescription}
@@ -244,7 +244,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(input.plannedStartDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -257,7 +257,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(input.plannedEndDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -267,7 +267,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Planned Budget:</label>
-                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered"
+                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered bg-white"
                                 name='plannedBudget'
                                 value={input.plannedBudget}
                                 onChange={(e) => { handleCreateTaskChange(e) }} />
@@ -277,7 +277,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(input.actualStartTime).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -290,7 +290,7 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(input.actualEndTime).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -300,14 +300,14 @@ const CreateTaskForm = ({ setDrawerState, handleCreateTaskChange, handleCreate, 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Actual Budget:</label>
-                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered"
+                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered bg-white"
                                 name='actualBudget'
                                 value={input.actualBudget}
                                 onChange={(e) => { handleCreateTaskChange(e) }} />
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Status:</label>
-                            <select className="select select-bordered"
+                            <select className="select select-bordered bg-white"
                                 value={input.status}
                                 label="status"
                                 name='status'

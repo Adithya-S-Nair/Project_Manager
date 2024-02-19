@@ -150,6 +150,7 @@ function EnhancedTableToolbar(props) {
     return (
         <>
             <Toolbar
+                className='flex justify-between'
                 sx={{
                     pl: { sm: 2 },
                     pr: { xs: 1, sm: 1 },
@@ -169,14 +170,7 @@ function EnhancedTableToolbar(props) {
                         {numSelected} selected
                     </Typography>
                 ) : (
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        variant="h6"
-                        id="tableTitle"
-                        component="div"
-                    >
-                        All Users
-                    </Typography>
+                    <input type="text" placeholder="Type here" className="input w-full max-w-xs bg-white" />
                 )}
 
                 {numSelected > 0 ? (

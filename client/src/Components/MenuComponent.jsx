@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import MenuButton from '@mui/material/Button';
 import { makeRequest } from '../Axios';
 import { AuthContext } from '../Context/AuthContext';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -61,7 +60,8 @@ const MenuComponent = ({ anchorEl, open, handleClose, isForwardIcon, setIsForwar
         >
             <MenuItem>
                 <AccountCircleIcon className='me-2' />
-                Profile</MenuItem>
+                Profile
+                </MenuItem>
             <MenuItem onClick={handleThemeMenuClick}>
                 {isForwardIcon ? <KeyboardArrowLeftIcon className='me-1' /> : <KeyboardArrowRightIcon className='me-1' />}
                 Theme Settings</MenuItem>

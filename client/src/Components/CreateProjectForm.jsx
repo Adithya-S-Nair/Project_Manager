@@ -112,7 +112,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                     <div className='grid grid-cols-1 gap-y-4 p-5'>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Project Name:</label>
-                            <input type="text" placeholder="Enter Project Name" className="input input-bordered" name="projectName" value={inputs.projectName} onChange={(e) => handleCreateProjectChange(e)} />
+                            <input type="text" placeholder="Enter Project Name" className="input input-bordered bg-white" name="projectName" value={inputs.projectName} onChange={(e) => handleCreateProjectChange(e)} />
 
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
@@ -133,7 +133,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(inputs.projectEndDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -146,7 +146,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(inputs.actualStartDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -159,7 +159,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(inputs.actualEndDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -171,7 +171,7 @@ const CreateProjectForm = ({ setDrawerState, handleCreateProjectChange, handleCr
 
                             <label>Project Description:</label>
 
-                            <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project" name='projectDescription' value={inputs.projectDescription} onChange={(e) => handleCreateProjectChange(e)}
+                            <textarea className="textarea textarea-bordered bg-white" placeholder="Describe About Your Project" name='projectDescription' value={inputs.projectDescription} onChange={(e) => handleCreateProjectChange(e)}
                             ></textarea>
                         </div>
                     </div>

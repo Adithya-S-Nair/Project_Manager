@@ -212,7 +212,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                     <div className='grid grid-cols-1 gap-y-4 p-5'>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Subtask Name:</label>
-                            <input type="text" placeholder="Enter Subtask Name" className="input input-bordered"
+                            <input type="text" placeholder="Enter Subtask Name" className="input input-bordered bg-white"
                                 value={info.subtaskName}
                                 name='subtaskName'
                                 onChange={(e) => { handleCreateSubtaskChange(e) }}
@@ -220,7 +220,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Project Name:</label>
-                            <select className="select select-bordered"
+                            <select className="select select-bordered bg-white"
                                 label="Project Name"
                                 name='projectId'
                                 value={info.projectId}
@@ -234,7 +234,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Task Name:</label>
-                            <select className="select select-bordered"
+                            <select className="select select-bordered bg-white"
                                 label="Task Name"
                                 name='taskId'
                                 value={info.taskId}
@@ -248,7 +248,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Priority:</label>
-                            <select className="select select-bordered accordion"
+                            <select className="select select-bordered accordion bg-white"
                                 name='priority'
                                 value={info.priority}
                                 onChange={(e) => { handleCreateSubtaskChange(e) }}>
@@ -261,7 +261,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Project Description:</label>
-                            <textarea className="textarea textarea-bordered" placeholder="Describe About Your Project"
+                            <textarea className="textarea textarea-bordered bg-white" placeholder="Describe About Your Project"
                                 name='taskDescription'
                                 label="Task Description"
                                 value={info.taskDescription}
@@ -272,7 +272,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(info.plannedStartDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -285,7 +285,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(info.plannedEndDate).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -295,7 +295,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Planned Budget:</label>
-                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered"
+                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered bg-white"
                                 name='plannedBudget'
                                 value={info.plannedBudget}
                                 onChange={(e) => { handleCreateSubtaskChange(e) }} />
@@ -305,7 +305,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(info.actualStartTime).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -318,7 +318,7 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                             <input
                                 type="date"
                                 placeholder=""
-                                className="input input-bordered"
+                                className="input input-bordered bg-white"
                                 value={moment(info.actualEndTime).format('YYYY-MM-DD')}
                                 onChange={(e) => {
                                     const formattedDate = moment(e.target.value, 'YYYY-MM-DD').toDate();
@@ -328,14 +328,14 @@ const CreateSubtaskForm = ({ setDrawerState, handleCreateSubtaskChange, handleCr
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Actual Budget:</label>
-                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered"
+                            <input type="text" placeholder="Enter Planned Budget" className="input input-bordered bg-white"
                                 name='actualBudget'
                                 value={info.actualBudget}
                                 onChange={(e) => { handleCreateSubtaskChange(e) }} />
                         </div>
                         <div className='container-fluid grid grid-cols-1 gap-y-3 p-2'>
                             <label>Status:</label>
-                            <select className="select select-bordered"
+                            <select className="select select-bordered bg-white"
                                 value={info.status}
                                 label="status"
                                 name='status'
