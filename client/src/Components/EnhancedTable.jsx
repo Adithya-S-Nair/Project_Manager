@@ -16,7 +16,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import MoreVertIcon from '@mui/icons-material/MoreVert';  // Import the three-dot icon
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -155,7 +155,7 @@ function EnhancedTableToolbar(props) {
                     pr: { xs: 1, sm: 1 },
                     ...(numSelected > 0 && {
                         bgcolor: (theme) =>
-                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                            alpha('#5cd4d0', theme.palette.action.activatedOpacity),
                     }),
                 }}
             >
@@ -319,7 +319,15 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
                                         tabIndex={-1}
                                         key={row.user_id}
                                         selected={isItemSelected}
-                                        sx={{ cursor: 'pointer' }}
+                                        sx={{
+                                            cursor: 'pointer',
+                                            '&.Mui-selected': {
+                                                backgroundColor: '#ebfafa',
+                                            },
+                                            '&:hover': {
+                                                backgroundColor: '#ebfafa'
+                                            },
+                                        }}
                                     >
                                         <TableCell padding="checkbox">
                                             {theme === 'theme1' ?

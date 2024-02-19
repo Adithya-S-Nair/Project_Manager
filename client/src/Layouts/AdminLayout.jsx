@@ -405,8 +405,8 @@ const AdminLayout = () => {
                                         selected={location.pathname === '/admin/dashboard'}
                                         onClick={projectDashboard}
                                         sx={{
-                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                            "&:hover": { backgroundColor: "#519d9a", color: "white" },
+                                            "&.Mui-selected": { backgroundColor: "#519d9a", color: "white" }
                                         }}>
                                         <ListItemIcon>
                                             <DashboardIcon className='text-white' />
@@ -419,8 +419,8 @@ const AdminLayout = () => {
                                         selected={location.pathname === '/admin/allusers'}
                                         onClick={allusers}
                                         sx={{
-                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                            "&:hover": { backgroundColor: "#519d9a", color: "white" },
+                                            "&.Mui-selected": { backgroundColor: "#519d9a", color: "white" }
                                         }}>
                                         <ListItemIcon>
                                             <GroupIcon className='text-white' />
