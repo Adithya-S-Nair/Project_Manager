@@ -1,35 +1,45 @@
-import React from 'react'
-import { Gantt, Task, EventOption, StylingOption, ViewMode, DisplayOption } from 'gantt-task-react';
-import "gantt-task-react/dist/index.css";
+import React from 'react';
+import { Gantt, Task } from 'gantt-task-react';
+import 'gantt-task-react/dist/index.css';
 
-const GanttChart = () => {
-
-    const tasks = [
+const MyGanttChart = () => {
+  const tasks = [
+    {
+      start: new Date(2020, 1, 1),
+      end: new Date(2020, 1, 2),
+      name: 'Idea',
+      id: 'Task 0',
+      type: 'task',
+      progress: 45,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+      children: [
         {
-            id: 'task1',
-            start: new Date(2020, 1, 1),
-            end: new Date(2020, 1, 2),
-            name: 'Task 1',
-            subtasks: [
-                { id: 'subtask1', start: '2022-01-01', end: '2022-01-05', name: 'Subtask 1.1' },
-                { id: 'subtask2', start: '2022-01-06', end: '2022-01-10', name: 'Subtask 1.2' },
-            ],
+          start: new Date(2020, 1, 1),
+          end: new Date(2020, 1, 1, 12),
+          name: 'Subtask 1',
+          id: 'Subtask 1',
+          type: 'task',
+          progress: 20,
+          isDisabled: true,
+          styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
         },
         {
-            id: 'task2',
-            start: new Date(2022, 1, 11),
-            end: new Date(2022, 1, 20),
-            name: 'Task 2',
-            subtasks: [
-                { id: 'subtask3', start: '2022-01-11', end: '2022-01-15', name: 'Subtask 2.1' },
-                { id: 'subtask4', start: '2022-01-16', end: '2022-01-20', name: 'Subtask 2.2' },
-            ],
+          start: new Date(2020, 1, 1, 12),
+          end: new Date(2020, 1, 2),
+          name: 'Subtask 2',
+          id: 'Subtask 2',
+          type: 'task',
+          progress: 70,
+          isDisabled: true,
+          styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
         },
-    ];
+      ],
+    },
+    // Add more tasks here if needed
+  ];
 
-    return (
-        <Gantt tasks={tasks} />
-    )
-}
+  return <Gantt tasks={tasks} />;
+};
 
-export default GanttChart
+export default MyGanttChart;

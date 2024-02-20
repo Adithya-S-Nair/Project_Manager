@@ -238,7 +238,7 @@ export const updateProjectDetail = (req, res) => {
         actual_end_date,
         project_description,
     } = req.body;
-    
+
     const projectId = req.params.projectId;
     console.log(project_name);
 
@@ -248,7 +248,7 @@ export const updateProjectDetail = (req, res) => {
                    WHERE project_id = ?`;
 
     const values = [
-        project_name, 
+        project_name,
         project_start_date,
         project_end_date,
         actual_start_date,
@@ -264,8 +264,8 @@ export const updateProjectDetail = (req, res) => {
     });
 }
 
-export const getProjectName = (req,res) =>{
-    const {taskId} = req.params;
+export const getProjectName = (req, res) => {
+    const { taskId } = req.params;
     const query = `SELECT project.project_name,task.project_id 
     from task
     INNER JOIN project
@@ -278,3 +278,57 @@ export const getProjectName = (req,res) =>{
         return res.status(200).json(data);
     });
 }
+
+export const getAllProjectDetails = (req, res) => {
+
+    const query = `SELECT p.*,t.*,s.*
+                   From project as p
+                   LEFT JOIN task as t ON p.project_id = t.project_id 
+                   LEFT JOIN subtask as s ON t.task_id = s.task_id
+                   ORDER BY 
+                   p.project_id, t.task_id, s.subtask_id`;
+
+    const projects = [];
+    let currentProject = null;
+    let currentTask = null;
+
+      db.query(query, (error, results) => {
+        if (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+          }
+    
+
+    results.forEach(row => {
+        if (!currentProject || currentProject.project_id !== row.project_id) {
+          currentProject = {
+            project_id: row.project_id,
+            project_name: row.project_name,
+            tasks: []
+          };
+          projects.push(currentProject);
+          currentTask = null;
+        }
+  
+        if (!currentTask || currentTask.task_id !== row.task_id) {
+          currentTask = {
+            task_id: row.task_id,
+            task_name: row.task_name,
+            subtasks: []
+          };
+          currentProject.tasks.push(currentTask);
+        }
+  
+        if (row.subtask_id) {
+          currentTask.subtasks.push({
+            subtask_id: row.subtask_id,
+            subtask_name: row.subtask_name
+          });
+        }
+      });
+  
+      res.json(projects);
+    });
+}
+

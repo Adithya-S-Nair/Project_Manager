@@ -234,7 +234,7 @@ const AdminLayout = () => {
                                         onClick={projectDashboard}
                                         sx={{
                                             "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                            "&.Mui-selected": { backgroundColor: "#596876", color: "#161245" }
                                         }}>
                                         <ListItemIcon>
                                             <DashboardIcon className='text-white' />
@@ -248,7 +248,7 @@ const AdminLayout = () => {
                                         onClick={allusers}
                                         sx={{
                                             "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                            "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                            "&.Mui-selected": { backgroundColor: "#596876", color: "#161245" }
                                         }}>
                                         <ListItemIcon>
                                             <GroupIcon className='text-white' />
