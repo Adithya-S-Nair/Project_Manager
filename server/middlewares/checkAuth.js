@@ -7,14 +7,12 @@ const checkAuth = (req, res, next) => {
         const { accessToken } = req.cookies;
         if (!accessToken) {
             return res.status(401).json({ msg: 'Unauthorized: Missing token' });
-            // return
         }
         jwt.verify(accessToken, process.env.SECRET, {}, (err, userData) => {
             if (err) {
                 return res.status(401).json({ msg: 'Unauthorized: Invalid Token' });
-                // return
+
             }
-            console.log(userData);
             req.userId = userData.user_id;
             req.userType = userData.user_type;
             req.userName = userData.user_name;

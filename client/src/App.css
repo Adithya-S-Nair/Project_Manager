@@ -14,6 +14,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
 
-._CZjuD{
+._CZjuD {
     overflow-x: scroll !important;
 }
+

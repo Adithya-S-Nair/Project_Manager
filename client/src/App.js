@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import './App.css';
 import { AuthContext } from './Context/AuthContext';
 import Login from './Pages/Auth/Login';
-import Register from './Pages/Auth/Register';
+import Register from './Pages/Auth/Register'
 import AdminLayout from './Layouts/AdminLayout';
 import UserLayout from './Layouts/UserLayout';
 import ProjectDashboard from './Pages/Common/ProjectDashboard';
@@ -12,6 +12,8 @@ import { makeRequest } from './Axios';
 import AllUsers from './Pages/Admin/AllUsers';
 import TestForm from './Pages/Admin/TestForm';
 import GanttChart from './Pages/Common/GanttChart';
+import NotFound from './Pages/Error/NotFound';
+import LandingPage from './Pages/Common/LandingPage';
 
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -106,6 +108,14 @@ const App = () => {
     {
       path: '/register',
       element: <Register />,
+    },
+    {
+      path: '/',
+      element: <LandingPage />,
+    },
+    {
+      path: '*',
+      element: <NotFound />,
     },
   ]);
 

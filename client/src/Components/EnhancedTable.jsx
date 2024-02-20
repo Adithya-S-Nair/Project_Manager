@@ -122,6 +122,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
+    const { theme } = React.useContext(ThemeContext)
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -130,6 +131,21 @@ function EnhancedTableToolbar(props) {
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
+
+    const handleSearchInput = (event) => {
+        const searchKey = event.target.value;
+
+        const filteredData = props.rowData.filter((item) => {
+            return Object.values(item).some(
+                (field) =>
+                    field &&
+                    field.toString().toLowerCase().includes(searchKey.toLocaleLowerCase())
+            );
+        })
+
+        props.setFilteredData(filteredData)
+    };
+
 
     const { numSelected, selected } = props;
     const handleMenuAction = (action) => {
@@ -156,7 +172,7 @@ function EnhancedTableToolbar(props) {
                     pr: { xs: 1, sm: 1 },
                     ...(numSelected > 0 && {
                         bgcolor: (theme) =>
-                            alpha('#5cd4d0', theme.palette.action.activatedOpacity),
+                            alpha(theme === 'theme1' ? '#e2edf9' : '#5cd4d0', theme.palette.action.activatedOpacity),
                     }),
                 }}
             >
@@ -170,7 +186,10 @@ function EnhancedTableToolbar(props) {
                         {numSelected} selected
                     </Typography>
                 ) : (
-                    <input type="text" placeholder="Type here" className="input w-full max-w-xs bg-white" />
+                    <input type="text"
+                        onChange={handleSearchInput}
+                        placeholder="Type here"
+                        className="input w-full max-w-xs bg-white" />
                 )}
 
                 {numSelected > 0 ? (
@@ -219,6 +238,7 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [filteredData, setFilteredData] = React.useState(rowData);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -269,21 +289,21 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
     const isSelected = (id) => selected.indexOf(id) !== -1;
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rowData.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
 
     const visibleRows = React.useMemo(
         () =>
-            stableSort(rowData, getComparator(order, orderBy)).slice(
+            stableSort(filteredData, getComparator(order, orderBy)).slice(
                 page * rowsPerPage,
                 page * rowsPerPage + rowsPerPage,
             ),
-        [order, orderBy, page, rowsPerPage, rowData],
+        [order, orderBy, page, rowsPerPage, filteredData],
     );
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar selected={selected} numSelected={selected.length} setToastOpen={setToastOpen} />
+                <EnhancedTableToolbar selected={selected} numSelected={selected.length} setToastOpen={setToastOpen} setFilteredData={setFilteredData} rowData={rowData} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -296,7 +316,7 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rowData.length}
+                            rowCount={filteredData.length}
                             headerData={headerData}
                         />
                         <TableBody>
@@ -332,7 +352,7 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
                                                         'aria-labelledby': labelId,
                                                     }}
                                                 /> :
-                                                <input type="checkbox" className="checkbox ms-2" checked={isItemSelected} />
+                                                <input type="checkbox" className="checkbox ms-2 text-indigo-500" checked={isItemSelected} />
                                             }
                                         </TableCell>
                                         {headerData.map((headCell) => (
@@ -364,7 +384,7 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={rowData.length}
+                    count={filteredData.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
