@@ -31,7 +31,7 @@ const GanttChart = () => {
     <div style={{ display: 'flex', height: '100vh' }}>
       <TreeViewComponent treeData={treeData} />
       <div style={{ flex: 1 }}>
-        <GanttChartComponent />
+        <GanttChartComponent/>
       </div>
     </div>
   )

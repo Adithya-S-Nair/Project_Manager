@@ -301,14 +301,24 @@ export const getAllProjectDetails = (req, res) => {
         let currentProject = null;
         let currentTask = null;
 
+        results.forEach(row => {
+            row.project_start_date = moment(row.project_start_date).format('DD-MM-YYYY');
+            row.project_end_date = moment(row.project_end_date).format('DD-MM-YYYY');
+            row.task_start_date = moment(row.actual_start_date).format('DD-MM-YYYY');
+            row.task_end_date = moment(row.actual_end_date).format('DD-MM-YYYY');
+            row.subtask_start_date = moment(row.actual_start_date).format('DD-MM-YYYY');
+            row.subtask_end_date = moment(row.actual_end_date).format('DD-MM-YYYY');
+
+        });
+
         results.forEach((row) => {
             console.log(row)
             if (currentProject === null || currentProject.project_id !== row.project_id) {
                 currentProject = {
                     project_id: row.project_id,
-                    project_name: row.project_name,
-                    project_start_date:row.project_start_date,
-                    project_end_date:row.project_end_date,
+                    name: row.project_name,
+                    start_date:row.project_start_date,
+                    end_date:row.project_end_date,
                     tasks: []
                 };
                 projects.push(currentProject);
@@ -319,9 +329,9 @@ export const getAllProjectDetails = (req, res) => {
                 if (!currentTask || currentTask.task_id !== row.task_id) {
                     currentTask = {
                         task_id: row.task_id,
-                        task_name: row.task_name,
-                        task_start_date:row.task_start_date,
-                        task_end_date:row.task_end_date,
+                        name: row.task_name,
+                        start_date:row.task_start_date,
+                        end_date:row.task_end_date,
                         subtasks: []
                     };
                     currentProject.tasks.push(currentTask);
@@ -330,9 +340,9 @@ export const getAllProjectDetails = (req, res) => {
                 if (row.subtask_id) {
                     currentTask.subtasks.push({
                         subtask_id: row.subtask_id,
-                        subtask_name: row.subtask_name,
-                        subtask_start_date:row.subtask_start_date,
-                        subtask_end_date:row.subtask_end_date,
+                        name: row.subtask_name,
+                        start_date:row.subtask_start_date,
+                        end_date:row.subtask_end_date,
                     });
                 }
             }
