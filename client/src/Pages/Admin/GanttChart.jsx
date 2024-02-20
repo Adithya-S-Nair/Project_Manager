@@ -8,7 +8,7 @@ const GanttChart = () => {
   const [treeData, setTreeData] = useState([])
 
   const { data: projectDetails, error: projectDetailsError, isLoading: projectDetailsLoading } = useQuery(['projectDetails'], async () => {
-    const response = await makeRequest.get(`/project/getprojectdetails`);
+    const response = await makeRequest.get(`/project/getallprojectdetails`);
     setTreeData(response.data);
     // return response.data;
 });

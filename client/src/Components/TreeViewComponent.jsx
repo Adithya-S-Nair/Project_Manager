@@ -47,7 +47,7 @@ const TreeViewComponent = ({ treeData }) => {
                 onNodeToggle={handleToggle}
                 onNodeSelect={handleSelect}
             >
-                {treeData.map((projectData) => (
+                {treeData && treeData.map((projectData) => (
                     <TreeItem nodeId={uniqueId++} label={projectData.project_name} key={uniqueId++}>
                         {projectData.tasks.length > 0 &&
                             projectData.tasks.map((taskData) => (
