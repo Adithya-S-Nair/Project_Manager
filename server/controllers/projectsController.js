@@ -288,7 +288,7 @@ export const getAllProjectDetails = (req, res) => {
     LEFT JOIN subtask AS s ON t.task_id = s.task_id
     ORDER BY p.project_id, t.task_id, s.subtask_id
     `;
-  
+
     const projects = [];
 
     db.query(query, (error, results) => {
@@ -312,13 +312,12 @@ export const getAllProjectDetails = (req, res) => {
         });
 
         results.forEach((row) => {
-            console.log(row)
             if (currentProject === null || currentProject.project_id !== row.project_id) {
                 currentProject = {
                     project_id: row.project_id,
                     name: row.project_name,
-                    start_date:row.project_start_date,
-                    end_date:row.project_end_date,
+                    start_date: row.project_start_date,
+                    end_date: row.project_end_date,
                     tasks: []
                 };
                 projects.push(currentProject);
@@ -330,8 +329,8 @@ export const getAllProjectDetails = (req, res) => {
                     currentTask = {
                         task_id: row.task_id,
                         name: row.task_name,
-                        start_date:row.task_start_date,
-                        end_date:row.task_end_date,
+                        start_date: row.task_start_date,
+                        end_date: row.task_end_date,
                         subtasks: []
                     };
                     currentProject.tasks.push(currentTask);
@@ -341,8 +340,8 @@ export const getAllProjectDetails = (req, res) => {
                     currentTask.subtasks.push({
                         subtask_id: row.subtask_id,
                         name: row.subtask_name,
-                        start_date:row.subtask_start_date,
-                        end_date:row.subtask_end_date,
+                        start_date: row.subtask_start_date,
+                        end_date: row.subtask_end_date,
                     });
                 }
             }

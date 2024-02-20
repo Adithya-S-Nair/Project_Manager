@@ -7,22 +7,17 @@ import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { v4 as uuidv4 } from 'uuid';
 
-const TreeViewComponent = ({ treeData }) => {
+const TreeViewComponent = ({ treeData, handleItemClick }) => {
     const [expanded, setExpanded] = React.useState([]);
-    const [selected, setSelected] = React.useState([]);
+    const [selected, setSelected] = React.useState([0]);
     var uniqueId = 0;
 
     const handleToggle = (event, nodeIds) => {
         setExpanded(nodeIds);
     };
 
-    // function generateUniqueId() {
-    //     setUniqueId(prev => prev + 1);
-    // }
-
     const handleSelect = (event, nodeIds) => {
         setSelected(nodeIds);
-        console.log(nodeIds);
     };
 
     const handleExpandClick = () => {
@@ -48,13 +43,13 @@ const TreeViewComponent = ({ treeData }) => {
                 onNodeSelect={handleSelect}
             >
                 {treeData && treeData.map((projectData) => (
-                    <TreeItem nodeId={uniqueId++} label={projectData.project_name} key={uniqueId++}>
+                    <TreeItem onClick={() => { handleItemClick(projectData.project_id, "project") }} nodeId={uniqueId++} label={projectData.name} key={uniqueId++}>
                         {projectData.tasks.length > 0 &&
                             projectData.tasks.map((taskData) => (
-                                <TreeItem key={uniqueId++} nodeId={uniqueId++} label={taskData.task_name}>
+                                <TreeItem onClick={() => { handleItemClick(taskData.task_id, "task") }} key={uniqueId++} nodeId={uniqueId++} label={taskData.name}>
                                     {taskData.subtasks.length > 0 &&
                                         taskData.subtasks.map((subtaskData) => (
-                                            <TreeItem key={uniqueId++} nodeId={uniqueId++} label={subtaskData.subtask_name}/>
+                                            <TreeItem onClick={() => { handleItemClick(subtaskData.subtask_id, "subtask") }} key={uniqueId++} nodeId={uniqueId++} label={subtaskData.name} />
                                         ))}
                                 </TreeItem>
                             ))}
