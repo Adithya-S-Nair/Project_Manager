@@ -281,54 +281,65 @@ export const getProjectName = (req, res) => {
 
 export const getAllProjectDetails = (req, res) => {
 
-    const query = `SELECT p.*,t.*,s.*
-                   From project as p
-                   LEFT JOIN task as t ON p.project_id = t.project_id 
-                   LEFT JOIN subtask as s ON t.task_id = s.task_id
-                   ORDER BY 
-                   p.project_id, t.task_id, s.subtask_id`;
-
+    const query = `
+    SELECT p.project_id ,p.project_name,p.project_start_date,p.project_end_date, t.task_id ,t.task_name,t.planned_start_date as task_start_date ,t.planned_end_date as task_end_date , s.subtask_id ,s.subtask_name,s.planned_start_date as subtask_start_date,s.planned_end_date as subtask_end_date  
+    FROM project AS p
+    LEFT JOIN task AS t ON p.project_id = t.project_id 
+    LEFT JOIN subtask AS s ON t.task_id = s.task_id
+    ORDER BY p.project_id, t.task_id, s.subtask_id
+    `;
+  
     const projects = [];
-    let currentProject = null;
-    let currentTask = null;
 
-      db.query(query, (error, results) => {
+    db.query(query, (error, results) => {
         if (error) {
             console.error('Error:', error);
             res.status(500).json({ error: 'Internal server error' });
             return;
-          }
-    
+        }
 
-    results.forEach(row => {
-        if (!currentProject || currentProject.project_id !== row.project_id) {
-          currentProject = {
-            project_id: row.project_id,
-            project_name: row.project_name,
-            tasks: []
-          };
-          projects.push(currentProject);
-          currentTask = null;
-        }
-  
-        if (!currentTask || currentTask.task_id !== row.task_id) {
-          currentTask = {
-            task_id: row.task_id,
-            task_name: row.task_name,
-            subtasks: []
-          };
-          currentProject.tasks.push(currentTask);
-        }
-  
-        if (row.subtask_id) {
-          currentTask.subtasks.push({
-            subtask_id: row.subtask_id,
-            subtask_name: row.subtask_name
-          });
-        }
-      });
-  
-      res.json(projects);
+        let currentProject = null;
+        let currentTask = null;
+
+        results.forEach((row) => {
+            console.log(row)
+            if (currentProject === null || currentProject.project_id !== row.project_id) {
+                currentProject = {
+                    project_id: row.project_id,
+                    project_name: row.project_name,
+                    project_start_date:row.project_start_date,
+                    project_end_date:row.project_end_date,
+                    tasks: []
+                };
+                projects.push(currentProject);
+                currentTask = null;
+            }
+
+            if (row.task_id) {
+                if (!currentTask || currentTask.task_id !== row.task_id) {
+                    currentTask = {
+                        task_id: row.task_id,
+                        task_name: row.task_name,
+                        task_start_date:row.task_start_date,
+                        task_end_date:row.task_end_date,
+                        subtasks: []
+                    };
+                    currentProject.tasks.push(currentTask);
+                }
+
+                if (row.subtask_id) {
+                    currentTask.subtasks.push({
+                        subtask_id: row.subtask_id,
+                        subtask_name: row.subtask_name,
+                        subtask_start_date:row.subtask_start_date,
+                        subtask_end_date:row.subtask_end_date,
+                    });
+                }
+            }
+        });
+        currentProject = null;
+        currentTask = null;
+
+        res.json(projects);
     });
-}
-
+};
