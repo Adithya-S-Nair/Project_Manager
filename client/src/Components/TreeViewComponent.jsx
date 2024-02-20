@@ -5,28 +5,29 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { v4 as uuidv4 } from 'uuid';
 
-const TreeViewComponent = () => {
+const TreeViewComponent = ({ treeData }) => {
     const [expanded, setExpanded] = React.useState([]);
     const [selected, setSelected] = React.useState([]);
+    var uniqueId = 0;
 
     const handleToggle = (event, nodeIds) => {
         setExpanded(nodeIds);
     };
 
+    // function generateUniqueId() {
+    //     setUniqueId(prev => prev + 1);
+    // }
+
     const handleSelect = (event, nodeIds) => {
         setSelected(nodeIds);
+        console.log(nodeIds);
     };
 
     const handleExpandClick = () => {
         setExpanded((oldExpanded) =>
-            oldExpanded.length === 0 ? ['1', '5', '6', '7'] : [],
-        );
-    };
-
-    const handleSelectClick = () => {
-        setSelected((oldSelected) =>
-            oldSelected.length === 0 ? ['1', '2', '3', '4', '5', '6', '7', '8', '9'] : [],
+            oldExpanded.length === 0 ? ['0', '12', '16'] : [],
         );
     };
 
@@ -45,24 +46,23 @@ const TreeViewComponent = () => {
                 selected={selected}
                 onNodeToggle={handleToggle}
                 onNodeSelect={handleSelect}
-                multiSelect
             >
-                <TreeItem nodeId="1" label="Applications">
-                    <TreeItem nodeId="2" label="Calendar" />
-                    <TreeItem nodeId="3" label="Chrome" />
-                    <TreeItem nodeId="4" label="Webstorm" />
-                </TreeItem>
-                <TreeItem nodeId="5" label="Documents">
-                    <TreeItem nodeId="6" label="MUI">
-                        <TreeItem nodeId="7" label="src">
-                            <TreeItem nodeId="8" label="index.js" />
-                            <TreeItem nodeId="9" label="tree-view.js" />
-                        </TreeItem>
+                {treeData.map((projectData) => (
+                    <TreeItem nodeId={uniqueId++} label={projectData.project_name} key={uniqueId++}>
+                        {projectData.tasks.length > 0 &&
+                            projectData.tasks.map((taskData) => (
+                                <TreeItem key={uniqueId++} nodeId={uniqueId++} label={taskData.task_name}>
+                                    {taskData.subtasks.length > 0 &&
+                                        taskData.subtasks.map((subtaskData) => (
+                                            <TreeItem key={uniqueId++} nodeId={uniqueId++} label={subtaskData.subtask_name}/>
+                                        ))}
+                                </TreeItem>
+                            ))}
                     </TreeItem>
-                </TreeItem>
+                ))}
             </TreeView>
-        </Box>
+        </Box >
     );
 }
 
-export default TreeViewComponent
+export default TreeViewComponent;

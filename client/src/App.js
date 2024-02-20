@@ -11,7 +11,7 @@ import ProjectDetail from './Pages/Common/ProjectDetail';
 import { makeRequest } from './Axios';
 import AllUsers from './Pages/Admin/AllUsers';
 import TestForm from './Pages/Admin/TestForm';
-import GanttChart from './Pages/Common/GanttChart';
+import GanttChart from './Pages/Admin/GanttChart';
 import NotFound from './Pages/Error/NotFound';
 import LandingPage from './Pages/Common/LandingPage';
 

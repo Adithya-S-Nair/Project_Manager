@@ -10,7 +10,7 @@ import { useContext } from 'react';
 
 const FloatingActionButtonComponent = ({ toggle, setType, setDaisyType }) => {
 
-    const { theme } = useContext(ThemeContext)    
+    const { theme } = useContext(ThemeContext)
     const handleCreateItemClick = (itemType) => {
         setType(itemType);
         toggle();
@@ -21,16 +21,17 @@ const FloatingActionButtonComponent = ({ toggle, setType, setDaisyType }) => {
     //     // setParentType(itemType)
     //     toggle();
     // };
-    
+
     return (
         <>
             {theme === "theme1" ? (
                 <SpeedDial
                     ariaLabel="SpeedDial basic example"
-                    sx={{ position: 'fixed', bottom: 30, right: 25, 
-                }}
+                    sx={{
+                        position: 'fixed', bottom: 30, right: 25,
+                    }}
                     icon={<SpeedDialIcon />}
-                   
+
                 >
                     <SpeedDialAction
                         icon={<NewspaperIcon />}
@@ -51,11 +52,15 @@ const FloatingActionButtonComponent = ({ toggle, setType, setDaisyType }) => {
             ) : (
                 <SpeedDial
                     ariaLabel="SpeedDial basic example"
-                    sx={{ position: 'fixed', bottom: 30, right: 25,
-                    '& .MuiFab-primary': { 
-                        backgroundColor: '#5cd4d0', 
-                    } 
-                }}
+                    sx={{
+                        position: 'fixed', bottom: 30, right: 25,
+                        '& .MuiFab-primary': {
+                            backgroundColor: '#5cd4d0',
+                        },
+                        '& .MuiFab-primary:hover': {
+                            backgroundColor: '#519d9a',
+                        }
+                    }}
                     icon={<SpeedDialIcon />}
                 >
                     <SpeedDialAction

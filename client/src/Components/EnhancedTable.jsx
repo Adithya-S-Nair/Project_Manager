@@ -189,7 +189,7 @@ function EnhancedTableToolbar(props) {
                     <input type="text"
                         onChange={handleSearchInput}
                         placeholder="Type here"
-                        className="input w-full max-w-xs bg-white" />
+                        className="input input-bordered w-full max-w-xs bg-white h-10" />
                 )}
 
                 {numSelected > 0 ? (
