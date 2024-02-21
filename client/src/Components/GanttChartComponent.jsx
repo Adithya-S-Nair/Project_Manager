@@ -3,11 +3,15 @@ import ReactApexChart from 'react-apexcharts';
 import moment from 'moment';
 
 const GanttChartComponent = ({ selectedData, initialData }) => {
+
+    console.log(selectedData);
+    console.log(initialData);
     const [series, setSeries] = useState([
         {
+
             data: [
                 {
-                    x: initialData && initialData.name,
+                    x: initialData ? initialData.name : '',
                     y: [
                         new Date('2019-02-27').getTime(),
                         new Date('2019-03-04').getTime()
@@ -18,30 +22,33 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
         }
     ]);
 
-    useEffect(() => {
 
-        setSeries([
-            {
-                data: [
+    useEffect(
+        () => {
+            if (selectedData.name) {
+                setSeries([
                     {
-                        x: selectedData ? selectedData.name : '',
-                        y: [
-                            new Date('2019-02-27').getTime(),
-                            new Date('2019-03-04').getTime()
-                        ],
-                        fillColor: '#008FFB'
-                    },
-                ]
+                        data: [
+                            {
+                                x: selectedData ? selectedData.name : '',
+                                y: [
+                                    new Date('2019-02-27').getTime(),
+                                    new Date('2019-03-04').getTime()
+                                ],
+                                fillColor: '#008FFB'
+                            },
+                        ]
+                    }
+                ]);
             }
-        ]);
-    }, [selectedData]);
+        }, [selectedData]);
+
 
     const [options, setOptions] = useState({});
     useEffect(() => {
         setOptions({
             chart: {
                 height: '250px',
-
                 type: 'rangeBar'
             },
             plotOptions: {
@@ -58,6 +65,7 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                 enabled: true,
                 formatter: function (val, opts) {
                     var label = opts.w.globals.labels[opts.dataPointIndex];
+                    if (!label) return '';
                     var a = moment(val[0]);
                     var b = moment(val[1]);
                     var diff = b.diff(a, 'days');
@@ -92,4 +100,4 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
         </div>)
 }
 
-export default GanttChartComponent
+export default GanttChartComponent 
