@@ -298,26 +298,27 @@ export const getAllProjectDetails = (req, res) => {
             return;
         }
 
+        // results.forEach(row => {
+        //     row.project_start_date = moment(row.project_start_date).format('YYYY-MM-DD');
+        //     row.project_end_date = moment(row.project_end_date).format('YYYY-MM-DD');
+        //     row.task_start_date = moment(row.actual_start_date).format('YYYY-MM-DD');
+        //     row.task_end_date = moment(row.actual_end_date).format('YYYY-MM-DD');
+        //     row.subtask_start_date = moment(row.actual_start_date).format('YYYY-MM-DD');
+        //     row.subtask_end_date = moment(row.actual_end_date).format('YYYY-MM-DD');
+
+        // });
         let currentProject = null;
         let currentTask = null;
 
-        results.forEach(row => {
-            row.project_start_date = moment(row.project_start_date).format('DD-MM-YYYY');
-            row.project_end_date = moment(row.project_end_date).format('DD-MM-YYYY');
-            row.task_start_date = moment(row.actual_start_date).format('DD-MM-YYYY');
-            row.task_end_date = moment(row.actual_end_date).format('DD-MM-YYYY');
-            row.subtask_start_date = moment(row.actual_start_date).format('DD-MM-YYYY');
-            row.subtask_end_date = moment(row.actual_end_date).format('DD-MM-YYYY');
 
-        });
 
         results.forEach((row) => {
             if (currentProject === null || currentProject.project_id !== row.project_id) {
                 currentProject = {
                     project_id: row.project_id,
                     name: row.project_name,
-                    start_date: row.project_start_date,
-                    end_date: row.project_end_date,
+                    start_date: moment(row.project_start_date).format('YYYY-MM-DD'),
+                    end_date: moment(row.project_end_date).format('YYYY-MM-DD'),
                     tasks: []
                 };
                 projects.push(currentProject);
@@ -329,8 +330,8 @@ export const getAllProjectDetails = (req, res) => {
                     currentTask = {
                         task_id: row.task_id,
                         name: row.task_name,
-                        start_date: row.task_start_date,
-                        end_date: row.task_end_date,
+                        start_date: moment(row.task_start_date).format('YYYY-MM-DD'),
+                        end_date: moment(row.task_end_date).format('YYYY-MM-DD'),
                         subtasks: []
                     };
                     currentProject.tasks.push(currentTask);

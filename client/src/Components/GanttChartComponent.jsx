@@ -4,8 +4,6 @@ import moment from 'moment';
 
 const GanttChartComponent = ({ selectedData, initialData }) => {
 
-    console.log(selectedData);
-    console.log(initialData);
     const [series, setSeries] = useState([
         {
 
@@ -13,8 +11,8 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                 {
                     x: initialData ? initialData.name : '',
                     y: [
-                        new Date('2019-02-27').getTime(),
-                        new Date('2019-03-04').getTime()
+                        new Date(initialData.start_date).getTime(),
+                        new Date(initialData.end_date).getTime()
                     ],
                     fillColor: '#008FFB'
                 },
@@ -32,8 +30,8 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                             {
                                 x: selectedData ? selectedData.name : '',
                                 y: [
-                                    new Date('2019-02-27').getTime(),
-                                    new Date('2019-03-04').getTime()
+                                    new Date(selectedData.start_date).getTime(),
+                                    new Date(selectedData.end_date).getTime()
                                 ],
                                 fillColor: '#008FFB'
                             },
