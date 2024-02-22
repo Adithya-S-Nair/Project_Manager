@@ -18,7 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import EditModalMUI from './EditModalMUI'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { makeRequest } from '../Axios';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import { useMediaQuery } from '@mui/material';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -60,6 +60,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     const [taskNames, setTaskNames] = useState(null);
     const [employeeName, setEmployeeName] = useState(null);
     const [tableData, setTableData] = useState(null);
+    const isMobile = useMediaQuery('(max-width:1080px)');
     const open = Boolean(anchorEls);
     const handleClick = (event) => {
         setAnchorEls(event.currentTarget);
@@ -70,19 +71,6 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     // console.log(projectData);
 
     const [selectedTask, setSelectedTask] = useState(null);
-    // const [projectColumns, setProjectColumns] = useState([
-    //     {
-    //         headerCheckboxSelection: true,
-    //         checkboxSelection: true,
-    //         width: 50
-    //     },
-    //     { colId: '0_1', field: 'project_name', headerName: 'Project Name', hide: false },
-    //     { colId: '1_1', field: 'project_start_date', headerName: 'Project Start Date', hide: false },
-    //     { colId: '2_1', field: 'project_end_date', headerName: 'Project End Date', hide: false },
-    //     { colId: '3_1', field: 'actual_start_date', headerName: 'Actual Start Date', hide: false },
-    //     { colId: '4_1', field: 'actual_end_date', headerName: 'Actual End Date', hide: false },
-    //     { colId: '5_1', field: 'project_description', headerName: 'Project Description', hide: false },
-    // ])
 
     const [taskColumns, setTaskColumns] = useState([
         {
@@ -152,7 +140,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                 }).catch((error) => {
                     console.log(error);
                 })
-        } 
+        }
         else if (type === "editTask") {
 
         } else if (type === "deleteTask") {
@@ -188,19 +176,16 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                 }).catch((error) => {
                     console.log(error);
                 })
-        } else if(type === "assignedProject"){
+        } else if (type === "assignedProject") {
             makeRequest.get('/employee/getallemployees')
-            .then((res) => {
-                setEmployeeName(res.data);
-            }).catch((error) => {
-                console.log(error);
-            })
+                .then((res) => {
+                    setEmployeeName(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
         }
         setEditModalOpen(true);
     };
-    console.log(selectedTask);
-    console.log("******"+taskNames);
-    console.log("*&*&*&*&*&*&*"+employeeName);
 
     const handleEditModalClose = () => setEditModalOpen(false);
 
@@ -229,7 +214,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
             </div>
             <div className='flex flex-col md:flex-row gap-4' style={{ width: '100%' }}>
                 <div className="flex-grow md:w-2/3">
-                    <Card className="w-full" style={{ height: '28em' }}>
+                    <Card className="w-full" style={{ height: isMobile ? 'auto' : '28em' }}>
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
