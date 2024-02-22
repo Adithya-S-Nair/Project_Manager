@@ -298,15 +298,6 @@ export const getAllProjectDetails = (req, res) => {
             return;
         }
 
-        // results.forEach(row => {
-        //     row.project_start_date = moment(row.project_start_date).format('YYYY-MM-DD');
-        //     row.project_end_date = moment(row.project_end_date).format('YYYY-MM-DD');
-        //     row.task_start_date = moment(row.actual_start_date).format('YYYY-MM-DD');
-        //     row.task_end_date = moment(row.actual_end_date).format('YYYY-MM-DD');
-        //     row.subtask_start_date = moment(row.actual_start_date).format('YYYY-MM-DD');
-        //     row.subtask_end_date = moment(row.actual_end_date).format('YYYY-MM-DD');
-
-        // });
         let currentProject = null;
         let currentTask = null;
 

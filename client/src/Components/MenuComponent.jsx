@@ -22,7 +22,6 @@ const MenuComponent = ({ anchorEl, open, handleClose, isForwardIcon, setIsForwar
     };
 
     const handleThemeClick = (themes) => {
-        console.log(`Selected theme: ${themes}`);
         setTheme(themes)
         handleClose();
     };
@@ -30,7 +29,6 @@ const MenuComponent = ({ anchorEl, open, handleClose, isForwardIcon, setIsForwar
 
     const handleThemeMenuClick = (event) => {
         setSubMenuAnchor(event.currentTarget);
-        // console.log(firstThemeClick);
         if (firstThemeClick) {
             setOpenSubMenu(!openSubMenu);
             console.log(openSubMenu);

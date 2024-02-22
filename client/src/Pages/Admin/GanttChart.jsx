@@ -10,7 +10,6 @@ const GanttChart = () => {
   const [selectedData, setSelectedData] = useState([])
 
   const handleItemClick = (selectedId, selectedType) => {
-    console.log(selectedType);
     treeData.filter((data) => {
       if (selectedType === "project") {
         if (data.project_id == selectedId) {
@@ -33,7 +32,6 @@ const GanttChart = () => {
       }
     })
   };
-  console.log(treeData[0])
 
   const { data: projectDetails, error: projectDetailsError, isLoading: projectDetailsLoading } = useQuery(['projectDetails'], async () => {
     const response = await makeRequest.get(`/project/getallprojectdetails`);
