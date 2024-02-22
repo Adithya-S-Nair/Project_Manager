@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import ReactApexChart from 'react-apexcharts';
 import moment from 'moment';
+import { ThemeContext } from '../Context/ThemeContext';
 
 const GanttChartComponent = ({ selectedData, initialData }) => {
 
+    const { theme } = useContext(ThemeContext)
     const [series, setSeries] = useState([
         {
 
@@ -14,7 +16,7 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                         new Date(initialData.start_date).getTime(),
                         new Date(initialData.end_date).getTime()
                     ],
-                    fillColor: '#008FFB'
+                    fillColor: theme === 'theme1' ? '#008FFB' : '#5cd4d0'
                 },
             ]
         }
@@ -33,13 +35,13 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                                     new Date(selectedData.start_date).getTime(),
                                     new Date(selectedData.end_date).getTime()
                                 ],
-                                fillColor: '#008FFB'
+                                fillColor: theme === 'theme1' ? '#008FFB' : '#5cd4d0'
                             },
                         ]
                     }
                 ]);
             }
-        }, [selectedData]);
+        }, [selectedData, theme]);
 
 
     const [options, setOptions] = useState({});

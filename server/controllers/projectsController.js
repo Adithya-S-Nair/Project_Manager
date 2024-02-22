@@ -341,8 +341,8 @@ export const getAllProjectDetails = (req, res) => {
                     currentTask.subtasks.push({
                         subtask_id: row.subtask_id,
                         name: row.subtask_name,
-                        start_date: row.subtask_start_date,
-                        end_date: row.subtask_end_date,
+                        start_date: moment(row.subtask_start_date).format('YYYY-MM-DD'),
+                        end_date: moment(row.subtask_end_date).format('YYYY-MM-DD'),
                     });
                 }
             }

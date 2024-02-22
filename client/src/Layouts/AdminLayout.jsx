@@ -32,7 +32,6 @@ import { useLocation, Navigate, Outlet, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import MenuComponent from '../Components/MenuComponent';
 import { makeRequest } from '../Axios';
-import { AuthContext } from '../Context/AuthContext';
 import { useContext } from 'react';
 import { ThemeContext, ThemeContextProvider } from '../Context/ThemeContext';
 import DashboardIcon from '@mui/icons-material/Dashboard';
