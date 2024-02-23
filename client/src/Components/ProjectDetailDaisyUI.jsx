@@ -12,7 +12,7 @@ import { makeRequest } from '../Axios';
 import { useMediaQuery } from '@mui/material';
 
 
-function ProjectDetailDaisyUI({ value, setValue,anchorEl,setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
+function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
     const [activeTab, setActiveTab] = useState(0);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [anchorEl1, setAnchorEl1] = useState(null);
@@ -28,6 +28,7 @@ function ProjectDetailDaisyUI({ value, setValue,anchorEl,setAnchorEl, projectDat
     const [modalEditType, setModalEditType] = useState("")
     const [selectedTask, setSelectedTask] = useState(null);
     const [filteredtaskData, setFilteredTaskData] = useState(taskData)
+    const [filteredSubtaskData, setFilteredSubtaskData] = useState(subtaskData)
     const [taskColumns, setTaskColumns] = useState([
         {
             colId: '0_1',
@@ -168,16 +169,26 @@ function ProjectDetailDaisyUI({ value, setValue,anchorEl,setAnchorEl, projectDat
 
     const handleKeyInput = (e) => {
         const key = e.target.value;
+        if (activeTab === 0) {
+            const filteredtaskData = taskData.filter((item) => {
+                return Object.values(item).some(
+                    (field) =>
+                        field &&
+                        field.toString().toLowerCase().includes(key.toLocaleLowerCase())
+                );
+            })
 
-        const filteredtaskData = taskData.filter((item) => {
-            return Object.values(item).some(
-                (field) =>
-                    field &&
-                    field.toString().toLowerCase().includes(key.toLocaleLowerCase())
-            );
-        })
-
-        setFilteredTaskData(filteredtaskData);
+            setFilteredTaskData(filteredtaskData);
+        } else if (activeTab === 1) {
+            const filteredSubtaskData = subtaskData.filter((item) => {
+                return Object.values(item).some(
+                    (field) =>
+                        field &&
+                        field.toString().toLowerCase().includes(key.toLocaleLowerCase())
+                );
+            })
+            setFilteredSubtaskData(filteredSubtaskData);
+        }
     };
 
     const handleSelectedTask = (task) => {
@@ -218,7 +229,7 @@ function ProjectDetailDaisyUI({ value, setValue,anchorEl,setAnchorEl, projectDat
                         <DatagridComponent
                             gridApi={gridApi}
                             setGridApi={setGridApi}
-                            data={subtaskData}
+                            data={filteredSubtaskData}
                             columnDefs={subtaskColumns}
                             type="subtaskdatagrid"
                             handleSelectedTask={handleSelectedTask}
