@@ -78,7 +78,7 @@ const App = () => {
           element: <AllUsers />,
         },
         {
-          path: '/admin/ganttchart/:projectId',
+          path: '/admin/ganttchart',
           element: <GanttChart />,
         },
         {

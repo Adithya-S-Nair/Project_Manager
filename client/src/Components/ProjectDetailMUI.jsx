@@ -19,6 +19,8 @@ import EditModalMUI from './EditModalMUI'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { makeRequest } from '../Axios';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import TextField from '@mui/material/TextField';
+
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -53,13 +55,16 @@ function a11yProps(index) {
     };
 }
 
-const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
+const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, setTaskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [modalEditType, setModalEditType] = useState("")
     const [anchorEls, setAnchorEls] = React.useState(null);
     const [taskNames, setTaskNames] = useState(null);
     const [employeeName, setEmployeeName] = useState(null);
     const [tableData, setTableData] = useState(null);
+    const [filteredTaskData, setFilteredTaskData] = useState(taskData);
+    const [filteredSubtaskData, setFilteredSubtaskData] = useState(subtaskData);
+    const [currentTab, setCurrentTab] = useState(0);
     const open = Boolean(anchorEls);
     const handleClick = (event) => {
         setAnchorEls(event.currentTarget);
@@ -67,8 +72,13 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     const handleClose = () => {
         setAnchorEls(null);
     };
-    // console.log(projectData);
 
+    const handleTabChange = (event, newValue) => {
+        setValue(newValue);
+        setCurrentTab(newValue); // Update the current tab index when the tab is changed
+    };
+
+    console.log(currentTab);
     const [selectedTask, setSelectedTask] = useState(null);
     // const [projectColumns, setProjectColumns] = useState([
     //     {
@@ -127,13 +137,13 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
         setTableData(selectedNodes[0])
 
     };
-    console.log(selectedTask);
+    // console.log(selectedTask);
     const taskId = tableData ? Object.keys(tableData) : null;
 
     if (taskId) {
         console.log(taskId[0]);
     }
-    console.log(taskNames);
+    // console.log(taskNames);
     const handleEditModalOpen = (type) => {
         setModalEditType(type)
         if (type === "assignedTask") {
@@ -152,7 +162,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                 }).catch((error) => {
                     console.log(error);
                 })
-        } 
+        }
         else if (type === "editTask") {
 
         } else if (type === "deleteTask") {
@@ -188,21 +198,52 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                 }).catch((error) => {
                     console.log(error);
                 })
-        } else if(type === "assignedProject"){
+        } else if (type === "assignedProject") {
             makeRequest.get('/employee/getallemployees')
-            .then((res) => {
-                setEmployeeName(res.data);
-            }).catch((error) => {
-                console.log(error);
-            })
+                .then((res) => {
+                    setEmployeeName(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
         }
         setEditModalOpen(true);
     };
-    console.log(selectedTask);
-    console.log("******"+taskNames);
-    console.log("*&*&*&*&*&*&*"+employeeName);
+    // console.log(selectedTask);
+    // console.log("******" + taskNames);
+    // console.log("*&*&*&*&*&*&*" + employeeName);
 
     const handleEditModalClose = () => setEditModalOpen(false);
+
+    const handleSearchInput = (event, tabIndex) => {
+        console.log(tabIndex);
+        const searchKey = event.target.value;
+
+        let dataToFilter = null;
+        console.log(subtaskData);
+
+        // Determine which data to filter based on the tab index
+        if (tabIndex === 0) {
+            dataToFilter = taskData;
+        } else if (tabIndex === 1) {
+            dataToFilter = subtaskData;
+        }
+
+        // Perform filtering
+        const filteredData = dataToFilter.filter((item) => {
+            return Object.values(item).some(
+                (field) =>
+                    field &&
+                    field.toString().toLowerCase().includes(searchKey.toLowerCase())
+            );
+        });
+        console.log(filteredData);
+        // Update the filtered data based on the active tab
+        if (tabIndex === 0) {
+            setFilteredTaskData(filteredData);
+        } else if (tabIndex === 1) {
+            setFilteredSubtaskData(filteredData);
+        }
+    };
 
 
     return (
@@ -369,7 +410,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                     <Box sx={{ width: '100%' }}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <div className='flex items-center justify-between'>
-                                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                                <Tabs value={value} onChange={handleTabChange} aria-label="basic tabs example">
 
                                     {/* <Tab label="Project" {...a11yProps(0)} /> */}
                                     <Tab label="Task" {...a11yProps(1)} />
@@ -377,12 +418,34 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
 
                                 </Tabs>
                                 <div>
+                                    {currentTab && currentTab === 0
+                                        ?
+                                        <TextField
+                                            sx={{ mb: 1, width: '15em', paddingY: '5px' }}
+                                            label="Search"
+                                            // value={taskData}
+                                            InputProps={{
+                                                style: { height: '40px' }
+                                            }}
+                                            onChange={(event) => handleSearchInput(event, currentTab)}
+                                        />
+                                        :
+                                        <TextField
+                                            sx={{ mb: 1, width: '15em', paddingY: '5px' }}
+                                            label="Search"
+                                            // value={taskData}
+                                            InputProps={{
+                                                style: { height: '40px' }
+                                            }}
+                                            onChange={(event) => handleSearchInput(event, currentTab)}
+                                        />
+
+                                    }
                                     {taskId && taskId[0] === "task_id"
                                         ?
                                         <>
-
                                             <IconButton onClick={handleClick}>
-                                                <MoreVertIcon />
+                                                <MoreVertIcon className='mt-1' />
                                             </IconButton>
 
                                             < Menu
@@ -410,7 +473,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                         <>
 
                                             <IconButton onClick={handleClick}>
-                                                <MoreVertIcon />
+                                                <MoreVertIcon className='mt-1' />
                                             </IconButton>
 
                                             < Menu
@@ -449,7 +512,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
-                                data={taskData}
+                                data={filteredTaskData}
                                 columnDefs={taskColumns}
                                 handleSelectedTask={handleSelectedTask}
 
@@ -459,7 +522,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
-                                data={subtaskData}
+                                data={filteredSubtaskData}
                                 columnDefs={subtaskColumns}
                                 handleSelectedTask={handleSelectedTask}
 

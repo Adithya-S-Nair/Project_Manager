@@ -146,7 +146,6 @@ function EnhancedTableToolbar(props) {
         props.setFilteredData(filteredData)
     };
 
-
     const { numSelected, selected } = props;
     const handleMenuAction = (action) => {
         if (action === 'appointEmployee') {

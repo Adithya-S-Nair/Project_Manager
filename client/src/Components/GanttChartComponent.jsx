@@ -6,7 +6,8 @@ import { ThemeContext } from '../Context/ThemeContext';
 const GanttChartComponent = ({ selectedData, initialData }) => {
 
     const { theme } = useContext(ThemeContext)
-    const [series, setSeries] = useState([
+
+    const [series, setSeries] = useState(theme === 'theme1' ? [
         {
 
             data: [
@@ -16,12 +17,26 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                         new Date(initialData.start_date).getTime(),
                         new Date(initialData.end_date).getTime()
                     ],
-                    fillColor: theme === 'theme1' ? '#008FFB' : '#5cd4d0'
+                    fillColor: '#008FFB'
                 },
             ]
         }
-    ]);
+    ] :
+        [
+            {
 
+                data: [
+                    {
+                        x: initialData ? initialData.name : '',
+                        y: [
+                            new Date(initialData.start_date).getTime(),
+                            new Date(initialData.end_date).getTime()
+                        ],
+                        fillColor: '#5cd4d0'
+                    },
+                ]
+            }
+        ]);
 
     useEffect(
         () => {
@@ -30,7 +45,7 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                     {
                         data: [
                             {
-                                x: selectedData ? selectedData.name : '',
+                                x: initialData ? initialData.name : '',
                                 y: [
                                     new Date(selectedData.start_date).getTime(),
                                     new Date(selectedData.end_date).getTime()
@@ -40,8 +55,23 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                         ]
                     }
                 ]);
+            } else {
+                setSeries([
+                    {
+                        data: [
+                            {
+                                x: initialData ? initialData.name : '',
+                                y: [
+                                    new Date(initialData.start_date).getTime(),
+                                    new Date(initialData.end_date).getTime()
+                                ],
+                                fillColor: theme === 'theme1' ? '#008FFB' : '#5cd4d0'
+                            },
+                        ]
+                    }
+                ]);
             }
-        }, [selectedData, theme]);
+        }, [theme, selectedData]);
 
 
     const [options, setOptions] = useState({});
@@ -65,7 +95,6 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
                 enabled: true,
                 formatter: function (val, opts) {
                     var label = opts.w.globals.labels[opts.dataPointIndex];
-                    if (!label) return '';
                     var a = moment(val[0]);
                     var b = moment(val[1]);
                     var diff = b.diff(a, 'days');

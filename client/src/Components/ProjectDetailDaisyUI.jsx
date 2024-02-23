@@ -177,7 +177,6 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
         setFilteredTaskData(filteredtaskData);
     };
 
-
     const handleSelectedTask = (task) => {
         console.log(task);
         setSelectedTask(task);

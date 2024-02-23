@@ -5,7 +5,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { v4 as uuidv4 } from 'uuid';
+import Typography from '@mui/material/Typography';
+
 
 const TreeViewComponent = ({ treeData, handleItemClick }) => {
     const [expanded, setExpanded] = React.useState([]);
@@ -28,10 +29,8 @@ const TreeViewComponent = ({ treeData, handleItemClick }) => {
 
     return (
         <Box sx={{ minHeight: 270, flexGrow: 1, maxWidth: 300 }}>
-            <Box sx={{ mb: 1 }}>
-                <Button onClick={handleExpandClick}>
-                    {expanded.length === 0 ? 'Expand all' : 'Collapse all'}
-                </Button>
+            <Box sx={{ mb: 2 }}>
+                <Typography className='font-bold' variant="p">All Projects</Typography>
             </Box>
             <TreeView
                 aria-label="controlled"
@@ -43,7 +42,7 @@ const TreeViewComponent = ({ treeData, handleItemClick }) => {
                 onNodeSelect={handleSelect}
             >
                 {treeData && treeData.map((projectData) => (
-                    <TreeItem onClick={() => { handleItemClick(projectData.project_id, "project") }} nodeId={uniqueId++} label={projectData.name} key={uniqueId++}>
+                    <TreeItem  sx={{ marginTop: 1 }} onClick={() => { handleItemClick(projectData.project_id, "project") }} nodeId={uniqueId++} label={projectData.name} key={uniqueId++}>
                         {projectData.tasks.length > 0 &&
                             projectData.tasks.map((taskData) => (
                                 <TreeItem onClick={() => { handleItemClick(taskData.task_id, "task") }} key={uniqueId++} nodeId={uniqueId++} label={taskData.name}>

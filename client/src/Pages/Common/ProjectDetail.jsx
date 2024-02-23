@@ -12,6 +12,7 @@ const ProjectDetail = () => {
     const { projectId } = useParams();
     const { theme } = useContext(ThemeContext)
     const [value, setValue] = useState(0);
+    const [taskData,setTaskData] = useState();
     const [gridApi, setGridApi] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [chevronRotation, setChevronRotation] = useState(0);
@@ -74,10 +75,11 @@ const ProjectDetail = () => {
         }
     );
 
-    const { data: taskData, error: taskDataError, isLoading: taskDataLoading } = useQuery(
+    const { data: taskdata, error: taskDataError, isLoading: taskDataLoading } = useQuery(
         ['taskData', projectId],
         async () => {
             const response = await makeRequest.get(`/task/getprojecttask/${projectId}`);
+            setTaskData(response.data);
             return response.data;
         },
         {
@@ -179,6 +181,7 @@ const ProjectDetail = () => {
                         pendingSubtaskCount={pendingSubtaskCount}
                         sparklineData={sparklineData}
                         taskData={taskData}
+                        setTaskData={setTaskData}
                         subtaskData={subtaskData}
                         navigate={navigate}
                         handleMenuOpen={handleMenuOpen}

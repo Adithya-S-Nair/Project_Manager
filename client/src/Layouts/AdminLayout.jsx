@@ -36,6 +36,7 @@ import { useContext } from 'react';
 import { ThemeContext, ThemeContextProvider } from '../Context/ThemeContext';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupIcon from '@mui/icons-material/Group';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 const drawerWidth = 240;
 
@@ -114,6 +115,11 @@ const AdminLayout = () => {
     const allusers = () => {
         navigate('/admin/allusers');
     };
+
+    const ganttChart = () => {
+        navigate('/admin/ganttchart');
+    };
+
 
     const uploadNavigate = () => {
         navigate('/upload');
@@ -253,6 +259,20 @@ const AdminLayout = () => {
                                             <GroupIcon className='text-white' />
                                         </ListItemIcon>
                                         <ListItemText className='text-white' primary='All Users' />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        selected={location.pathname === '/admin/ganttchart'}
+                                        onClick={ganttChart}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#596876", color: "#161245" },
+                                            "&.Mui-selected": { backgroundColor: "#596876", color: "#161245" }
+                                        }}>
+                                        <ListItemIcon>
+                                            <InsertChartIcon className='text-white' />
+                                        </ListItemIcon>
+                                        <ListItemText className='text-white' primary='Gantt Chart' />
                                     </ListItemButton>
                                 </ListItem>
                                 {/* <ListItem disablePadding>
@@ -425,6 +445,20 @@ const AdminLayout = () => {
                                             <GroupIcon className='text-white' />
                                         </ListItemIcon>
                                         <ListItemText className='text-white' primary='All Users' />
+                                    </ListItemButton>
+                                </ListItem>
+                                <ListItem disablePadding>
+                                    <ListItemButton
+                                        selected={location.pathname === '/admin/ganttchart'}
+                                        onClick={ganttChart}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#519d9a", color: "white" },
+                                            "&.Mui-selected": { backgroundColor: "#519d9a", color: "white" }
+                                        }}>
+                                        <ListItemIcon>
+                                            <InsertChartIcon className='text-white' />
+                                        </ListItemIcon>
+                                        <ListItemText className='text-white' primary='Gantt Chart' />
                                     </ListItemButton>
                                 </ListItem>
                                 {/* <ListItem disablePadding>
