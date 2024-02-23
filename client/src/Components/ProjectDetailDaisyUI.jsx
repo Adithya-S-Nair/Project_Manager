@@ -9,18 +9,21 @@ import EditModalDaisyUI from './EditModalDaisyUI';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { makeRequest } from '../Axios';
+import { useMediaQuery } from '@mui/material';
 
-function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
+
+function ProjectDetailDaisyUI({ value, setValue,anchorEl,setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
     const [activeTab, setActiveTab] = useState(0);
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorEl1, setAnchorEl1] = useState(null);
     const [employeeList, setEmployeeList] = useState([])
-    const open = Boolean(anchorEl);
+    const isMobile = useMediaQuery('(max-width:1180px)');
+    const open = Boolean(anchorEl1);
     const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+        setAnchorEl1(event.currentTarget);
     };
     const handleClose = () => {
-        setAnchorEl(null);
+        setAnchorEl1(null);
     };
     const [modalEditType, setModalEditType] = useState("")
     const [selectedTask, setSelectedTask] = useState(null);
@@ -165,7 +168,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
 
     const handleKeyInput = (e) => {
         const key = e.target.value;
-        
+
         const filteredtaskData = taskData.filter((item) => {
             return Object.values(item).some(
                 (field) =>
@@ -220,12 +223,12 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                             type="subtaskdatagrid"
                             handleSelectedTask={handleSelectedTask}
                         />
-                    {/* {console.log("finished")} */}
+                        {/* {console.log("finished")} */}
                     </>
 
                 );
 
-            
+
             default:
                 return null;
         }
@@ -241,17 +244,19 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                     </svg>
                 </div>
                 <hr className='mb-2' />
-                {Boolean(anchorEl) && (
-                    <ul className={`menu bg-white-200 w-56 rounded-box`} style={{ position: 'absolute', top: '100%', left: 0 }}>
-                        <li><a>Item 1</a></li>
-                        <li><a>Item 2</a></li>
-                        <li><a>Item 3</a></li>
-                    </ul>
-                )}
+                {/* Material-UI Menu */}
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                >
+                    <MenuItem >See all projects</MenuItem>
+                    <MenuItem onClick={handleMenuClose}>Add a project</MenuItem>
+                </Menu>
             </div>
             <div className='flex flex-col md:flex-row gap-4' style={{ width: '100%' }}>
                 <div className="flex-grow md:w-2/3">
-                    <div className="card card-compact w-full shadow-xl" style={{ height: '28em' }}>
+                    <div className="card card-compact w-full shadow-xl" style={{ height: isMobile ? 'auto' : '28em' }}>
                         <div className="card-body">
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold '>Project Details</h2>
@@ -433,7 +438,7 @@ function ProjectDetailDaisyUI({ value, setValue, projectData, gridApi, setGridAp
                                     </div>
                                     <Menu
                                         id="basic-menu"
-                                        anchorEl={anchorEl}
+                                        anchorEl={anchorEl1}
                                         open={open}
                                         onClose={handleClose}
                                         MenuListProps={{
