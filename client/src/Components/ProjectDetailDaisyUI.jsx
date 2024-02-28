@@ -5,7 +5,7 @@ import DatagridComponent from './DatagridComponent';
 import SparkLineChart from './SparkLineChart';
 import moment from 'moment';
 import IconButton from '@mui/material/IconButton';
-import EditModalDaisyUI from './EditModalDaisyUI';
+import EditModal from './EditModalMUI';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { makeRequest } from '../Axios';
@@ -17,6 +17,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [anchorEl1, setAnchorEl1] = useState(null);
     const [employeeList, setEmployeeList] = useState([])
+    const [changedDataArray, setChangedDataArray] = useState([]);
     const isMobile = useMediaQuery('(max-width:1180px)');
     const open = Boolean(anchorEl1);
     const handleClick = (event) => {
@@ -123,6 +124,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
         },
     ])
 
+
     useEffect(() => {
         makeRequest.get('/employee/getallemployees')
             .then((res) => {
@@ -162,9 +164,55 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
             });
     }, []);
 
+    console.log(changedDataArray);
+    // const handleCellValueChanged = (event) => {
+    //     const { data } = event.node;
+    //     console.log(data);
+    //     // Check if the data is already in the array
+    //     const arrayvalue = changedDataArray.length;
+    //     console.log(arrayvalue);
+    //     const existingIndex = changedDataArray.findIndex(indexMatch)
+    //     if (existingIndex !== -1) {
+    //         console.log(existingIndex)
+    //         // If the data is already in the array, update it
+    //         // const newArray = [...changedDataArray];
+    //         // newArray[existingIndex] = data;
+    //         changedDataArray[existingIndex] = data;
+
+    //     // Update the state with the modified array
+    //     setChangedDataArray(changedDataArray);
+
+    //         // setChangedDataArray(newArray);
+    //     } else {
+    //         // If the data is not in the array, add it
+    //         setChangedDataArray(prevArray => [...prevArray, data]);
+
+    //     }
+
+    //     function indexMatch(value) {
+    //         console.log(value);
+    //         return value.task_id === data.task_id;
+    //     }
+    // }
+
+    const handleCellValueChanged = (event) => {
+        const { data } = event.node;
+        const isTaskIdPresent = changedDataArray.some(item => item.task_id === data.task_id);
+
+        if (!isTaskIdPresent) {
+            changedDataArray.push(data);
+        }
+    }
 
     const handleSaveChanges = () => {
-
+        changedDataArray.map((updateData) => {
+            console.log(updateData);
+            if (!updateData.subtask_id) {
+                makeRequest.patch(`/task/updatetask/${updateData.task_id}`, updateData)
+            } else {
+                makeRequest.patch(`/subtask/updatesubtaskbyid/${updateData.subtask_id}`, updateData)
+            }
+        })
     }
 
     const handleKeyInput = (e) => {
@@ -220,6 +268,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                             columnDefs={taskColumns}
                             type="task"
                             handleSelectedTask={handleSelectedTask}
+                            handleCellValueChanged={handleCellValueChanged}
                         />
                     </>
                 );
@@ -233,6 +282,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                             columnDefs={subtaskColumns}
                             type="subtaskdatagrid"
                             handleSelectedTask={handleSelectedTask}
+                            handleCellValueChanged={handleCellValueChanged}
                         />
                         {/* {console.log("finished")} */}
                     </>
@@ -470,7 +520,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                 </div>
             </div>
             {projectData &&
-                <EditModalDaisyUI
+                <EditModal
                     open={editModalOpen}
                     editType={modalEditType}
                     setOpen={setEditModalOpen}

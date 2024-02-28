@@ -84,6 +84,7 @@ const GanttChartComponent = ({ selectedData, initialData }) => {
             plotOptions: {
                 bar: {
                     horizontal: true,
+                    vertical: true,
                     distributed: true,
                     dataLabels: {
                         hideOverflowingLabels: false

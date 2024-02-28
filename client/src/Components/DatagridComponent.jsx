@@ -4,17 +4,17 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { makeRequest } from '../Axios'
 
-const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type }) => {
+const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type, handleCellValueChanged}) => {
 
-    const handleCellValueChanged = (event) => {
-        const { data } = event.node;
-        console.log(data);
-        if (!data.subtask_id) {
-            makeRequest.patch(`/task/updatetask/${data.task_id}`, data)
-        } else {
-            makeRequest.patch(`/subtask/updatesubtaskbyid/${data.subtask_id}`, data)
-        }
-    }
+
+    // const handleCellValueChanged = (event) => {
+    //     const { data } = event.node;
+    //     if (!data.subtask_id) {
+    //         makeRequest.patch(`/task/updatetask/${data.task_id}`, data)
+    //     } else {
+    //         makeRequest.patch(`/subtask/updatesubtaskbyid/${data.subtask_id}`, data)
+    //     }
+    // }
 
 
     const onGridReady = (params) => {

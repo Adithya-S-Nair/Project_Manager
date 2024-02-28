@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
@@ -18,8 +18,9 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { makeRequest } from '../Axios';
-import { useQuery } from 'react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query';
 import ToastComponent from './ToastComponent';
+import { ThemeContext } from '../Context/ThemeContext';
 
 const style = {
     position: 'absolute',
@@ -40,16 +41,79 @@ const style = {
 };
 
 // selectedTasks={taskNames}
-const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks }) => {
-
+const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks, selectedUser, setRowData }) => {
     let modalContent;
+    const { theme } = useContext(ThemeContext)
     const [employeeId, setEmployeeId] = React.useState('');
     const [projectId, setProjectId] = React.useState('');
     const [formData, setFormData] = useState({ ...projectData });
     const [taskFormData, setTaskFormData] = useState();
     const [subtaskFormData, setSubtaskFormData] = useState();
     const [toastOpen, setToastOpen] = useState({ open: false, msg: "" })
+    const [userData, setUserData] = useState({
+        userName: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+    });
 
+    useEffect(() => {
+        if (editType === "edituser") {
+            setUserData({
+                userName: selectedUser.user_name,
+                firstName: selectedUser.first_name,
+                lastName: selectedUser.last_name,
+                email: selectedUser.email,
+            })
+        }
+    }, [selectedUser])
+
+    const handleUserDataChange = (e) => {
+        const { name, value } = e.target;
+        setUserData({
+            ...userData,
+            [name]: value,
+        });
+    }
+    const queryClient = useQueryClient();
+    const createMutation = useMutation((userId) => {
+        makeRequest.patch(`/user/updateuser/${userId}`, userData)
+            .then((response) => {
+                handleClose();
+                queryClient.invalidateQueries(["UserData"]);
+
+            }).catch((error) => {
+                console.log(error);
+            })
+    }, {
+        onSuccess: () => {
+            setToastOpen({
+                open: true,
+                msg: "User updated successfully"
+            });
+        }
+    })
+
+    const handleEditUserSubmit = async (userId) => {
+
+        createMutation.mutate(userId)
+
+        // try {
+        //     const response = await makeRequest.patch(`/user/updateuser/${userId}`, userData);
+        //     if (response) {
+        //         makeRequest.get('/user/getallusers').then((res) => {
+        //             setRowData(res.data)
+        //             handleClose()
+        //             setToastOpen({
+        //                 open: true,
+        //                 msg: "User updated successfully"
+        //             })
+        //         })
+        //     }
+        // } catch (error) {
+        //     console.error('Error editing user:', error);
+        // }
+    };
 
     const status = {
         workinprogress: "Work in Progress",
@@ -365,12 +429,24 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                         </div>
                         <br />
                         <div className='flex justify-center space-x-5'>
-                            <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
-                                Cancel
-                            </Button>
-                            <Button variant="contained" size="medium" onClick={handleSubmit}>
-                                Save Changes
-                            </Button>
+                            {theme === "theme1" ?
+                                <>
+                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" size="medium" onClick={handleSubmit}>
+                                        Save Changes
+                                    </Button>
+                                </> :
+                                <>
+                                    <button className='text-white font-bold py-2 px-4 rounded' onClick={() => setOpen(!open)} style={{ background: '#5cd4d0' }}>
+                                        Cancel
+                                    </button>
+                                    <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={handleSubmit}>
+                                        Save Changes
+                                    </button>
+                                </>
+                            }
                         </div>
                     </Typography>
                 </>
@@ -977,6 +1053,87 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     
                 </>
             )
+        case "edituser":
+            modalContent = (
+                <>
+                    <div className="flex items-center justify-between mb-2">
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Edit User
+                        </Typography>
+                        <Tooltip title="Close">
+                            <IconButton onClick={() => { setOpen(!open) }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <hr />
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        <div className='grid grid-cols-1 gap-y-6'>
+                            <TextField
+                                id="outlined-basic"
+                                label="User Name"
+                                variant="outlined"
+                                name='userName'
+                                value={userData.userName}
+                                onChange={handleUserDataChange}
+                            />
+                            <div className='flex items-center justify-center gap-5'>
+                                <TextField
+                                    id="outlined-basic"
+                                    label="First Name"
+                                    variant="outlined"
+                                    name='firstName'
+                                    value={userData.firstName}
+                                    onChange={handleUserDataChange}
+                                />
+                                <TextField
+                                    id="outlined-basic"
+                                    label="Last Name"
+                                    variant="outlined"
+                                    name='lastName'
+                                    value={userData.lastName}
+                                    onChange={handleUserDataChange}
+                                />
+                            </div>
+                            <TextField
+                                id="outlined-basic"
+                                label="Email"
+                                type='email'
+                                variant="outlined"
+                                name='email'
+                                value={userData.email}
+                                onChange={handleUserDataChange}
+
+                            />
+                        </div>
+                        <br />
+                        <div className='flex justify-center space-x-5'>
+                            {theme === 'theme1' ?
+                                <>
+                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" size="medium" onClick={() => {
+                                        handleEditUserSubmit(selectedUser.user_id)
+                                    }}>
+                                        Save Changes
+                                    </Button>
+                                </> :
+                                <>
+                                    <button className='text-white font-bold py-2 px-4 rounded' onClick={() => setOpen(!open)} style={{ background: '#5cd4d0' }}>
+                                        Cancel
+                                    </button>
+                                    <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={() => {
+                                        handleEditUserSubmit(selectedUser.user_id)
+                                    }}>
+                                        Save Changes
+                                    </button>
+                                </>
+                            }
+                        </div>
+                    </Typography >
+                </>
+            );
             break;
         default:
             modalContent = (

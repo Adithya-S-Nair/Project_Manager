@@ -27,6 +27,8 @@ import { ThemeContext } from '../Context/ThemeContext';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import EditModalMUI from './EditModalMUI';
 import { useState } from 'react';
+import EditModal from './EditModalMUI';
+import { useEffect } from 'react';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -256,7 +258,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-function EnhancedTable({ headerData, rowData, setToastOpen }) {
+function EnhancedTable({ headerData, rowData, setRowData, setToastOpen }) {
     const { theme } = React.useContext(ThemeContext)
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
@@ -264,7 +266,15 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [filteredData, setFilteredData] = React.useState(rowData);
+    const [filteredData, setFilteredData] = React.useState([]);
+    const [editModalOpen, setEditModalOpen] = React.useState(false);
+    const [selectedUser, setSelectedUser] = React.useState({});
+
+    useEffect(() => {
+        setFilteredData(rowData)
+    }, [rowData])
+
+    const handleEditModalClose = () => setEditModalOpen(false);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -312,6 +322,12 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
         setDense(event.target.checked);
     };
 
+    const handleEditUser = (userId) => {
+        const selectedUser = rowData.find((item) => item.user_id === userId);
+        setSelectedUser(selectedUser);
+        setEditModalOpen(true)
+    }
+
     const isSelected = (id) => selected.indexOf(id) !== -1;
 
     const emptyRows =
@@ -327,99 +343,110 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
     );
 
     return (
-        <Box sx={{ width: '100%' }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar selected={selected} numSelected={selected.length} setToastOpen={setToastOpen} setFilteredData={setFilteredData} rowData={rowData} />
-                <TableContainer>
-                    <Table
-                        sx={{ minWidth: 750 }}
-                        aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
-                    >
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={filteredData.length}
-                            headerData={headerData}
-                        />
-                        <TableBody>
-                            {visibleRows.map((row, index) => {
-                                const isItemSelected = isSelected(row.user_id);
-                                const labelId = `enhanced-table-checkbox-${index}`;
+        <>
+            <Box sx={{ width: '100%' }}>
+                <Paper sx={{ width: '100%', mb: 2 }}>
+                    <EnhancedTableToolbar selected={selected} numSelected={selected.length} setToastOpen={setToastOpen} setFilteredData={setFilteredData} rowData={rowData} />
+                    <TableContainer>
+                        <Table
+                            sx={{ minWidth: 750 }}
+                            aria-labelledby="tableTitle"
+                            size={dense ? 'small' : 'medium'}
+                        >
+                            <EnhancedTableHead
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                                rowCount={filteredData.length}
+                                headerData={headerData}
+                            />
+                            <TableBody>
+                                {visibleRows.map((row, index) => {
+                                    const isItemSelected = isSelected(row.user_id);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                                return (
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => handleClick(event, row.user_id)}
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.user_id}
+                                            selected={isItemSelected}
+                                            sx={{
+                                                cursor: 'pointer',
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#ebfafa',
+                                                },
+                                                '&:hover': {
+                                                    backgroundColor: '#ebfafa'
+                                                },
+                                            }}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                {theme === 'theme1' ?
+                                                    <Checkbox
+                                                        color="primary"
+                                                        checked={isItemSelected}
+                                                        inputProps={{
+                                                            'aria-labelledby': labelId,
+                                                        }}
+                                                    /> :
+                                                    <input type="checkbox" className="checkbox ms-2 text-indigo-500" checked={isItemSelected} />
+                                                }
+                                            </TableCell>
+                                            {headerData.map((headCell) => (
+                                                <TableCell
+                                                    key={headCell.id}
+                                                    align={headCell.numeric ? 'right' : 'left'}
+                                                >
+                                                    {row[headCell.id]}
+                                                </TableCell>
+                                            ))}
+                                            <TableCell align={'right'}>
+                                                <button onClick={() => {
+                                                    handleEditUser(row.user_id)
+                                                }}
+                                                    className='bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow'>Edit</button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                                {emptyRows > 0 && (
                                     <TableRow
-                                        hover
-                                        onClick={(event) => handleClick(event, row.user_id)}
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={row.user_id}
-                                        selected={isItemSelected}
-                                        sx={{
-                                            cursor: 'pointer',
-                                            '&.Mui-selected': {
-                                                backgroundColor: '#ebfafa',
-                                            },
-                                            '&:hover': {
-                                                backgroundColor: '#ebfafa'
-                                            },
+                                        style={{
+                                            height: (dense ? 33 : 53) * emptyRows,
                                         }}
                                     >
-                                        <TableCell padding="checkbox">
-                                            {theme === 'theme1' ?
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId,
-                                                    }}
-                                                /> :
-                                                <input type="checkbox" className="checkbox ms-2 text-indigo-500" checked={isItemSelected} />
-                                            }
-                                        </TableCell>
-                                        {headerData.map((headCell) => (
-                                            <TableCell
-                                                key={headCell.id}
-                                                align={headCell.numeric ? 'right' : 'left'}
-                                            >
-                                                {row[headCell.id]}
-                                            </TableCell>
-                                        ))}
-                                        <TableCell align={'right'}>
-                                            Edit
-                                        </TableCell>
+                                        <TableCell colSpan={headerData.length + 2} />
                                     </TableRow>
-                                );
-                            })}
-                            {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: (dense ? 33 : 53) * emptyRows,
-                                    }}
-                                >
-                                    <TableCell colSpan={headerData.length + 2} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={filteredData.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-
-        </Box>
-
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={filteredData.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </Paper>
+            </Box>
+            <EditModal
+                open={editModalOpen}
+                editType="edituser"
+                setOpen={setEditModalOpen}
+                handleClose={handleEditModalClose}
+                selectedUser={selectedUser}
+                setRowData={setRowData}
+            />
+        </>
     );
 }
 
