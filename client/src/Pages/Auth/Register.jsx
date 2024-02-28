@@ -53,48 +53,6 @@ const getStyles = (name, personName, theme) => ({
 const theme = createTheme();
 
 const Register = () => {
-
-  //   const [userType, setUserType] = React.useState('');
-  //   const [input, setInput] = useState({
-  //     username: '',
-  //     email: '',
-  //     password: '',
-  //     firstname: '',
-  //     lastname: '',
-  //     usertype: ''
-  //   })
-
-  //   const navigate = useNavigate();
-
-  //   const handleChanges = (event) => {
-  //     setInput((prev) => ({ ...prev, [event.target.name]: event.target.value }));
-  //   };
-
-  //   const handleChange = (event) => {
-  //     setUserType(event.target.value);
-  //   };
-
-  //   const handleClick = async (e) => {
-  //     e.preventDefault();
-  //     try {
-  //         await makeRequest.post("/auth/register", input);
-  //         console.log("successfully registered");
-  //         // setInput({
-  //         //     username: '',
-  //         //     password: '',
-  //         //     userType: '',
-  //         // });
-
-  //         setTimeout(() => {
-  //             navigate("/login");
-  //         }, 2000); 
-
-  //     } catch (err) {
-  //         console.log(err);
-  //     }
-  // };
-
-
   const [personName, setPersonName] = React.useState('');
   const [input, setInput] = useState({
     username: '',
@@ -149,156 +107,156 @@ const Register = () => {
     });
   };
 
-  const Register = () => {
-    return (
-      <ThemeProvider theme={theme}>
-        <Container component="main" maxWidth="sm">
-          <CssBaseline />
-          <Box
-            sx={{
-              paddingTop: 8,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              boxShadow: 3,
-              borderRadius: 2,
-              px: 4,
-              py: 6,
-            }}
-          >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign up
-            </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="username"
-                    label="UserName"
-                    name="username"
-                    autoComplete="username"
-                    value={input.username}
-                    onChange={handleChanges}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                    value={input.email}
-                    onChange={handleChanges}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    value={input.password}
-                    onChange={handleChanges}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="firstname"
-                    label="First Name"
-                    name="firstname"
-                    autoComplete="firstname"
-                    value={input.firstname}
-                    onChange={handleChanges}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="lastname"
-                    label="Last Name"
-                    name="lastname"
-                    autoComplete="lastname"
-                    value={input.lastname}
-                    onChange={handleChanges}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl sx={{ width: 500 }}>
-                    <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
-                    <Select
-                      labelId="demo-multiple-name-label"
-                      id="demo-multiple-name"
-                      value={input.usertype}
-                      onChange={(event) => {
-                        handleChanges(event);
-                        handleChange(event);
-                      }}
-                      input={<OutlinedInput label="User Type" />}
-                      MenuProps={MenuProps}
-                      name="usertype"
-                    >
-                      {names.map((name) => (
-                        <MenuItem
-                          key={name}
-                          value={name}
-                          style={getStyles(name, personName, theme)}
-                        >
-                          {name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
+  return (
+    <ThemeProvider theme={theme}>
+      <Container component="main" maxWidth="sm">
+        <CssBaseline />
+        <Box
+          sx={{
+            paddingTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            boxShadow: 3,
+            borderRadius: 2,
+            px: 4,
+            py: 6,
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="username"
+                  label="UserName"
+                  name="username"
+                  autoComplete="username"
+                  value={input.username}
+                  onChange={handleChanges}
+                />
               </Grid>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                onClick={handleClick}
-              >
-                Sign Up
-              </Button>
-              <Grid container justifyContent="flex-end">
-                <Grid item>
-                  <Link to="/login" variant="body2">
-                    Already have an account? Sign in
-                  </Link>
-                </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  value={input.email}
+                  onChange={handleChanges}
+                />
               </Grid>
-              {/* Conditionally render the Alert component
-                      {isRegistered && (
-                           <Stack sx={{ width: '22%', position: 'fixed', top: '9%', right: '0',left: '40%'}} spacing={2}>
-                           <Alert
-                               icon={<CheckIcon fontSize="inherit" />}
-                               variant="filled"
-                               severity="success"
-                               anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                           >
-                               User Registered Successfully
-                           </Alert>
-                       </Stack>
-                      )} */}
-            </Box>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  value={input.password}
+                  onChange={handleChanges}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="firstname"
+                  label="First Name"
+                  name="firstname"
+                  autoComplete="firstname"
+                  value={input.firstname}
+                  onChange={handleChanges}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="lastname"
+                  label="Last Name"
+                  name="lastname"
+                  autoComplete="lastname"
+                  value={input.lastname}
+                  onChange={handleChanges}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl sx={{ width: 500 }}>
+                  <InputLabel id="demo-multiple-name-label">User Type</InputLabel>
+                  <Select
+                    labelId="demo-multiple-name-label"
+                    id="demo-multiple-name"
+                    value={input.usertype}
+                    onChange={(event) => {
+                      handleChanges(event);
+                      handleChange(event);
+                    }}
+                    input={<OutlinedInput label="User Type" />}
+                    MenuProps={MenuProps}
+                    name="usertype"
+                  >
+                    {names.map((name) => (
+                      <MenuItem
+                        key={name}
+                        value={name}
+                        style={getStyles(name, personName, theme)}
+                      >
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleClick}
+            >
+              Sign Up
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link to="/login" variant="body2">
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
+            {/* Conditionally render the Alert component */}
+            {isRegistered && (
+              <Box mt={2}>
+                <Alert
+                  icon={<CheckIcon fontSize="inherit" />}
+                  variant="filled"
+                  severity="success"
+                  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                  User Registered Successfully
+                </Alert>
+              </Box>
+            )}
           </Box>
-          <Copyright sx={{ mt: 5 }} />
-        </Container>
-      </ThemeProvider>
-    );
-  };
-}
+        </Box>
+        <Box mt={5}>
+          <Copyright />
+        </Box>
+      </Container>
+    </ThemeProvider>
+  );
+};
+
 export default Register;

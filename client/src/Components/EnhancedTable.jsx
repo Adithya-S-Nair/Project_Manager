@@ -24,6 +24,9 @@ import { visuallyHidden } from '@mui/utils';
 import { useQuery } from 'react-query';
 import { makeRequest } from '../Axios';
 import { ThemeContext } from '../Context/ThemeContext';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import EditModalMUI from './EditModalMUI';
+import { useState } from 'react';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -124,6 +127,9 @@ EnhancedTableHead.propTypes = {
 function EnhancedTableToolbar(props) {
     const { theme } = React.useContext(ThemeContext)
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [editType,setEditType] = useState('');
+    const [open, setOpen] = React.useState(false);
+
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -162,6 +168,14 @@ function EnhancedTableToolbar(props) {
         handleMenuClose();
     };
 
+   
+    const handleOpen = () => {
+        setOpen(true);
+        setEditType('createUser')
+    }
+    const handleClose = () => setOpen(false);
+
+
     return (
         <>
             <Toolbar
@@ -198,11 +212,16 @@ function EnhancedTableToolbar(props) {
                         </IconButton>
                     </Tooltip>
                 ) : (
-                    <Tooltip title="Filter list">
-                        <IconButton>
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
+                    <div>
+                        <Tooltip title='Create User'>
+                            <ControlPointIcon sx={{ color: '#757575', width: '0.88em' }} className='me-2 cursor-pointer' onClick={handleOpen} />
+                        </Tooltip>
+                        <Tooltip title="Filter list">
+                            <IconButton>
+                                <FilterListIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
                 )}
             </Toolbar>
             <Menu
@@ -221,6 +240,14 @@ function EnhancedTableToolbar(props) {
                     Delete
                 </MenuItem>
             </Menu>
+            {
+                <EditModalMUI
+                    open={open}
+                    setOpen={setOpen}
+                    handleClose={handleClose}
+                    editType={editType}
+                />
+            }
         </>
     );
 }
@@ -390,7 +417,9 @@ function EnhancedTable({ headerData, rowData, setToastOpen }) {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
+
         </Box>
+
     );
 }
 

@@ -80,6 +80,42 @@ export const getTasksByProjectId = (req, res) => {
     })
 }
 
+export const getProjectTasks = (req, res) => {
+    const projectId = req.params.projectId;
+
+    // Query to fetch all task information
+    const taskQuery = `SELECT * FROM task WHERE project_id = ?`;
+
+    // Query to fetch count of all tasks
+    const countQuery = `SELECT COUNT(*) AS task_count FROM task WHERE project_id = ?`;
+
+    // Execute both queries in parallel using Promise.all
+    Promise.all([
+        new Promise((resolve, reject) => {
+            db.query(taskQuery, [projectId], (err, tasks) => {
+                if (err) reject(err);
+                resolve(tasks);
+            });
+        }),
+        new Promise((resolve, reject) => {
+            db.query(countQuery, [projectId], (err, counts) => {
+                if (err) reject(err);
+                resolve(counts[0].task_count); // Extract task count from the result
+            });
+        })
+    ])
+    .then(([tasks, taskCount]) => {
+        if (tasks.length === 0) {
+            return res.status(404).json({ msg: "No tasks found for the project" });
+        }
+        return res.status(200).json({ tasks, taskCount });
+    })
+    .catch(err => {
+        console.error("Error fetching data:", err);
+        return res.status(500).json({ error: "Internal server error" });
+    });
+}
+
 export const updateTask = (req, res) => {
     const taskId = req.params.taskId;
 
@@ -148,20 +184,20 @@ export const deleteTask = (req, res) => {
 
 export const getPendingTaskCount = (req, res) => {
     const query = `SELECT
-                    possible_priorities.Priority,
-                    COALESCE(SUM(CASE WHEN task.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
-                FROM
-                    (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
-                LEFT JOIN
-                    task ON possible_priorities.Priority = task.Priority
-                        AND task.project_id = ?
-                        AND task.is_deleted = 0
-                WHERE
-                    possible_priorities.Priority IN ('High', 'Medium', 'Low')
-                GROUP BY
-                    possible_priorities.Priority
-                ORDER BY
-                    FIELD(possible_priorities.Priority, 'High', 'Medium', 'Low')`
+                   possible_priorities.Priority,
+                   COALESCE(COUNT(task_id), 0) AS task_count
+                   FROM
+                   (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+                   LEFT JOIN
+                   task ON possible_priorities.Priority = task.Priority
+                   AND task.project_id = ?
+                   AND task.is_deleted = 0
+                   WHERE
+                   possible_priorities.Priority IN ('High', 'Medium', 'Low')
+                   GROUP BY
+                   possible_priorities.Priority
+                   ORDER BY
+                   FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High');`
     db.query(query, [req.params.projectId], (err, data) => {
         if (err) return res.status(500).json(err);
         if (data.length === 0) return res.status(404).json({ msg: "No data found" })
@@ -271,3 +307,47 @@ export const deleteMultipleTask = (req, res) => {
         res.status(200).json({ message: 'Tasks deleted successfully' });
     });
 };
+
+export const getProjectPriorityBasedTask = (req,res) =>{
+    const {projectId,priority} = req.params;
+
+    const query =' SELECT * FROM task WHERE project_id = ? AND Priority = ?';
+    const value =[projectId,priority];
+    db.query(query, value, (err,data)=>{
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data)
+    })
+}
+
+export const getProjectTaskById = (req,res) =>{
+    const {projectId} = req.params;
+
+    const query = `SELECT * FROM task where project_id = ?`;
+
+    db.query(query, projectId, (err,data)=>{
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data)
+    })
+}

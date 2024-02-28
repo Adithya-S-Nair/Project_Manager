@@ -6,13 +6,18 @@ import { useQuery } from 'react-query';
 import CircularProgress from '@mui/material/CircularProgress';
 import ProjectDetailMUI from '../../Components/ProjectDetailMUI';
 import ProjectDetailDaisyUI from '../../Components/ProjectDetailDaisyUI';
+import WorkProgress from '../Admin/WorkProgress';
 
 
 const ProjectDetail = () => {
     const { projectId } = useParams();
     const { theme } = useContext(ThemeContext)
     const [value, setValue] = useState(0);
-    const [taskData,setTaskData] = useState();
+    const [taskData, setTaskData] = useState();
+    const [allTaskData, setAllTaskData] = useState();
+    const [taskCount, setTaskCount] = useState();
+    const [allSubtaskData, setAllSubtaskData] = useState();
+    const [subtaskCount, setSubtaskCount] = useState();
     const [gridApi, setGridApi] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [chevronRotation, setChevronRotation] = useState(0);
@@ -103,6 +108,34 @@ const ProjectDetail = () => {
         // return response.data;
     });
 
+    // console.log("hiii");
+    const { data: getAllTaskData, error: getAllTaskDataError, isLoading: getAllTaskDataLoading } = useQuery(
+        ['allTaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getprojecttasks/${projectId}`);
+            setTaskCount(response.data.taskCount)
+            setAllTaskData(response.data.tasks);
+            // console.log(response.data.tasks);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: getAllSubtaskData, error: getAllSubtaskDataError, isLoading: getAllSubtaskDataLoading } = useQuery(
+        ['allSubtaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getprojectsubtasks/${projectId}`);
+            setSubtaskCount(response.data.subtaskCount)
+            setAllSubtaskData(response.data.subtasks);
+            // console.log(response.data.tasks);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
 
     if (projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
         console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
@@ -137,7 +170,7 @@ const ProjectDetail = () => {
             case 'low':
                 return 'green-400';
             default:
-                return 'black'; // Default color or handle other cases
+                return 'Blue-400'; // Default color or handle other cases
         }
     };
 
@@ -161,11 +194,11 @@ const ProjectDetail = () => {
             </div>
         );
     }
-
+    console.log(gridApi);
     if (theme === 'theme1') {
         return (
-            projectData && (
-                <>
+            <>
+                {projectData && (
                     <ProjectDetailMUI
                         value={value}
                         setValue={setValue}
@@ -191,11 +224,19 @@ const ProjectDetail = () => {
                         getPriorityColor={getPriorityColor}
                         getChartPriorityColor={getChartPriorityColor}
                         projectCompletionStatus={projectCompletionStatus}
+                        allTaskData={allTaskData}
+                        taskCount={taskCount}
+                        allSubtaskData={allSubtaskData}
+                        subtaskCount={subtaskCount}
+                        projectId={projectId}
                     />
-                </>
-            )
+                )}
+                
+            </>
         );
-    } else if (theme === 'theme2') {
+    }
+
+    else if (theme === 'theme2') {
         return (
             projectData && (
                 <>

@@ -45,7 +45,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     let modalContent;
     const [employeeId, setEmployeeId] = React.useState('');
     const [projectId, setProjectId] = React.useState('');
-    const [formData, setFormData] = useState( { ...projectData } );
+    const [formData, setFormData] = useState({ ...projectData });
     const [taskFormData, setTaskFormData] = useState();
     const [subtaskFormData, setSubtaskFormData] = useState();
     const [toastOpen, setToastOpen] = useState({ open: false, msg: "" })
@@ -360,7 +360,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                 label="Project Description"
                                 value={formData.project_description}
                                 onChange={handleChange}
-                             // onChange={(e) => handleCreateProjectChange(e)}
+                            // onChange={(e) => handleCreateProjectChange(e)}
                             />
                         </div>
                         <br />
@@ -970,6 +970,13 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     </div>
                 </>
             );
+            break;
+        case "createUser":
+            modalContent = (
+                <>
+                    
+                </>
+            )
             break;
         default:
             modalContent = (

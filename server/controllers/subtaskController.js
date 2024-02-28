@@ -139,20 +139,21 @@ export const deleteSubtask = (req, res) => {
 
 export const getPendingSubtaskCount = (req, res) => {
     const query = `SELECT
-                    possible_priorities.Priority,
-                    COALESCE(SUM(CASE WHEN subtask.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
-                FROM
-                    (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
-                LEFT JOIN
-                    subtask ON possible_priorities.Priority = subtask.Priority
-                        AND subtask.project_id = ?
-                        AND subtask.is_deleted = 0
-                WHERE
-                    possible_priorities.Priority IN ('High', 'Medium', 'Low')
-                GROUP BY
-                    possible_priorities.Priority
-                ORDER BY
-                    FIELD(possible_priorities.Priority, 'High', 'Medium', 'Low')`
+                   possible_priorities.Priority,
+                   COALESCE(COUNT(subtask_id), 0) AS subtask_count
+                   FROM
+                   (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+                   LEFT JOIN
+                   subtask ON possible_priorities.Priority = subtask.Priority
+                   AND subtask.project_id = ?
+                   AND subtask.is_deleted = 0
+                   WHERE
+                   possible_priorities.Priority IN ('High', 'Medium', 'Low')
+                   GROUP BY
+                   possible_priorities.Priority
+                   ORDER BY
+                   FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High');`
+
     db.query(query, [req.params.projectId], (err, data) => {
         if (err) return res.status(500).json(err);
         if (data.length === 0) return res.status(404).json({ msg: "No data found" })
@@ -291,4 +292,84 @@ export const deleteMultipleSubtask = (req, res) => {
 
         res.status(200).json({ message: 'Subtasks deleted successfully' });
     });
+}
+
+export const getProjectSubtasks = (req,res) =>{
+    const {projectId} = req.params;
+
+    // Query to fetch all task information
+    const subtaskQuery = `SELECT * FROM subtask WHERE project_id = ?`;
+
+    // Query to fetch count of all tasks
+    const countQuery = `SELECT COUNT(*) AS subtask_count FROM subtask WHERE project_id = ?`;
+
+    // Execute both queries in parallel using Promise.all
+    Promise.all([
+        new Promise((resolve, reject) => {
+            db.query(subtaskQuery, [projectId], (err, subtasks) => {
+                if (err) reject(err);
+                resolve(subtasks);
+            });
+        }),
+        new Promise((resolve, reject) => {
+            db.query(countQuery, [projectId], (err, counts) => {
+                if (err) reject(err);
+                resolve(counts[0].subtask_count); // Extract task count from the result
+            });
+        })
+    ])
+    .then(([subtasks, subtaskCount]) => {
+        if (subtasks.length === 0) {
+            return res.status(404).json({ msg: "No tasks found for the project" });
+        }
+        return res.status(200).json({ subtasks, subtaskCount });
+    })
+    .catch(err => {
+        console.error("Error fetching data:", err);
+        return res.status(500).json({ error: "Internal server error" });
+    });
+}
+
+export const getProjectSubtaskByProjectId = (req,res) =>{
+    const {projectId} = req.params;
+
+    const query = `SELECT * FROM subtask where project_id = ?`;
+
+    db.query(query, projectId, (err,data)=>{
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data)
+    })
+}
+
+export const getProjectPriorityBasedSubtask = (req,res) =>{
+    const {projectId,priority} = req.params;
+
+    const query =' SELECT * FROM subtask WHERE project_id = ? AND Priority = ?';
+    const value =[projectId,priority];
+    db.query(query, value, (err,data)=>{
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data)
+    })
 }

@@ -6,7 +6,6 @@ import { makeRequest } from '../Axios'
 
 const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type }) => {
 
-
     const handleCellValueChanged = (event) => {
         const { data } = event.node;
         console.log(data);
@@ -42,8 +41,6 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
         }
     }
 
-
-
     const defaultColDef = {
         sortable: true,
         filter: true,
@@ -59,7 +56,7 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
         onSelectionChanged: handleSelectionChanged,
         onCellValueChanged: handleCellValueChanged,
     };
-
+    console.log(data);
     return (
         <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
             <AgGridReact

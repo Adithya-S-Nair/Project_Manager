@@ -9,7 +9,10 @@ import {
     getSubtaskNameById,
     getSubtaskById,
     updateSubtaskById,
-    deleteMultipleSubtask
+    deleteMultipleSubtask,
+    getProjectSubtasks,
+    getProjectSubtaskByProjectId,
+    getProjectPriorityBasedSubtask
 } from '../controllers/subtaskController.js';
 
 const router = express.Router();
@@ -24,6 +27,9 @@ router.post('/getsubtasknamebyid', checkAuth, getSubtaskNameById)
 router.get('/getsubtask/:subtaskId', checkAuth, getSubtaskById)
 router.patch('/updatesubtaskbyid/:subtaskId', checkAuth, updateSubtaskById)
 router.delete('/deletemultiplesubtask/:subtaskIds', checkAuth, deleteMultipleSubtask)
+router.get('/getprojectsubtasks/:projectId', checkAuth, getProjectSubtasks)
+router.get('/getprojectsubtaskbyprojectid/:projectId', checkAuth, getProjectSubtaskByProjectId)
+router.get('/getprojectprioritybasedsubtask/:projectId/:priority', checkAuth, getProjectPriorityBasedSubtask)
 
 
 export default router;

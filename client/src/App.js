@@ -14,6 +14,7 @@ import TestForm from './Pages/Admin/TestForm';
 import GanttChart from './Pages/Admin/GanttChart';
 import NotFound from './Pages/Error/NotFound';
 import LandingPage from './Pages/Common/LandingPage';
+import WorkProgress from './Pages/Admin/WorkProgress';
 
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -84,6 +85,10 @@ const App = () => {
         {
           path: '/admin/testform',
           element: <TestForm />,
+        },
+        {
+          path: '/admin/workprogress/:projectId/:type',
+          element: <WorkProgress />,
         },
       ],
     },

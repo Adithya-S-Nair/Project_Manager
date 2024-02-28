@@ -35,7 +35,7 @@ app.use('/pmapi/auth', authRoute);
 app.use('/pmapi/project', projectRoute);
 app.use('/pmapi/task', taskRoute);
 app.use('/pmapi/subtask', subtaskRoute);
-app.use('/pmapi/user', userRoute);
+app.use('/pmapi/user', userRoute);   
 app.use('/pmapi/employee', employeeRoute);
 app.use('/pmapi/assign', assignRoute);
 
