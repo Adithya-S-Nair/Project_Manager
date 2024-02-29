@@ -15,7 +15,7 @@ export const register = (req, res) => {
         if (err) return res.status(500).json(err);
         if (data.length) return res.status(409).json("User already exists!");
 
-        const salt = bcrypt.genSaltSync(10);
+        const salt = bcrypt.genSaltSync(10);  
         const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
         const insertQuery =

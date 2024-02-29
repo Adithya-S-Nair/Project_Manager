@@ -8,7 +8,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import dayjs from 'dayjs';
@@ -19,8 +18,9 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { makeRequest } from '../Axios';
 import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query';
-import ToastComponent from './ToastComponent';
 import { ThemeContext } from '../Context/ThemeContext';
+import ToastComponent from './ToastComponent';
+import CloseIcon from '@mui/icons-material/Close';
 
 const style = {
     position: 'absolute',
@@ -44,6 +44,7 @@ const style = {
 const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks, selectedUser, setRowData }) => {
     let modalContent;
     const { theme } = useContext(ThemeContext)
+    const queryClient = useQueryClient();
     const [employeeId, setEmployeeId] = React.useState('');
     const [projectId, setProjectId] = React.useState('');
     const [formData, setFormData] = useState({ ...projectData });
@@ -55,6 +56,14 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         firstName: '',
         lastName: '',
         email: '',
+    });
+    const [input, setInput] = useState({
+        email: '',
+        firstname: '',
+        lastname: '',
+        username: '',
+        usertype: 'Users',
+        password: ''
     });
 
     useEffect(() => {
@@ -75,7 +84,6 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
             [name]: value,
         });
     }
-    const queryClient = useQueryClient();
     const createMutation = useMutation((userId) => {
         makeRequest.patch(`/user/updateuser/${userId}`, userData)
             .then((response) => {
@@ -331,7 +339,41 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
             });
     }
 
-    console.log(editType);
+    const handleCreateUser = (e) => {
+
+        setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+    }
+
+    const createRegisterMutation = useMutation((input) => {
+        makeRequest.post("/auth/register", input)
+            .then((res) => {
+                queryClient.invalidateQueries(["UserData"])
+                setToastOpen({ open: true, msg: "User Created Successfully" })
+                setInput({
+                    email: "",
+                    firstname: "",
+                    lastname: "",
+                    username: "",
+                    usertype: "Users",
+                    password: "",
+                })
+
+            }).catch((error) => {
+                console.log(error);
+            })
+    }, {
+        onSuccess: () => {
+            console.log("hii prince");
+        },
+    })
+
+    const handleRegisterUser = () => {
+        createRegisterMutation.mutate(input);
+    }
+
+
+    // console.log(editType);
     switch (editType) {
         case "project":
             modalContent = (
@@ -756,11 +798,11 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     </div>
 
                     <div className='flex justify-center mt-4'>
-                        {theme==='theme1'?
-                        <Button variant="contained" onClick={handleTaskDelete}>Delete Tasks</Button>
-                        :
-                        <button className='text-white font-bold py-2 px-4 rounded' style={{background:'#5cd4d0'}} onClick={handleTaskDelete}>Delete Tasks</button>
-                    }
+                        {theme === 'theme1' ?
+                            <Button variant="contained" onClick={handleTaskDelete}>Delete Tasks</Button>
+                            :
+                            <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={handleTaskDelete}>Delete Tasks</button>
+                        }
                     </div>
                 </>
             );
@@ -1053,9 +1095,85 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         case "createUser":
             modalContent = (
                 <>
-                    
+                    <div className='flex items-center justify-between'>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Create User
+                        </Typography>
+                        <Tooltip title="Close">
+                            <IconButton onClick={() => { setOpen(!open) }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <hr className='mt-2' />
+                    <div className='mt-3'>
+                        <TextField
+                            className='w-full'
+                            id="outlined-basic"
+                            label="Email"
+                            variant="outlined"
+                            name='email'
+                            value={input.email}
+                            onChange={(e) => handleCreateUser(e)}
+                        />
+                    </div>
+                    <div className='flex items-center mt-2 gap-x-3'>
+                        <TextField
+                            id="outlined-basic"
+                            label="First Name"
+                            variant="outlined"
+                            name='firstname'
+                            value={input.firstname}
+                            onChange={(e) => handleCreateUser(e)}
+                        />
+                        <TextField
+                            id="outlined-basic"
+                            label="Last Name"
+                            variant="outlined"
+                            name='lastname'
+                            value={input.lastname}
+                            onChange={(e) => handleCreateUser(e)}
+                        />
+                    </div>
+                    <div className='flex items-center mt-2 gap-x-3'>
+                        <TextField
+                            className=''
+                            id="outlined-basic"
+                            label="Username"
+                            variant="outlined"
+                            name='username'
+                            value={input.username}
+                            onChange={(e) => handleCreateUser(e)}
+                        />
+                        <TextField
+                            className=''
+                            id="outlined-basic"
+                            label="User Type"
+                            variant="outlined"
+                            name='usertype'
+                            value={input.usertype}
+                            disabled
+                        />
+                    </div>
+                    <div className='mt-2'>
+                        <TextField
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            autoComplete="new-password"
+                            value={input.password}
+                            onChange={(e) => handleCreateUser(e)}
+                        />
+                    </div>
+                    <div className='flex items-center justify-center mt-4'>
+                        <Button variant="contained" onClick={handleRegisterUser}>Create User</Button>
+                    </div>
                 </>
             )
+            break;
         case "edituser":
             modalContent = (
                 <>
@@ -1070,72 +1188,78 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                         </Tooltip>
                     </div>
                     <hr />
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        <div className='grid grid-cols-1 gap-y-6'>
-                            <TextField
-                                id="outlined-basic"
-                                label="User Name"
-                                variant="outlined"
-                                name='userName'
-                                value={userData.userName}
-                                onChange={handleUserDataChange}
-                            />
-                            <div className='flex items-center justify-center gap-5'>
+                    <div>
+
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <div className='grid grid-cols-1 gap-y-6'>
                                 <TextField
                                     id="outlined-basic"
-                                    label="First Name"
+                                    label="User Name"
                                     variant="outlined"
-                                    name='firstName'
-                                    value={userData.firstName}
+                                    name='userName'
+                                    value={userData.userName}
                                     onChange={handleUserDataChange}
                                 />
+                                <div className='flex items-center justify-center gap-5'>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="First Name"
+                                        variant="outlined"
+                                        name='firstName'
+                                        value={userData.firstName}
+                                        onChange={handleUserDataChange}
+                                    />
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Last Name"
+                                        variant="outlined"
+                                        name='lastName'
+                                        value={userData.lastName}
+                                        onChange={handleUserDataChange}
+                                    />
+                                </div>
                                 <TextField
                                     id="outlined-basic"
-                                    label="Last Name"
+                                    label="Email"
+                                    type='email'
                                     variant="outlined"
-                                    name='lastName'
-                                    value={userData.lastName}
+                                    name='email'
+                                    value={userData.email}
                                     onChange={handleUserDataChange}
+
                                 />
                             </div>
-                            <TextField
-                                id="outlined-basic"
-                                label="Email"
-                                type='email'
-                                variant="outlined"
-                                name='email'
-                                value={userData.email}
-                                onChange={handleUserDataChange}
+                            <br />
+                            <div className='flex justify-center space-x-5'>
+                                {theme === 'theme1' ?
+                                    <>
+                                        <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                            Cancel
+                                        </Button>
+                                        <Button variant="contained" size="medium" onClick={() => {
+                                            handleEditUserSubmit(selectedUser.user_id)
+                                        }}>
+                                            Save Changes
+                                        </Button>
+                                    </> :
+                                    <>
+                                        <button className='text-white font-bold py-2 px-4 rounded' onClick={() => setOpen(!open)} style={{ background: '#5cd4d0' }}>
+                                            Cancel
+                                        </button>
+                                        <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={() => {
+                                            handleEditUserSubmit(selectedUser.user_id)
+                                        }}>
+                                            Save Changes
+                                        </button>
+                                    </>
+                                }
+                            </div>
+                        </Typography >
+                    </div>
 
-                            />
-                        </div>
-                        <br />
-                        <div className='flex justify-center space-x-5'>
-                            {theme === 'theme1' ?
-                                <>
-                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
-                                        Cancel
-                                    </Button>
-                                    <Button variant="contained" size="medium" onClick={() => {
-                                        handleEditUserSubmit(selectedUser.user_id)
-                                    }}>
-                                        Save Changes
-                                    </Button>
-                                </> :
-                                <>
-                                    <button className='text-white font-bold py-2 px-4 rounded' onClick={() => setOpen(!open)} style={{ background: '#5cd4d0' }}>
-                                        Cancel
-                                    </button>
-                                    <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={() => {
-                                        handleEditUserSubmit(selectedUser.user_id)
-                                    }}>
-                                        Save Changes
-                                    </button>
-                                </>
-                            }
-                        </div>
-                    </Typography >
                 </>
+
+
             );
             break;
         default:
@@ -1154,10 +1278,16 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
-                    {modalContent}
+                {editType === 'createUser' ?
 
-                </Box>
+                    <Box sx={{ ...style, overflowY: 'hidden' }}>
+                        {modalContent}
+                    </Box>
+                    :
+                    <Box sx={style}>
+                        {modalContent}
+                    </Box>
+                }
             </Modal>
             {
                 toastOpen.open &&

@@ -24,10 +24,12 @@ import Tooltip from '@mui/material/Tooltip';
 import EditModalMUI from '../../Components/EditModalMUI';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TextField from '@mui/material/TextField';
-import { useMediaQuery } from '@mui/material';
+import { Button, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 import { useContext } from 'react';
 import { ThemeContext } from '../../Context/ThemeContext';
+import DatePickerModal from '../../Components/DatePickerModal';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -82,6 +84,10 @@ const WorkProgress = () => {
     const [taskData, setTaskData] = useState();
     const [subtaskData, setSubtaskData] = useState();
     const [changedDataArray, setChangedDataArray] = useState([]);
+    const [dateModalOpen, setDateModalOpen] = React.useState(false);
+
+    const handleOpen = () => setDateModalOpen(true);
+    console.log(dateModalOpen);
 
     const handleClick = (event) => {
         setAnchorEls(event.currentTarget);
@@ -257,7 +263,6 @@ const WorkProgress = () => {
 
         return response.data;
     });
-
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -539,6 +544,18 @@ const WorkProgress = () => {
                     handleClose={handleEditModalClose}
                     selectedSubtaskId={selectedTask}
                     selectedSubtaskNames={taskNames}
+                />
+            }
+            {dateModalOpen &&
+                <DatePickerModal
+                    dateModalOpen={dateModalOpen}
+                    setDateModalOpen={setDateModalOpen}
+                    taskData={taskData}
+                    subtaskData={subtaskData}
+                    filteredTaskData={filteredTaskData}
+                    setFilteredTaskData={setFilteredTaskData}
+                    filteredSubtaskData={filteredSubtaskData}
+                    setFilteredSubtaskData={setFilteredSubtaskData}
                 />
             }
         </div >

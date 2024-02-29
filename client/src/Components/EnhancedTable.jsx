@@ -247,7 +247,7 @@ function EnhancedTableToolbar(props) {
                     open={open}
                     setOpen={setOpen}
                     handleClose={handleClose}
-                    editType={editType}
+                    editType="createUser"
                 />
             }
         </>
