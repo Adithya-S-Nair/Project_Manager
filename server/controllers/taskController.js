@@ -84,10 +84,10 @@ export const getProjectTasks = (req, res) => {
     const projectId = req.params.projectId;
 
     // Query to fetch all task information
-    const taskQuery = `SELECT * FROM task WHERE project_id = ?`;
+    const taskQuery = `SELECT * FROM task WHERE project_id = ? AND is_deleted = 0`;
 
     // Query to fetch count of all tasks
-    const countQuery = `SELECT COUNT(*) AS task_count FROM task WHERE project_id = ?`;
+    const countQuery = `SELECT COUNT(*) AS task_count FROM task WHERE project_id = ? AND is_deleted = 0`;
 
     // Execute both queries in parallel using Promise.all
     Promise.all([
@@ -95,6 +95,13 @@ export const getProjectTasks = (req, res) => {
             db.query(taskQuery, [projectId], (err, tasks) => {
                 if (err) reject(err);
                 resolve(tasks);
+
+                tasks.forEach(row => {
+                    row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+                    row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+                    row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+                    row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+                });
             });
         }),
         new Promise((resolve, reject) => {
@@ -104,16 +111,19 @@ export const getProjectTasks = (req, res) => {
             });
         })
     ])
-    .then(([tasks, taskCount]) => {
-        if (tasks.length === 0) {
-            return res.status(404).json({ msg: "No tasks found for the project" });
-        }
-        return res.status(200).json({ tasks, taskCount });
-    })
-    .catch(err => {
-        console.error("Error fetching data:", err);
-        return res.status(500).json({ error: "Internal server error" });
-    });
+        .then(([tasks, taskCount]) => {
+            if (tasks.length === 0) {
+                return res.status(404).json({ msg: "No tasks found for the project" });
+            }
+
+            
+
+            return res.status(200).json({ tasks, taskCount });
+        })
+        .catch(err => {
+            console.error("Error fetching data:", err);
+            return res.status(500).json({ error: "Internal server error" });
+        });
 }
 
 export const updateTask = (req, res) => {
@@ -308,12 +318,12 @@ export const deleteMultipleTask = (req, res) => {
     });
 };
 
-export const getProjectPriorityBasedTask = (req,res) =>{
-    const {projectId,priority} = req.params;
+export const getProjectPriorityBasedTask = (req, res) => {
+    const { projectId, priority } = req.params;
 
-    const query =' SELECT * FROM task WHERE project_id = ? AND Priority = ?';
-    const value =[projectId,priority];
-    db.query(query, value, (err,data)=>{
+    const query = ' SELECT * FROM task WHERE project_id = ? AND Priority = ? AND is_deleted = 0';
+    const value = [projectId, priority];
+    db.query(query, value, (err, data) => {
         if (err) return res.status(500).json(err);
 
         if (data.length === 0) {
@@ -330,12 +340,12 @@ export const getProjectPriorityBasedTask = (req,res) =>{
     })
 }
 
-export const getProjectTaskById = (req,res) =>{
-    const {projectId} = req.params;
+export const getProjectTaskById = (req, res) => {
+    const { projectId } = req.params;
 
     const query = `SELECT * FROM task where project_id = ?`;
 
-    db.query(query, projectId, (err,data)=>{
+    db.query(query, projectId, (err, data) => {
         if (err) return res.status(500).json(err);
 
         if (data.length === 0) {

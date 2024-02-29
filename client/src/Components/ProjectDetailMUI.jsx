@@ -244,7 +244,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
 
     const handleSubtaskDataClick = (choice) => {
         // console.log(gridApi);
-        setType('sub'+choice);
+        setType('sub' + choice);
         navigate(`/admin/workprogress/${projectId}/subtask${choice}`)
     }
 
@@ -358,13 +358,13 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <Card style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handleTaskDataClick(pendingTaskCount.Priority)} >
                                 <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className={`text-xl font-bold text-${getPriorityColor(pendingTaskCount.Priority)}`}>
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(pendingTaskCount.Priority) }}>
                                             {`${pendingTaskCount.Priority} Priority Task`}
                                         </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
-                                        <h2 className={`text-4xl font-extrabold text-${getPriorityColor(pendingTaskCount.Priority)}`}>
+                                        <h2 className='text-4xl font-extrabold' style={{ color: getChartPriorityColor(pendingTaskCount.Priority) }}>
                                             {pendingTaskCount.task_count}
                                         </h2>
                                         <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingTaskCount.Priority)} />
@@ -408,13 +408,13 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                             <Card key={pendingSubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(pendingSubtaskCount.Priority)} >
                                 <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className={`text-xl font-bold text-${getPriorityColor(pendingSubtaskCount.Priority)}`}>
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(pendingSubtaskCount.Priority) }}>
                                             {`${pendingSubtaskCount.Priority} Priority Subtask`}
                                         </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
-                                        <h2 className={`text-4xl font-extrabold text-${getPriorityColor(pendingSubtaskCount.Priority)}`}>
+                                        <h2 className='text-4xl font-extrabold' style={{ color: getChartPriorityColor(pendingSubtaskCount.Priority) }}>
                                             {pendingSubtaskCount.subtask_count}
                                         </h2>
                                         <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingSubtaskCount.Priority)} />

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { makeRequest } from '../Axios'
+import { ThemeContext } from '../Context/ThemeContext';
 
-const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type, handleCellValueChanged}) => {
+const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDefs, handleSelectedTask, type, handleCellValueChanged }) => {
 
 
     // const handleCellValueChanged = (event) => {
@@ -16,7 +17,7 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
     //     }
     // }
 
-
+    const { theme } = useContext(ThemeContext)
     const onGridReady = (params) => {
         setGridApi(params.api);
         console.log('Grid API initialized:', params.api);
@@ -44,8 +45,9 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
     const defaultColDef = {
         sortable: true,
         filter: true,
-        editable: true
+        editable: theme === 'theme2'
     };
+
 
     const gridOptions = {
         pagination: true,
@@ -55,8 +57,8 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
         suppressRowClickSelection: true,
         onSelectionChanged: handleSelectionChanged,
         onCellValueChanged: handleCellValueChanged,
-    };
-    console.log(data);
+    }
+
     return (
         <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
             <AgGridReact

@@ -95,7 +95,6 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     })
 
     const handleEditUserSubmit = async (userId) => {
-
         createMutation.mutate(userId)
 
         // try {
@@ -757,7 +756,11 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     </div>
 
                     <div className='flex justify-center mt-4'>
+                        {theme==='theme1'?
                         <Button variant="contained" onClick={handleTaskDelete}>Delete Tasks</Button>
+                        :
+                        <button className='text-white font-bold py-2 px-4 rounded' style={{background:'#5cd4d0'}} onClick={handleTaskDelete}>Delete Tasks</button>
+                    }
                     </div>
                 </>
             );

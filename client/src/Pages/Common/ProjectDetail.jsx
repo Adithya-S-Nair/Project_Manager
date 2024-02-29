@@ -13,7 +13,7 @@ const ProjectDetail = () => {
     const { projectId } = useParams();
     const { theme } = useContext(ThemeContext)
     const [value, setValue] = useState(0);
-    const [taskData, setTaskData] = useState();
+    const [taskData, setTaskData] = useState([]);
     const [allTaskData, setAllTaskData] = useState();
     const [taskCount, setTaskCount] = useState();
     const [allSubtaskData, setAllSubtaskData] = useState();
@@ -168,7 +168,7 @@ const ProjectDetail = () => {
             case 'medium':
                 return 'yellow-400';
             case 'low':
-                return 'green-400';
+                return 'green-800';
             default:
                 return 'Blue-400'; // Default color or handle other cases
         }
@@ -231,7 +231,7 @@ const ProjectDetail = () => {
                         projectId={projectId}
                     />
                 )}
-                
+
             </>
         );
     }
@@ -264,6 +264,11 @@ const ProjectDetail = () => {
                         getPriorityColor={getPriorityColor}
                         getChartPriorityColor={getChartPriorityColor}
                         projectCompletionStatus={projectCompletionStatus}
+                        allTaskData={allTaskData}
+                        taskCount={taskCount}
+                        allSubtaskData={allSubtaskData}
+                        subtaskCount={subtaskCount}
+                        projectId={projectId}
                     />
                 </>
             )

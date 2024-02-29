@@ -26,6 +26,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TextField from '@mui/material/TextField';
 import { useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
+import { useContext } from 'react';
+import { ThemeContext } from '../../Context/ThemeContext';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -62,7 +64,7 @@ function a11yProps(index) {
 
 
 const WorkProgress = () => {
-
+    const { theme } = useContext(ThemeContext)
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [modalEditType, setModalEditType] = useState("")
     const [anchorEls, setAnchorEls] = React.useState(null);
@@ -79,6 +81,7 @@ const WorkProgress = () => {
     const [value, setValue] = useState(0);
     const [taskData, setTaskData] = useState();
     const [subtaskData, setSubtaskData] = useState();
+    const [changedDataArray, setChangedDataArray] = useState([]);
 
     const handleClick = (event) => {
         setAnchorEls(event.currentTarget);
@@ -141,9 +144,9 @@ const WorkProgress = () => {
     // console.log(selectedTask);
     const taskId = tableData ? Object.keys(tableData) : null;
 
-    if (taskId) {
-        console.log(taskId[0]);
-    }
+    useEffect(() => {
+        console.log(taskId);
+    }, [taskId])
     // console.log(taskNames);
     const handleEditModalOpen = (type) => {
         setModalEditType(type)
@@ -167,6 +170,7 @@ const WorkProgress = () => {
         else if (type === "editTask") {
 
         } else if (type === "deleteTask") {
+            console.log(selectedTask);
             makeRequest.post(`/task/gettasknamebyid`, selectedTask)
                 .then((res) => {
                     setTaskNames(res.data);
@@ -258,10 +262,10 @@ const WorkProgress = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         if (type === 'alltaskdata') {
-            makeRequest.get(`/task/getprojecttaskbyid/${projectId}`)
+            makeRequest.get(`/task/getprojecttasks/${projectId}`)
                 .then((res) => {
-                    setTaskData(res.data)
-                    setFilteredTaskData(res.data);
+                    setTaskData(res.data.tasks)
+                    setFilteredTaskData(res.data.tasks);
                 }).catch((error) => {
                     console.log(error);
                 })
@@ -295,6 +299,26 @@ const WorkProgress = () => {
         }
     }, [])
 
+    const handleCellValueChanged = (event) => {
+        const { data } = event.node;
+        const isTaskIdPresent = changedDataArray.some(item => item.task_id === data.task_id);
+
+        if (!isTaskIdPresent) {
+            changedDataArray.push(data);
+        }
+    }
+
+    const handleSaveChanges = () => {
+        changedDataArray.map((updateData) => {
+            console.log(updateData);
+            if (!updateData.subtask_id) {
+                makeRequest.patch(`/task/updatetask/${updateData.task_id}`, updateData)
+            } else {
+                makeRequest.patch(`/subtask/updatesubtaskbyid/${updateData.subtask_id}`, updateData)
+            }
+        })
+    }
+
     const titleIcon = (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -321,104 +345,78 @@ const WorkProgress = () => {
             {subtaskData &&
                 <PageTitle titleText='All Subtask Data' titleIcon={titleIcon} />
             }
-            <Card className='mt-5' style={{ width: '100%' }}>
-                <CardContent>
-                    <Box sx={{ width: '100%' }}>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <div className='flex items-center justify-between'>
-                                {/* <Tabs value={value} onChange={handleTabChange} aria-label="basic tabs example">
-
-                                    <Tab label="Project" {...a11yProps(0)} />
-                                    <Tab label="Task" {...a11yProps(1)} />
-                                    <Tab label="Sub Task" {...a11yProps(2)} />
-
-                                </Tabs> */}
-                                <div>
-                                    {/* {currentTab && currentTab === 0
-                                        ? */}
-                                    <TextField
-                                        sx={{ mb: 1, width: '15em', paddingY: '5px' }}
-                                        label="Search"
-                                        // value={taskData}
-                                        InputProps={{
-                                            style: { height: '40px' }
+            <Box sx={{ width: '100%' }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <div className='flex items-center justify-between'>
+                        <div>
+                            <TextField
+                                sx={{ mb: 1, width: '15em', paddingY: '5px' }}
+                                label="Search"
+                                InputProps={{
+                                    style: { height: '40px' }
+                                }}
+                                onChange={(event) => handleSearchInput(event, currentTab)}
+                            />
+                        </div>
+                        <div>
+                            {theme === 'theme1' ?
+                                <>
+                                    {selectedTask && selectedTask.length > 0 &&
+                                        <>
+                                            <IconButton onClick={handleClick}>
+                                                <MoreVertIcon className='mt-1' />
+                                            </IconButton>
+                                            <Menu
+                                                id="basic-menu"
+                                                anchorEl={anchorEls}
+                                                open={open}
+                                                onClose={handleClose}
+                                                MenuListProps={{
+                                                    'aria-labelledby': 'basic-button',
+                                                }}
+                                            >
+                                                {taskId && taskId[0] === "task_id" ?
+                                                    <>
+                                                        <MenuItem onClick={() => { handleEditModalOpen("assignedTask") }}>Assigned Tasks</MenuItem>
+                                                        {selectedTask && selectedTask.length <= 1 &&
+                                                            <MenuItem onClick={() => { handleEditModalOpen("editTask") }}>Edit Tasks</MenuItem>
+                                                        }
+                                                        <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete Tasks</MenuItem>
+                                                    </> :
+                                                    <>
+                                                        <MenuItem onClick={() => { handleEditModalOpen("assignedSubtask") }}>Assigned Subtasks</MenuItem>
+                                                        {selectedTask && selectedTask.length <= 1 &&
+                                                            <MenuItem onClick={() => { handleEditModalOpen("editSubtask") }}>Edit Subtasks</MenuItem>
+                                                        }
+                                                        <MenuItem onClick={() => { handleEditModalOpen("deleteSubtask") }}>Delete Subtasks</MenuItem>
+                                                    </>
+                                                }
+                                            </Menu>
+                                        </>
+                                    }
+                                </> :
+                                <>
+                                    <IconButton onClick={handleClick}>
+                                        <MoreVertIcon className='mt-1' />
+                                    </IconButton>
+                                    <Menu
+                                        id="basic-menu"
+                                        anchorEl={anchorEls}
+                                        open={open}
+                                        onClose={handleClose}
+                                        MenuListProps={{
+                                            'aria-labelledby': 'basic-button',
                                         }}
-                                        onChange={(event) => handleSearchInput(event, currentTab)}
-                                    />
-                                    {/* :
-                                        <TextField
-                                            sx={{ mb: 1, width: '15em', paddingY: '5px' }}
-                                            label="Search"
-                                            // value={taskData}
-                                            InputProps={{
-                                                style: { height: '40px' }
-                                            }}
-                                            onChange={(event) => handleSearchInput(event, currentTab)}
-                                        />
+                                    >
 
-                                    } */}
-                                </div>
-                                <div>
-                                    {taskId && taskId[0] === "task_id"
-                                        ?
-                                        <>
-                                            <IconButton onClick={handleClick}>
-                                                <MoreVertIcon className='mt-1' />
-                                            </IconButton>
-
-                                            < Menu
-                                                id="basic-menu"
-                                                anchorEl={anchorEls}
-                                                open={open}
-                                                onClose={handleClose}
-                                                MenuListProps={{
-                                                    'aria-labelledby': 'basic-button',
-                                                }}
-                                            >
-                                                <MenuItem onClick={() => { handleEditModalOpen("assignedTask") }}>Assigned Tasks</MenuItem>
-                                                {selectedTask && selectedTask.length <= 1 &&
-                                                    <MenuItem onClick={() => { handleEditModalOpen("editTask") }}>Edit Tasks</MenuItem>
-                                                }
-                                                <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete Tasks</MenuItem>
-                                            </Menu>
-
-                                        </>
-                                        :
-                                        null
-                                    }
-                                    {taskId && taskId[0] === "subtask_id"
-                                        ?
-                                        <>
-
-                                            <IconButton onClick={handleClick}>
-                                                <MoreVertIcon className='mt-1' />
-                                            </IconButton>
-
-                                            < Menu
-                                                id="basic-menu"
-                                                anchorEl={anchorEls}
-                                                open={open}
-                                                onClose={handleClose}
-                                                MenuListProps={{
-                                                    'aria-labelledby': 'basic-button',
-                                                }}
-                                            >
-                                                <MenuItem onClick={() => { handleEditModalOpen("assignedSubtask") }}>Assigned Subtasks</MenuItem>
-                                                {selectedTask && selectedTask.length <= 1 &&
-                                                    <MenuItem onClick={() => { handleEditModalOpen("editSubtask") }}>Edit Subtasks</MenuItem>
-                                                }
-                                                <MenuItem onClick={() => { handleEditModalOpen("deleteSubtask") }}>Delete Subtasks</MenuItem>
-                                            </Menu>
-
-                                        </>
-                                        :
-                                        null
-                                    }
-                                </div>
-
-                            </div>
-                        </Box>
-                        {/* <CustomTabPanel value={value} index={0}>
+                                        <MenuItem onClick={handleSaveChanges}>Save Changes</MenuItem>
+                                        <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete</MenuItem>
+                                    </Menu>
+                                </>}
+                        </div>
+                    </div>
+                </Box>
+                {/* <CustomTabPanel value={value} index={0}>
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
@@ -427,8 +425,9 @@ const WorkProgress = () => {
                                 handleSelectedTask={handleSelectedTask}
                             />
                         </CustomTabPanel> */}
-                        {type === 'alltaskdata' &&
-                            // <CustomTabPanel value={value} index={0}>
+                {(type === 'alltaskdata' || type === 'High' || type === 'Low' || type === 'Medium') ?
+                    <>
+                        {theme === 'theme1' ?
                             <DatagridComponent
                                 key={value}
                                 gridApi={gridApi}
@@ -436,101 +435,47 @@ const WorkProgress = () => {
                                 data={filteredTaskData}
                                 columnDefs={taskColumns}
                                 handleSelectedTask={handleSelectedTask}
-
                             />
-                            // </CustomTabPanel>
-                        }
-                        {type === 'High' &&
-                            // <CustomTabPanel value={value} index={0}>
+                            :
                             <DatagridComponent
                                 key={value}
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
                                 data={filteredTaskData}
                                 columnDefs={taskColumns}
+                                type="task"
                                 handleSelectedTask={handleSelectedTask}
-
+                                handleCellValueChanged={handleCellValueChanged}
                             />
-                            // </CustomTabPanel>
                         }
-                        {type === 'Medium' &&
-                            // <CustomTabPanel value={value} index={0}>
+                    </>
+                    :
+                    <>
+                        {(type === 'subtaskallsubtaskdata' || type === 'subtaskHigh' || type === 'subtaskMedium' || type === 'subtaskLow') && theme === 'theme1' ?
+                            <DatagridComponent
+                                gridApi={gridApi}
+                                setGridApi={setGridApi}
+                                data={filteredSubtaskData}
+                                columnDefs={subtaskColumns}
+                                handleSelectedTask={handleSelectedTask}
+                            />
+                            :
                             <DatagridComponent
                                 key={value}
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
-                                data={filteredTaskData}
-                                columnDefs={taskColumns}
-                                handleSelectedTask={handleSelectedTask}
-
-                            />
-                            //  </CustomTabPanel> 
-                        }
-                        {type === 'Low' &&
-                            // <CustomTabPanel value={value} index={0}>
-                            <DatagridComponent
-                                key={value}
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
-                                data={filteredTaskData}
-                                columnDefs={taskColumns}
-                                handleSelectedTask={handleSelectedTask}
-
-                            />
-                            // </CustomTabPanel>
-                        }
-                        {type === 'subtaskallsubtaskdata' &&
-                            // <CustomTabPanel value={value} index={1}>
-                            <DatagridComponent
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
                                 data={filteredSubtaskData}
                                 columnDefs={subtaskColumns}
+                                type="subtask"
                                 handleSelectedTask={handleSelectedTask}
-
+                                handleCellValueChanged={handleCellValueChanged}
                             />
-                            // </CustomTabPanel>
                         }
-                        {type === 'subtaskHigh' &&
-                            // <CustomTabPanel value={value} index={1}>
-                            <DatagridComponent
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
-                                data={filteredSubtaskData}
-                                columnDefs={subtaskColumns}
-                                handleSelectedTask={handleSelectedTask}
+                    </>
+                }
 
-                            />
-                            // </CustomTabPanel>
-                        }
-                        {type === 'subtaskMedium' &&
-                            // <CustomTabPanel value={value} index={1}>
-                            <DatagridComponent
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
-                                data={filteredSubtaskData}
-                                columnDefs={subtaskColumns}
-                                handleSelectedTask={handleSelectedTask}
+            </Box>
 
-                            />
-                            // </CustomTabPanel>
-                        }
-                        {type === 'subtaskLow' &&
-                            // <CustomTabPanel value={value} index={1}>
-                            <DatagridComponent
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
-                                data={filteredSubtaskData}
-                                columnDefs={subtaskColumns}
-                                handleSelectedTask={handleSelectedTask}
-
-                            />
-                            // </CustomTabPanel>
-                        }
-                    </Box>
-                </CardContent>
-            </Card >
-           
             {
                 // taskNames &&
                 modalEditType === "assignedTask" &&

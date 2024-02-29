@@ -333,7 +333,7 @@ export const getProjectSubtasks = (req,res) =>{
 export const getProjectSubtaskByProjectId = (req,res) =>{
     const {projectId} = req.params;
 
-    const query = `SELECT * FROM subtask where project_id = ?`;
+    const query = `SELECT * FROM subtask where project_id = ? AND is_deleted = 0`;
 
     db.query(query, projectId, (err,data)=>{
         if (err) return res.status(500).json(err);
@@ -355,7 +355,7 @@ export const getProjectSubtaskByProjectId = (req,res) =>{
 export const getProjectPriorityBasedSubtask = (req,res) =>{
     const {projectId,priority} = req.params;
 
-    const query =' SELECT * FROM subtask WHERE project_id = ? AND Priority = ?';
+    const query =' SELECT * FROM subtask WHERE project_id = ? AND Priority = ? AND is_deleted = 0';
     const value =[projectId,priority];
     db.query(query, value, (err,data)=>{
         if (err) return res.status(500).json(err);

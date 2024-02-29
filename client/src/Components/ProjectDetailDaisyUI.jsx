@@ -12,7 +12,7 @@ import { makeRequest } from '../Axios';
 import { useMediaQuery } from '@mui/material';
 
 
-function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus }) {
+function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, allTaskData, taskCount, allSubtaskData, subtaskCount, projectId }) {
     const [activeTab, setActiveTab] = useState(0);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [anchorEl1, setAnchorEl1] = useState(null);
@@ -20,6 +20,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
     const [changedDataArray, setChangedDataArray] = useState([]);
     const isMobile = useMediaQuery('(max-width:1180px)');
     const open = Boolean(anchorEl1);
+    const [type, setType] = useState('');
     const handleClick = (event) => {
         setAnchorEl1(event.currentTarget);
     };
@@ -124,6 +125,17 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
         },
     ])
 
+    const handleTaskDataClick = (choice) => {
+        // console.log(gridApi);
+        setType(choice);
+        navigate(`/admin/workprogress/${projectId}/${choice}`)
+    }
+
+    const handleSubtaskDataClick = (choice) => {
+        // console.log(gridApi);
+        setType('sub' + choice);
+        navigate(`/admin/workprogress/${projectId}/subtask${choice}`)
+    }
 
     useEffect(() => {
         makeRequest.get('/employee/getallemployees')
@@ -387,46 +399,39 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
             <div className='card card-compact shadow-xl mt-5' style={{ width: '100%' }}>
                 <div className="card-body">
                     <div className="flex items-center justify-between">
-                        <h2 className='text-xl font-bold'>Pending Task Status</h2>
+                        <h2 className='text-xl font-bold'>Task Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
-                    <div className="flex items-center justify-between p-5">
-                        <div className='card card-compact shadow-xl mt-5' style={{ width: 'auto' }}>
-                            <div className="card-body">
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-red-400'>High Priority Task</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-red-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#ef7070'} />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='card card-compact shadow-xl mt-5' style={{ width: 'auto' }}>
-                            <div className="card-body">
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-yellow-400'>Medium Priority Task</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-yellow-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#facd48'} />
+                    <div className="grid grid-cols-2 gap-6">
+                        {pendingTaskCount && pendingTaskCount.map((pendingTaskCount) => (
+                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleTaskDataClick(pendingTaskCount.Priority)}>
+                                <div className="card-body">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(pendingTaskCount.Priority) }}>{pendingTaskCount.Priority} Priority Task</h2>
+                                        {console.log(pendingTaskCount.Priority)}
+                                    </div>
+                                    <hr className='mt-2 mb-2' />
+                                    <div className="flex items-center justify-between">
+                                        <h2 className='text-4xl font-extrabold' style={{ color: getChartPriorityColor(pendingTaskCount.Priority) }}>{pendingTaskCount.task_count}</h2>
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingTaskCount.Priority)} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className='card card-compact shadow-xl mt-5' style={{ width: 'auto' }}>
-                            <div className="card-body">
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-green-400'>Low Priority Task</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-green-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#66de81'} />
+                        ))}
+                        {allTaskData &&
+                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleTaskDataClick('alltaskdata')}>
+                                <div className="card-body">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className='text-xl font-bold text-blue-800'>All Task</h2>
+                                    </div>
+                                    <hr className='mt-2 mb-2' />
+                                    <div className="flex items-center justify-between">
+                                        <h2 className='text-4xl font-extrabold text-blue-800'>{taskCount}</h2>
+                                        <SparkLineChart data={sparklineData} color="blue" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -435,51 +440,43 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
             <div className='card card-compact shadow-xl mt-5' style={{ width: '100%' }}>
                 <div className="card-body">
                     <div className="flex items-center justify-between">
-                        <h2 className='text-xl font-bold'>Pending Subtask Status</h2>
+                        <h2 className='text-xl font-bold'>Subtask Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
-                    <div className="flex items-center justify-between p-5">
-                        <div className='card card-compact shadow-xl mt-5' style={{ width: 'auto' }}>
-                            <div className="card-body">
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-red-400'>High Priority Subtask</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-red-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#ef7070'} />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='card card-compact shadow-xl mt-5' style={{ width: 'auto' }}>
-                            <div className="card-body">
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-yellow-400'>Medium Priority Subtask</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-yellow-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#facd48'} />
+                    <div className="grid grid-cols-2 gap-6">
+                        {pendingSubtaskCount.map((pendingSubtaskCount) => (
+                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(pendingSubtaskCount.Priority)} >
+                                <div className="card-body">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(pendingSubtaskCount.Priority) }}>{pendingSubtaskCount.Priority} Priority Subtask</h2>
+                                    </div>
+                                    <hr className='mt-2 mb-2' />
+                                    <div className="flex items-center justify-between">
+                                        <h2 className='text-4xl font-extrabold' style={{ color: getChartPriorityColor(pendingSubtaskCount.Priority) }}>{pendingSubtaskCount.subtask_count}</h2>
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingSubtaskCount.Priority)} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className='card card-compact shadow-xl mt-5' style={{ width: 'auto' }}>
-                            <div className="card-body">
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-xl font-bold text-green-400'>Low Priority Subtask</h2>
-                                </div>
-                                <hr className='mt-2 mb-2' />
-                                <div className="flex items-center justify-between">
-                                    <h2 className='text-4xl font-extrabold text-green-400'>0</h2>
-                                    <SparkLineChart data={sparklineData} color={'#66de81'} />
+                        ))}
+                        {allSubtaskData &&
+                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick('allsubtaskdata')}>
+                                <div className="card-body">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className={`text-xl font-bold text-blue-800`}>All Subtask</h2>
+                                    </div>
+                                    <hr className='mt-2 mb-2' />
+                                    <div className="flex items-center justify-between">
+                                        <h2 className={`text-4xl font-extrabold text-blue-800`}>{subtaskCount}</h2>
+                                        <SparkLineChart data={sparklineData} color="blue" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
 
-            <div className='card card-compact shadow-xl mt-5' style={{ width: '100%' }}>
+            {/* <div className='card card-compact shadow-xl mt-5' style={{ width: '100%' }}>
                 <div className='card-body'>
                     <div>
                         <div className='flex items-center justify-between'>
@@ -518,7 +515,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
             {projectData &&
                 <EditModal
                     open={editModalOpen}

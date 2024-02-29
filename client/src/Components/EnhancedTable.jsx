@@ -129,7 +129,7 @@ EnhancedTableHead.propTypes = {
 function EnhancedTableToolbar(props) {
     const { theme } = React.useContext(ThemeContext)
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [editType,setEditType] = useState('');
+    const [editType, setEditType] = useState('');
     const [open, setOpen] = React.useState(false);
 
     const handleMenuOpen = (event) => {
@@ -170,7 +170,7 @@ function EnhancedTableToolbar(props) {
         handleMenuClose();
     };
 
-   
+
     const handleOpen = () => {
         setOpen(true);
         setEditType('createUser')
@@ -284,7 +284,7 @@ function EnhancedTable({ headerData, rowData, setRowData, setToastOpen }) {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = rowData.map((n) => n.id);
+            const newSelected = rowData.map((n) => n.user_id);
             setSelected(newSelected);
             return;
         }
