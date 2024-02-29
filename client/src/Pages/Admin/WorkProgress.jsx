@@ -353,15 +353,18 @@ const WorkProgress = () => {
             <Box sx={{ width: '100%' }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <div className='flex items-center justify-between'>
-                        <div>
+                        <div className='flex items-center gap-x-4 mb-3'>
                             <TextField
-                                sx={{ mb: 1, width: '15em', paddingY: '5px' }}
+                                sx={{width: '15em', paddingY: '5px' }}
                                 label="Search"
                                 InputProps={{
                                     style: { height: '40px' }
                                 }}
                                 onChange={(event) => handleSearchInput(event, currentTab)}
                             />
+                            <Button sx={{borderColor: 'black',color: 'black'}} variant="outlined" startIcon={<CalendarMonthIcon sx={{color: 'black'}}/>} onClick={handleOpen}>
+                                Search By date
+                            </Button>
                         </div>
                         <div>
                             {theme === 'theme1' ?
