@@ -30,6 +30,7 @@ import { useContext } from 'react';
 import { ThemeContext } from '../../Context/ThemeContext';
 import DatePickerModal from '../../Components/DatePickerModal';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { AuthContext } from '../../Context/AuthContext';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -66,6 +67,7 @@ function a11yProps(index) {
 
 
 const WorkProgress = () => {
+    const { user } = useContext(AuthContext)
     const { theme } = useContext(ThemeContext)
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [modalEditType, setModalEditType] = useState("")
@@ -85,6 +87,8 @@ const WorkProgress = () => {
     const [subtaskData, setSubtaskData] = useState();
     const [changedDataArray, setChangedDataArray] = useState([]);
     const [dateModalOpen, setDateModalOpen] = React.useState(false);
+    const [calendarStartDate, setCalendarStartDate] = useState(null)
+    const [calendarEndDate, setCalendarEndDate] = useState(null)
 
     const handleOpen = () => setDateModalOpen(true);
     console.log(dateModalOpen);
@@ -176,7 +180,7 @@ const WorkProgress = () => {
         else if (type === "editTask") {
 
         } else if (type === "deleteTask") {
-            console.log(selectedTask);
+            // console.log(selectedTask);
             makeRequest.post(`/task/gettasknamebyid`, selectedTask)
                 .then((res) => {
                     setTaskNames(res.data);
@@ -267,40 +271,80 @@ const WorkProgress = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         if (type === 'alltaskdata') {
-            makeRequest.get(`/task/getprojecttasks/${projectId}`)
-                .then((res) => {
-                    setTaskData(res.data.tasks)
-                    setFilteredTaskData(res.data.tasks);
-                }).catch((error) => {
-                    console.log(error);
-                })
+            if (user.user_type === 'Admin') {
+                makeRequest.get(`/task/getprojecttasks/${projectId}`)
+                    .then((res) => {
+                        setTaskData(res.data.tasks)
+                        setFilteredTaskData(res.data.tasks);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            } else {
+                makeRequest.get(`/task/getusertasks/${projectId}/${user.user_id}`)
+                    .then((res) => {
+                        setTaskData(res.data)
+                        setFilteredTaskData(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            }
         } else if (type === 'High' || type === 'Medium' || type === 'Low') {
-            console.log(type);
-            makeRequest.get(`/task/getprojectprioritybasedtask/${projectId}/${type}`)
-                .then((res) => {
-                    setTaskData(res.data)
-                    setFilteredTaskData(res.data);
-                }).catch((error) => {
-                    console.log(error);
-                })
+            // console.log(type);
+            if (user.user_type === 'Users') {
+                makeRequest.get(`/task/getprojectprioritybasedtask/${projectId}/${type}`)
+                    .then((res) => {
+                        setTaskData(res.data)
+                        setFilteredTaskData(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            } else {
+                makeRequest.get(`/task/getuserprojectprioritybasedtask/${projectId}/${type}/${user.user_id}`)
+                    .then((res) => {
+                        setTaskData(res.data)
+                        setFilteredTaskData(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            }
         } else if (type === 'subtaskallsubtaskdata') {
-            makeRequest.get(`/subtask/getprojectsubtaskbyprojectid/${projectId}`)
-                .then((res) => {
-                    setSubtaskData(res.data)
-                    setFilteredSubtaskData(res.data);
-                }).catch((error) => {
-                    console.log(error);
-                })
+            if (user.user_type === 'Admin') {
+                makeRequest.get(`/subtask/getprojectsubtaskbyprojectid/${projectId}`)
+                    .then((res) => {
+                        setSubtaskData(res.data)
+                        setFilteredSubtaskData(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            } else {
+                makeRequest.get(`/subtask/getuserprojectsubtasks/${projectId}/${user.user_id}`)
+                    .then((res) => {
+                        setSubtaskData(res.data.subtasks)
+                        setFilteredSubtaskData(res.data.subtasks);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            }
         } else if (type === 'subtaskHigh' || type === 'subtaskMedium' || type === 'subtaskLow') {
             const choice = type.slice(7);
-            console.log(choice);
-            makeRequest.get(`/subtask/getprojectprioritybasedsubtask/${projectId}/${choice}`)
-                .then((res) => {
-                    setSubtaskData(res.data)
-                    setFilteredSubtaskData(res.data);
-                }).catch((error) => {
-                    console.log(error);
-                })
+            // console.log(choice);
+            if (user.user_type === 'Admin') {
+                makeRequest.get(`/subtask/getprojectprioritybasedsubtask/${projectId}/${choice}`)
+                    .then((res) => {
+                        setSubtaskData(res.data)
+                        setFilteredSubtaskData(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            } else {
+                makeRequest.get(`/subtask/getuserprojectprioritybasedsubtask/${projectId}/${choice}/${user.user_id}`)
+                    .then((res) => {
+                        setSubtaskData(res.data)
+                        setFilteredSubtaskData(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            }
         }
     }, [])
 
@@ -355,16 +399,30 @@ const WorkProgress = () => {
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-x-4 mb-3'>
                             <TextField
-                                sx={{width: '15em', paddingY: '5px' }}
+                                sx={{ width: '15em', paddingY: '5px' }}
                                 label="Search"
                                 InputProps={{
                                     style: { height: '40px' }
                                 }}
                                 onChange={(event) => handleSearchInput(event, currentTab)}
                             />
-                            <Button sx={{borderColor: 'black',color: 'black'}} variant="outlined" startIcon={<CalendarMonthIcon sx={{color: 'black'}}/>} onClick={handleOpen}>
+                            <TextField
+                                className='cursor-pointer'
+                                sx={{ width: '18em', paddingY: '5px' }}
+                                label="Search By Date"
+                                InputProps={{
+                                    startAdornment: (
+                                        <CalendarMonthIcon sx={{ color: 'black', marginRight: '5px' }} />
+                                    ),
+                                    style: { height: '40px', cursor: 'pointer' }, // Add cursor: pointer here
+                                    onClick: handleOpen
+                                }}
+                                value={`FROM ${moment(calendarStartDate).format('YYYY-MM-DD')} TO ${moment(calendarEndDate).format('YYYY-MM-DD')}`}
+                            // onClick={handleOpen}
+                            />
+                            {/* <Button sx={{borderColor: 'black',color: 'black'}} variant="outlined" startIcon={<CalendarMonthIcon sx={{color: 'black'}}/>} onClick={handleOpen}>
                                 Search By date
-                            </Button>
+                            </Button> */}
                         </div>
                         <div>
                             {theme === 'theme1' ?
@@ -559,6 +617,8 @@ const WorkProgress = () => {
                     setFilteredTaskData={setFilteredTaskData}
                     filteredSubtaskData={filteredSubtaskData}
                     setFilteredSubtaskData={setFilteredSubtaskData}
+                    setCalendarStartDate={setCalendarStartDate}
+                    setCalendarEndDate={setCalendarEndDate}
                 />
             }
         </div >

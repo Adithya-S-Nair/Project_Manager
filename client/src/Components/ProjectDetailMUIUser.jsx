@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import ProjectStatusChart from './ProjectStatusChart';
@@ -24,8 +24,8 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import { useNavigate } from 'react-router-dom';
 import WorkProgress from '../Pages/Admin/WorkProgress';
 import { useEffect } from 'react';
-import { useContext } from 'react';
 import { AuthContext } from '../Context/AuthContext';
+import { useQuery, useQueryClient } from 'react-query';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -60,7 +60,8 @@ function a11yProps(index) {
     };
 }
 
-const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, priorityTaskCount, prioritySubtaskCount, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, setTaskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, allTaskData, taskCount, projectId, allSubtaskData, subtaskCount, totalPendingTaskCount, totalPendingSubtaskCount }) => {
+const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, userPriorityTaskCount, userPrioritySubtaskCount, userPendingTaskCount, userPendingSubtaskCount, sparklineData, navigate, taskData, setTaskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, userAllTaskData, userTaskCount, projectId, userAllSubtaskData, userSubtaskCount, userTotalPendingTaskCount, userTotalPendingSubtaskCount }) => {
+    const { user } = useContext(AuthContext)
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [modalEditType, setModalEditType] = useState("")
     const [anchorEls, setAnchorEls] = React.useState(null);
@@ -72,7 +73,6 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     const [currentTab, setCurrentTab] = useState(0);
     const isMobile = useMediaQuery('(max-width:1080px)');
     const [type, setType] = useState('');
-    const {user} = useContext(AuthContext)
 
     // const navigates = useNavigate();
     const open = Boolean(anchorEls);
@@ -166,6 +166,8 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                 }).catch((error) => {
                     console.log(error);
                 })
+        } else if (type === "createPersonalTask") {
+
         }
         setEditModalOpen(true);
     };
@@ -206,14 +208,16 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     const handleTaskDataClick = (choice) => {
         // console.log(gridApi);
         setType(choice);
-        navigate(`/admin/workprogress/${projectId}/${choice}`)
+        navigate(`/user/workprogress/${projectId}/${choice}`)
     }
 
     const handleSubtaskDataClick = (choice) => {
         // console.log(gridApi);
         setType('sub' + choice);
-        navigate(`/admin/workprogress/${projectId}/subtask${choice}`)
+        navigate(`/user/workprogress/${projectId}/subtask${choice}`)
     }
+
+
 
     return (
         <>
@@ -233,7 +237,9 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                     onClose={handleMenuClose}
                 >
                     <MenuItem onClick={navigateToAllProject}>See all projects</MenuItem>
-                    <MenuItem onClick={handleMenuClose}>Add a project</MenuItem>
+                    {user.user_type === 'Admin' &&
+                        <MenuItem onClick={handleMenuClose}>Add a project</MenuItem>
+                    }
                     {/* Add more menu items as needed */}
                 </Menu>
             </div>
@@ -243,22 +249,35 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <h2 className='text-xl font-bold'>Project Details</h2>
-                                <div className='flex items-center gap-2'>
-                                    <Tooltip title="Assign Project">
-                                        <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("assignedProject") }}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
-                                            </svg>
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Edit Project Details">
-                                        <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("project") }}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 font-bold">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                            </svg>
-                                        </IconButton>
-                                    </Tooltip>
-                                </div>
+                                {user.user_type === 'Admin' &&
+                                    < div className='flex items-center gap-2'>
+                                        <Tooltip title="Assign Project">
+                                            <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("assignedProject") }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                                                </svg>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Edit Project Details">
+                                            <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("project") }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 font-bold">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>
+                                            </IconButton>
+                                        </Tooltip>
+                                    </div>
+                                }
+                                {user.user_type === 'Users' &&
+                                    < div className='flex items-center '>
+                                        <Tooltip title="Create Personal Task">
+                                            <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("createPersonalTask") }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                            </IconButton>
+                                        </Tooltip>
+                                    </div>
+                                }
                             </div>
                             <hr className='mt-2 mb-2' />
                             <div className="flex justify-between">
@@ -314,51 +333,52 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
 
             {/* Pending task status */}
 
-            <Card className='mt-5' style={{ width: '100%' }}>
+            < Card className='mt-5' style={{ width: '100%' }
+            }>
                 <CardContent>
                     <div className="flex items-center justify-between">
                         <h2 className='text-xl font-bold'>Task Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
                     <div className="grid grid-cols-2 gap-6">
-                        {priorityTaskCount && priorityTaskCount.map((priorityTaskCount) => (
-                            <Card style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handleTaskDataClick(priorityTaskCount.Priority)} >
+                        {userPriorityTaskCount && userPriorityTaskCount.map((userPriorityTaskCount) => (
+                            <Card style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handleTaskDataClick(userPriorityTaskCount.Priority)} >
                                 <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(priorityTaskCount.Priority) }}>
-                                            {`${priorityTaskCount.Priority} Priority Task`}
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(userPriorityTaskCount.Priority) }}>
+                                            {`${userPriorityTaskCount.Priority} Priority Task`}
                                         </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
                                         <div className='grid grid-cols-1 gap-1'>
-                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(priorityTaskCount.Priority) }}>
-                                                TOTAL {priorityTaskCount.Priority.toUpperCase()} TASK COUNT: {priorityTaskCount.task_count}
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(userPriorityTaskCount.Priority) }}>
+                                                TOTAL {userPriorityTaskCount.Priority.toUpperCase()} TASK COUNT: {userPriorityTaskCount.task_count}
                                             </h2>
-                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(priorityTaskCount.Priority) }}>
-                                                {priorityTaskCount.Priority === 'Low' &&
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(userPriorityTaskCount.Priority) }}>
+                                                {userPriorityTaskCount.Priority === 'Low' &&
                                                     <>
-                                                        TOTAL PENDING TASK COUNT:{pendingTaskCount[0].pending_count}
+                                                        TOTAL PENDING TASK COUNT:{userPendingTaskCount[0].pending_count}
                                                     </>
                                                 }
-                                                {priorityTaskCount.Priority === 'Medium' &&
+                                                {userPriorityTaskCount.Priority === 'Medium' &&
                                                     <>
-                                                        TOTAL PENDING TASK COUNT:{pendingTaskCount[1].pending_count}
+                                                        TOTAL PENDING TASK COUNT:{userPendingTaskCount[1].pending_count}
                                                     </>
                                                 }
-                                                {priorityTaskCount.Priority === 'High' &&
+                                                {userPriorityTaskCount.Priority === 'High' &&
                                                     <>
-                                                        TOTAL PENDING TASK COUNT:{pendingTaskCount[2].pending_count}
+                                                        TOTAL PENDING TASK COUNT:{userPendingTaskCount[2].pending_count}
                                                     </>
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(priorityTaskCount.Priority)} />
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(userPriorityTaskCount.Priority)} />
                                     </div>
                                 </CardContent>
                             </Card>
                         ))}
-                        {allTaskData &&
+                        {userAllTaskData &&
                             <Card className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleTaskDataClick('alltaskdata')}>
                                 <CardContent>
                                     <div className="flex items-center justify-between">
@@ -370,10 +390,10 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                     <div className="flex items-center justify-between">
                                         <div className='grid grid-cols-1 gap-1'>
                                             <h2 className='text-xs font-light text-blue-800'>
-                                                TOTAL TASK COUNT: {taskCount}
+                                                TOTAL TASK COUNT: {userTaskCount}
                                             </h2>
                                             <h2 className='text-xs font-light text-blue-800'>
-                                                TOTAL PENDING TASK COUNT: {totalPendingTaskCount.pending_task_count}
+                                                TOTAL PENDING TASK COUNT: {userTotalPendingTaskCount.total_pending_tasks}
                                             </h2>
                                         </div>
                                         <SparkLineChart data={sparklineData} color={'blue'} />
@@ -383,55 +403,55 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                         }
                     </div>
                 </CardContent>
-            </Card>
+            </Card >
 
             {/* Pending subtask status */}
 
-            <Card className='mt-5' style={{ width: '100%' }}>
+            < Card className='mt-5' style={{ width: '100%' }}>
                 <CardContent>
                     <div className="flex items-center justify-between">
                         <h2 className='text-xl font-bold'>Subtask Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
                     <div className="grid grid-cols-2 gap-6">
-                        {prioritySubtaskCount.map((prioritySubtaskCount) => (
-                            <Card key={prioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(prioritySubtaskCount.Priority)} >
+                        {userPrioritySubtaskCount.map((userPrioritySubtaskCount) => (
+                            <Card key={userPrioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(userPrioritySubtaskCount.Priority)} >
                                 <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(prioritySubtaskCount.Priority) }}>
-                                            {`${prioritySubtaskCount.Priority} Priority Subtask`}
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(userPrioritySubtaskCount.Priority) }}>
+                                            {`${userPrioritySubtaskCount.Priority} Priority Subtask`}
                                         </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
                                         <div className='grid grid-cols-1 gap-1'>
-                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(prioritySubtaskCount.Priority) }}>
-                                                TOTAL SUBTASK COUNT: {prioritySubtaskCount.subtask_count}
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(userPrioritySubtaskCount.Priority) }}>
+                                                TOTAL SUBTASK COUNT: {userPrioritySubtaskCount.subtask_count}
                                             </h2>
-                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(prioritySubtaskCount.Priority) }}>
-                                                {prioritySubtaskCount.Priority === 'Low' &&
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(userPrioritySubtaskCount.Priority) }}>
+                                                {userPrioritySubtaskCount.Priority === 'Low' &&
                                                     <>
-                                                        TOTAL PENDING SUBTASK COUNT:{pendingSubtaskCount[0].pending_count}
+                                                        TOTAL PENDING SUBTASK COUNT:{userPendingSubtaskCount[0].pending_count}
                                                     </>
                                                 }
-                                                {prioritySubtaskCount.Priority === 'Medium' &&
+                                                {userPrioritySubtaskCount.Priority === 'Medium' &&
                                                     <>
-                                                        TOTAL PENDING SUBTASK COUNT:{pendingSubtaskCount[1].pending_count}
+                                                        TOTAL PENDING SUBTASK COUNT:{userPendingSubtaskCount[1].pending_count}
                                                     </>
                                                 }
-                                                {prioritySubtaskCount.Priority === 'High' &&
+                                                {userPrioritySubtaskCount.Priority === 'High' &&
                                                     <>
-                                                        TOTAL PENDING SUBTASK COUNT:{pendingSubtaskCount[2].pending_count}
+                                                        TOTAL PENDING SUBTASK COUNT:{userPendingSubtaskCount[2].pending_count}
                                                     </>
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(prioritySubtaskCount.Priority)} />
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(userPrioritySubtaskCount.Priority)} />
                                     </div>
                                 </CardContent>
                             </Card>
                         ))}
-                        {allSubtaskData &&
+                        {userAllSubtaskData &&
                             <Card className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick('allsubtaskdata')}>
                                 <CardContent>
                                     <div className="flex items-center justify-between">
@@ -443,12 +463,12 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                     <div className="flex items-center justify-between">
                                         <div className='grid grid-cols-1 gap-1'>
                                             <h2 className='text-xs font-light text-blue-800'>
-                                                TOTAL SUBTASK COUNT: {subtaskCount}
+                                                TOTAL SUBTASK COUNT: {userSubtaskCount}
                                             </h2>
-                                            {totalPendingSubtaskCount &&
-                                            <h2 className='text-xs font-light text-blue-800'>
-                                                TOTAL PENDING SUBTASK COUNT: {totalPendingSubtaskCount.pending_subtask_count}
-                                            </h2>
+                                            {userTotalPendingSubtaskCount &&
+                                                <h2 className='text-xs font-light text-blue-800'>
+                                                    TOTAL PENDING SUBTASK COUNT: {userTotalPendingSubtaskCount.pending_subtask_count}
+                                                </h2>
                                             }
                                         </div>
                                         <SparkLineChart data={sparklineData} color={'blue'} />
@@ -458,7 +478,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                         }
                     </div>
                 </CardContent>
-            </Card>
+            </Card >
 
             {
                 projectData &&
@@ -482,9 +502,18 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
 
                 />
             }
+            {
+                modalEditType === "createPersonalTask" &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                />
+            }
 
         </>
     )
 }
 
-export default ProjectDetailMUI;
+export default ProjectDetailMUIUser;

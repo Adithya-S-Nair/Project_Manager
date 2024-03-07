@@ -29,7 +29,7 @@ const style = {
 
 
 
-const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskData, filteredTaskData, setFilteredTaskData, filteredSubtaskData, setFilteredSubtaskData }) => {
+const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskData, filteredTaskData, setFilteredTaskData, filteredSubtaskData, setFilteredSubtaskData, setCalendarStartDate, setCalendarEndDate }) => {
 
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
@@ -47,6 +47,8 @@ const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskDat
             const dateFilter = taskData;
             const filteredDate = dateFilter.filter((task) => {
                 console.log(selectedDate.selection.endDate);
+                setCalendarStartDate(selectedDate.selection.startDate)
+                setCalendarEndDate(selectedDate.selection.endDate)
                 const projectDate = new Date(task.planned_start_date);
                 return (
                     projectDate >= selectedDate.selection.startDate &&
@@ -59,6 +61,8 @@ const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskDat
             const dateFilter = subtaskData;
             const filteredDate = dateFilter.filter((subtask) => {
                 console.log(selectedDate.selection.endDate);
+                setCalendarStartDate(selectedDate.selection.startDate)
+                setCalendarEndDate(selectedDate.selection.endDate)
                 const projectDate = new Date(subtask.planned_start_date);
                 return (
                     projectDate >= selectedDate.selection.startDate &&

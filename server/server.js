@@ -15,6 +15,7 @@ import userRoute from './routes/userRoute.js';
 import employeeRoute from './routes/employeeRoute.js';
 import assignRoute from './routes/assignRoute.js';
 import personalTaskRoute from './routes/personalTaskRoute.js';
+import personalSubtaskRoute from './routes/personalSubtaskRoute.js';
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/pmapi/user', userRoute);
 app.use('/pmapi/employee', employeeRoute);
 app.use('/pmapi/assign', assignRoute);
 app.use('/pmapi/personaltask', personalTaskRoute);
+app.use('/pmapi/personalSubtask', personalSubtaskRoute);
 
 // Listen to port
 app.listen(PORT, () => {

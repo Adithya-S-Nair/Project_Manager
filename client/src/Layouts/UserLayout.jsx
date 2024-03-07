@@ -33,6 +33,7 @@ import Button from '@mui/material/Button';
 import MenuComponent from '../Components/MenuComponent';
 import { makeRequest } from '../Axios';
 import { AuthContext } from '../Context/AuthContext';
+import { useContext } from 'react';
 
 const drawerWidth = 240;
 
@@ -80,6 +81,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 const UserLayout = () => {
+    const { user } = useContext(AuthContext)
     const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
@@ -88,6 +90,7 @@ const UserLayout = () => {
     const [listOpen, setListOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const menuOpen = Boolean(anchorEl);
+    console.log(user);
     // const { setUser } = React.useContext(AuthContext)
     const handleClicked = (event) => {
         setAnchorEl(event.currentTarget);
@@ -135,6 +138,14 @@ const UserLayout = () => {
     //         })
     // }
 
+    const projectDashboard = () => {
+        navigate('/user/dashboard');
+    };
+
+    const ganttChart = () => {
+        navigate('/user/ganttchart');
+    };
+
     return (
         <div>
             <Box sx={{ display: 'flex' }}>
@@ -151,10 +162,9 @@ const UserLayout = () => {
                             >
                                 <MenuIcon className='text-black' />
                             </IconButton>
-                            <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
-                                User
-                                {/* <img className='img-fluid' style={{ width: '7em' }} src={TechnodromeLogo} alt="" /> */}
-                            </Typography>
+                                <Typography variant="h6" noWrap component="div" className='font-bold text-black'>
+                                    {user.user_name}
+                                </Typography>
                         </Toolbar>
                         <Button
                             id="demo-positioned-button"
@@ -209,22 +219,22 @@ const UserLayout = () => {
                     <List>
                         <ListItem disablePadding>
                             <ListItemButton
-                                selected={location.pathname === '/newcustomer'}
-                                onClick={newCustomerNavigate}
+                                selected={location.pathname === '/user/dashboard'}
+                                onClick={projectDashboard}
                                 sx={{
                                     "&:hover": { backgroundColor: "#596876", color: "#161245" },
-                                    "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
+                                    "&.Mui-selected": { backgroundColor: "#596876", color: "#161245" }
                                 }}>
                                 <ListItemIcon>
                                     <PersonAddAltIcon className='text-white' />
                                 </ListItemIcon>
-                                <ListItemText className='text-white' primary='New Customer' />
+                                <ListItemText className='text-white' primary='Project Dashboard' />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton
-                                selected={location.pathname === '/newva'}
-                                onClick={newVaNavigate}
+                                selected={location.pathname === '/admin/ganttchart'}
+                                onClick={ganttChart}
                                 sx={{
                                     "&:hover": { backgroundColor: "#596876", color: "#161245" },
                                     "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
@@ -232,10 +242,10 @@ const UserLayout = () => {
                                 <ListItemIcon>
                                     <AccountBalanceIcon className='text-white' />
                                 </ListItemIcon>
-                                <ListItemText className='text-white' primary='New VA' />
+                                <ListItemText className='text-white' primary='Gantt Chart' />
                             </ListItemButton>
                         </ListItem>
-                        <ListItem disablePadding>
+                        {/* <ListItem disablePadding>
                             <ListItemButton
                                 selected={location.pathname === '/upload'}
                                 onClick={uploadNavigate}
@@ -248,9 +258,9 @@ const UserLayout = () => {
                                 </ListItemIcon>
                                 <ListItemText className='text-white' primary='Upload' />
                             </ListItemButton>
-                        </ListItem>
+                        </ListItem> */}
                     </List>
-                    <List
+                    {/* <List
                         sx={{ width: '100%', maxWidth: 360, bgcolor: 'transparent' }}
                         component="nav"
                         aria-labelledby="nested-list-subheader"
@@ -292,11 +302,11 @@ const UserLayout = () => {
                                 </ListItemButton>
                             </List>
                         </Collapse>
-                    </List>
+                    </List> */}
                 </Drawer>
-                <Main open={open} style={{minHeight:'100vh'}}>
+                <Main open={open} style={{ minHeight: '100vh' }}>
                     <DrawerHeader />
-                    <Outlet/>
+                    <Outlet />
                 </Main>
             </Box>
         </div>

@@ -27,8 +27,8 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
         const selectedNodes = event.columnApi.api.getSelectedRows();
         const titleName = selectedNodes[0] ? Object.keys(selectedNodes[0]) : null;
         if (titleName && titleName.length > 0) {
-            console.log(selectedNodes);
-            console.log(titleName[0]);
+            // console.log(selectedNodes);
+            // console.log(titleName[0]);
             if (titleName[0] === "task_id") {
                 const selectedData = selectedNodes.map(node => node.task_id);
                 handleSelectedTask(selectedData, selectedNodes);

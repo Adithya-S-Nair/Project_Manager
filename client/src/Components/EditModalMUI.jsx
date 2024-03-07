@@ -249,7 +249,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     }
 
     const handleTaskDelete = () => {
-        console.log(selectedTaskId);
+        // console.log(selectedTaskId);
         makeRequest.delete(`/task/deletemultipletask/${selectedTaskId}`)
             .then((res) => {
                 setToastOpen({ open: true, msg: "Task Deleted Successfully" })
@@ -584,193 +584,6 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                     <div className='flex justify-center mt-4'>
                         <Button variant="contained" onClick={handleEmployeeSubmit}>Save</Button>
                     </div>
-                </>
-            );
-            break;
-        case "editTask":
-            modalContent = (
-                <>
-                    {editTaskData &&
-                        <>
-                            <div className="flex items-center justify-between mb-2">
-                                <Typography id="modal-modal-title" variant="h6" component="h2">
-                                    Edit Task Details
-                                </Typography>
-                                <Tooltip title="Close">
-                                    <IconButton onClick={() => { setOpen(!open) }}>
-                                        <CloseIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
-                            <hr />
-                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                                <div className='grid grid-cols-1 gap-y-6'>
-                                    <TextField
-                                        id="outlined-password-input"
-                                        label="Task Name"
-                                        name="task_name"
-                                        type="text"
-                                        value={taskFormData.task_name}
-                                        onChange={handleTaskChange}
-
-                                    // onChange={(e) => handleCreateProjectChange(e)}
-                                    />
-                                    <div className='mt-7'>
-                                        <FormControl fullWidth >
-                                            <InputLabel id="demo-simple-select-label">Project Names</InputLabel>
-                                            <Select
-
-                                                labelId="demo-simple-select-label"
-                                                id="demo-simple-select"
-                                                value={taskFormData.project_id}
-                                                label="Project Names"
-                                                name='project_id'
-                                                onChange={handleTaskChange}
-                                            >
-                                                {editTaskProjectName && editTaskProjectName.map((project) => (
-                                                    <MenuItem
-                                                        key={project.project_id}
-                                                        value={project.project_id}
-                                                    // selected={project.project_id === editTaskData.project_id}
-                                                    >
-                                                        {project.project_name}
-                                                    </MenuItem>
-                                                ))}
-
-                                            </Select>
-                                        </FormControl>
-                                    </div>
-                                    <div className="flex gap-6">
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                                label="Planned Start Date"
-                                                name="planned_start_date"
-                                                slots={{ openPickerIcon: DateRangeIcon }}
-                                                value={dayjs(taskFormData.planned_start_date)}
-                                                onChange={(date) => setTaskFormData((prevData) => ({
-                                                    ...prevData,
-                                                    planned_start_date: date.format('YYYY-MM-DD')
-                                                }))}
-                                            />
-                                        </LocalizationProvider>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                                label="Planned End Date"
-                                                name="planned_end_date"
-                                                slots={{ openPickerIcon: DateRangeIcon }}
-                                                value={dayjs(taskFormData.planned_end_date)}
-                                                onChange={(date) => setTaskFormData((prevData) => ({
-                                                    ...prevData,
-                                                    planned_end_date: date.format('YYYY-MM-DD')
-                                                }))}
-
-                                            />
-                                        </LocalizationProvider>
-                                    </div>
-                                    <div className="flex gap-6">
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                                label="Actual Start Time"
-                                                name="actual_start_time"
-                                                slots={{ openPickerIcon: DateRangeIcon }}
-                                                value={dayjs(taskFormData.actual_start_time)}
-                                                onChange={(date) => setTaskFormData((prevData) => ({
-                                                    ...prevData,
-                                                    actual_start_time: date.format('YYYY-MM-DD')
-                                                }))}
-
-                                            />
-                                        </LocalizationProvider>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                                label="Actual End Time"
-                                                name="actual_end_time"
-                                                slots={{ openPickerIcon: DateRangeIcon }}
-                                                value={dayjs(taskFormData.actual_end_time)}
-                                                onChange={(date) => setTaskFormData((prevData) => ({
-                                                    ...prevData,
-                                                    actual_end_time: date.format('YYYY-MM-DD')
-                                                }))}
-                                            />
-                                        </LocalizationProvider>
-                                    </div>
-                                    <div className="flex gap-6">
-                                        <FormControl fullWidth>
-                                            <InputLabel id="demo-simple-select-label">Priority</InputLabel>
-                                            <Select
-                                                labelId="demo-simple-select-label"
-                                                id="demo-simple-select"
-
-                                                label="priority"
-                                                name='priority'
-                                                value={taskFormData.priority}
-                                                onChange={(e) => { handleTaskChange(e) }}
-                                            >
-                                                <MenuItem value={priority.high}>High</MenuItem>
-                                                <MenuItem value={priority.medium}>Medium</MenuItem>
-                                                <MenuItem value={priority.low}>Low</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                        <FormControl fullWidth>
-                                            <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                                            <Select
-                                                labelId="demo-simple-select-label"
-                                                id="demo-simple-select"
-                                                value={taskFormData.status}
-                                                label="status"
-                                                name='status'
-                                                onChange={(e) => handleTaskChange(e)}
-                                            >
-                                                <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
-                                                <MenuItem value={status.pending}>Pending</MenuItem>
-                                                <MenuItem value={status.onhold}>On Hold</MenuItem>
-                                                <MenuItem value={status.completed}>Completed</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </div>
-                                    <div className="flex gap-6">
-                                        <TextField
-                                            id="outlined-password-input"
-                                            label="Planned Budget"
-                                            name="planned_budget"
-                                            type="text"
-                                            value={taskFormData.planned_budget}
-                                            autoComplete="planned-budget"
-                                            onChange={handleTaskChange}
-                                        />
-                                        <TextField
-                                            id="outlined-password-input"
-                                            label="Actual Budget"
-                                            name="actual_budget"
-                                            type="text"
-                                            value={taskFormData.actual_budget}
-                                            autoComplete="actual-budget"
-                                            onChange={handleTaskChange}
-                                        />
-                                    </div>
-                                    <TextField
-                                        multiline
-                                        fullWidth
-                                        rows={3}
-                                        name='task_description'
-                                        label="Project Description"
-                                        value={taskFormData.task_description}
-                                        onChange={handleTaskChange}
-                                    />
-                                </div>
-                                <br />
-                                <div className='flex justify-center space-x-5'>
-                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
-                                        Cancel
-                                    </Button>
-                                    <Button variant="contained" size="medium" onClick={handleEditTask}>
-                                        Save Changes
-                                    </Button>
-                                </div>
-                            </Typography>
-
-                        </>
-                    }
                 </>
             );
             break;
@@ -1260,6 +1073,189 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                 </>
 
 
+            );
+            break;
+        case "createPersonalTask":
+            modalContent = (
+                <>
+                    <>
+                        <div className="flex items-center justify-between mb-2">
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Create Personal Task
+                            </Typography>
+                            <Tooltip title="Close">
+                                <IconButton onClick={() => { setOpen(!open) }}>
+                                    <CloseIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+                        <hr />
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <div className='grid grid-cols-1 gap-y-6'>
+                                <TextField
+                                    id="outlined-password-input"
+                                    label="Task Name"
+                                    name="task_name"
+                                    type="text"
+                                // value={taskFormData.task_name}
+                                // onChange={handleTaskChange}
+                                />
+                                <div>
+                                    <FormControl fullWidth >
+                                        <InputLabel id="demo-simple-select-label">Project Names</InputLabel>
+                                        <Select
+
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            // value={taskFormData.project_id}
+                                            label="Project Names"
+                                            name='project_id'
+                                            onChange={handleTaskChange}
+                                        >
+                                            {editTaskProjectName && editTaskProjectName.map((project) => (
+                                                <MenuItem
+                                                    key={project.project_id}
+                                                    value={project.project_id}
+                                                // selected={project.project_id === editTaskData.project_id}
+                                                >
+                                                    {project.project_name}
+                                                </MenuItem>
+                                            ))}
+
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex gap-6">
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Planned Start Date"
+                                            name="planned_start_date"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.planned_start_date)}
+                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                                ...prevData,
+                                                planned_start_date: date.format('YYYY-MM-DD')
+                                            }))}
+                                        />
+                                    </LocalizationProvider>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Planned End Date"
+                                            name="planned_end_date"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.planned_end_date)}
+                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                                ...prevData,
+                                                planned_end_date: date.format('YYYY-MM-DD')
+                                            }))}
+
+                                        />
+                                    </LocalizationProvider>
+                                </div>
+                                <div className="flex gap-6">
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Actual Start Time"
+                                            name="actual_start_time"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.actual_start_time)}
+                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                                ...prevData,
+                                                actual_start_time: date.format('YYYY-MM-DD')
+                                            }))}
+
+                                        />
+                                    </LocalizationProvider>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Actual End Time"
+                                            name="actual_end_time"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.actual_end_time)}
+                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                                ...prevData,
+                                                actual_end_time: date.format('YYYY-MM-DD')
+                                            }))}
+                                        />
+                                    </LocalizationProvider>
+                                </div>
+                                <div className="flex gap-6">
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+
+                                            label="priority"
+                                            name='priority'
+                                            // value={taskFormData.priority}
+                                            onChange={(e) => { handleTaskChange(e) }}
+                                        >
+                                            <MenuItem value={priority.high}>High</MenuItem>
+                                            <MenuItem value={priority.medium}>Medium</MenuItem>
+                                            <MenuItem value={priority.low}>Low</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            // value={taskFormData.status}
+                                            label="status"
+                                            name='status'
+                                            onChange={(e) => handleTaskChange(e)}
+                                        >
+                                            <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
+                                            <MenuItem value={status.pending}>Pending</MenuItem>
+                                            <MenuItem value={status.onhold}>On Hold</MenuItem>
+                                            <MenuItem value={status.completed}>Completed</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex gap-6">
+                                    <TextField
+                                        id="outlined-password-input"
+                                        label="Planned Budget"
+                                        name="planned_budget"
+                                        type="text"
+                                        // value={taskFormData.planned_budget}
+                                        autoComplete="planned-budget"
+                                        onChange={handleTaskChange}
+                                    />
+                                    <TextField
+                                        id="outlined-password-input"
+                                        label="Actual Budget"
+                                        name="actual_budget"
+                                        type="text"
+                                        // value={taskFormData.actual_budget}
+                                        autoComplete="actual-budget"
+                                        onChange={handleTaskChange}
+                                    />
+                                </div>
+                                <TextField
+                                    multiline
+                                    fullWidth
+                                    rows={3}
+                                    name='task_description'
+                                    label="Project Description"
+                                    // value={taskFormData.task_description}
+                                    onChange={handleTaskChange}
+                                />
+                            </div>
+                            <br />
+                            <div className='flex justify-center space-x-5'>
+                                <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                    Cancel
+                                </Button>
+                                <Button variant="contained" size="medium" onClick={handleEditTask}>
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </Typography>
+
+                    </>
+                </>
             );
             break;
         default:

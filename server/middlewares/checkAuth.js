@@ -13,6 +13,7 @@ const checkAuth = (req, res, next) => {
                 return res.status(401).json({ msg: 'Unauthorized: Invalid Token' });
 
             }
+            console.log(userData);
             req.userId = userData.user_id;
             req.userType = userData.user_type;
             req.userName = userData.user_name;

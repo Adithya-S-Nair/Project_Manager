@@ -25,7 +25,7 @@ export const getAllProjects = (req, res) => {
         })
     } else if (userType === "Users" || userType === "users") {
         const q = `  SELECT
-        project.project_id, project.project_name
+        distinct project.project_id, project.project_name
         FROM
         project
         JOIN

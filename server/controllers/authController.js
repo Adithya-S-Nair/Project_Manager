@@ -69,7 +69,8 @@ export const login = (req, res) => {
             {
                 user_id: selectResult[0].user_id,
                 user_type: selectResult[0].user_type,
-                email: selectResult[0].user_email
+                email: selectResult[0].user_email,
+                user_name: selectResult[0].user_name,
             },
             process.env.SECRET
         );
@@ -88,6 +89,11 @@ export const logout = (req, res) => {
 
 export const verify = (req, res) => {
     if (req.userId) {
-        return res.status(200).json({ msg: "authorization successful", userId: req.userId, user_type: req.userType })
+        return res.status(200).json({
+            msg: "authorization successful",
+            user_id: req.userId,
+            user_name: req.userName,
+            user_type: req.userType
+        })
     }
 }

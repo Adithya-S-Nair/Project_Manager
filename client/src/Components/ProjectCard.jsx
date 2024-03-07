@@ -98,7 +98,7 @@ const ProjectCard = () => {
         }
     }, [projectData])
 
-
+    console.log(projectData);
     // const { isloading: projectDataLoading, err: projectErrorLoading, data: projectInfo} = useQuery(["projectData",projectData], async () => {
     //     console.log("hiiiiiii");
     //     const response = await makeRequest.get('/project/getallprojects')
@@ -136,7 +136,11 @@ const ProjectCard = () => {
     const CardComponent = theme === 'theme1' ? MUICard : DaisyUICard;
 
     const handleNavigate = (projectId) => {
-        navigate(`/admin/projectdetail/${projectId}`)
+        if (user.user_type === 'Admin')
+            navigate(`/admin/projectdetail/${projectId}`)
+        else
+            navigate(`/user/projectdetail/${projectId}`)
+
     }
 
     // if (projectDataLoading) {
@@ -148,7 +152,12 @@ const ProjectCard = () => {
     return (
         <div>
             <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 mx-auto text-center`}>
-                {projectData && projectData.map((project, index) => (
+                {user.user_type === 'Admin' && projectData && projectData.map((project, index) => (
+                    <div onClick={() => handleNavigate(project.project_id)} key={project.project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
+                        <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]} />
+                    </div>
+                ))}
+                {user.user_type === 'Users' && projectData && projectData.map((project, index) => (
                     <div onClick={() => handleNavigate(project.project_id)} key={project.project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
                         <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]} />
                     </div>

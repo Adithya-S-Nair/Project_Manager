@@ -9,10 +9,10 @@ import EditModal from './EditModalMUI';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { makeRequest } from '../Axios';
-import { useMediaQuery } from '@mui/material';
+import { Card, CardContent, useMediaQuery } from '@mui/material';
 
 
-function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, pendingTaskCount, pendingSubtaskCount, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, allTaskData, taskCount, allSubtaskData, subtaskCount, projectId }) {
+function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectData, gridApi, setGridApi, chevronRotation, setChevronRotation, radarChartData, sparklineData, navigate, taskData, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, allTaskData, taskCount, allSubtaskData, subtaskCount, projectId, priorityTaskCount, prioritySubtaskCount, pendingTaskCount, pendingSubtaskCount, totalPendingTaskCount, totalPendingSubtaskCount }) {
     const [activeTab, setActiveTab] = useState(0);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [anchorEl1, setAnchorEl1] = useState(null);
@@ -29,8 +29,8 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
     };
     const [modalEditType, setModalEditType] = useState("")
     const [selectedTask, setSelectedTask] = useState(null);
-    const [filteredtaskData, setFilteredTaskData] = useState(taskData)
-    const [filteredSubtaskData, setFilteredSubtaskData] = useState(subtaskData)
+    const [filteredtaskData, setFilteredTaskData] = useState()
+    const [filteredSubtaskData, setFilteredSubtaskData] = useState()
     const [taskColumns, setTaskColumns] = useState([
         {
             colId: '0_1',
@@ -142,7 +142,6 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
             .then((res) => {
                 setEmployeeList(res.data);
 
-                // Update taskColumns after fetching employeeList
                 setTaskColumns(prevColumns => {
                     return prevColumns.map(column => {
                         if (column.field === 'employee_name') {
@@ -403,34 +402,65 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                     </div>
                     <hr className='mt-2 mb-2' />
                     <div className="grid grid-cols-2 gap-6">
-                        {pendingTaskCount && pendingTaskCount.map((pendingTaskCount) => (
-                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleTaskDataClick(pendingTaskCount.Priority)}>
-                                <div className="card-body">
+                        {priorityTaskCount && priorityTaskCount.map((priorityTaskCount) => (
+                            <Card style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handleTaskDataClick(priorityTaskCount.Priority)} >
+                                <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(pendingTaskCount.Priority) }}>{pendingTaskCount.Priority} Priority Task</h2>
-                                        {console.log(pendingTaskCount.Priority)}
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(priorityTaskCount.Priority) }}>
+                                            {`${priorityTaskCount.Priority} Priority Task`}
+                                        </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-4xl font-extrabold' style={{ color: getChartPriorityColor(pendingTaskCount.Priority) }}>{pendingTaskCount.task_count}</h2>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingTaskCount.Priority)} />
+                                        <div className='grid grid-cols-1 gap-1'>
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(priorityTaskCount.Priority) }}>
+                                                TOTAL {priorityTaskCount.Priority.toUpperCase()} TASK COUNT: {priorityTaskCount.task_count}
+                                            </h2>
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(priorityTaskCount.Priority) }}>
+                                                {priorityTaskCount.Priority === 'Low' &&
+                                                    <>
+                                                        TOTAL PENDING TASK COUNT:{pendingTaskCount[0].pending_count}
+                                                    </>
+                                                }
+                                                {priorityTaskCount.Priority === 'Medium' &&
+                                                    <>
+                                                        TOTAL PENDING TASK COUNT:{pendingTaskCount[1].pending_count}
+                                                    </>
+                                                }
+                                                {priorityTaskCount.Priority === 'High' &&
+                                                    <>
+                                                        TOTAL PENDING TASK COUNT:{pendingTaskCount[2].pending_count}
+                                                    </>
+                                                }
+                                            </h2>
+                                        </div>
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(priorityTaskCount.Priority)} />
                                     </div>
-                                </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         ))}
                         {allTaskData &&
-                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleTaskDataClick('alltaskdata')}>
-                                <div className="card-body">
+                            <Card className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleTaskDataClick('alltaskdata')}>
+                                <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-xl font-bold text-blue-800'>All Task</h2>
+                                        <h2 className={`text-xl font-bold text-blue-800`}>
+                                            {`All Tasks`}
+                                        </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-4xl font-extrabold text-blue-800'>{taskCount}</h2>
-                                        <SparkLineChart data={sparklineData} color="blue" />
+                                        <div className='grid grid-cols-1 gap-1'>
+                                            <h2 className='text-xs font-light text-blue-800'>
+                                                TOTAL TASK COUNT: {taskCount}
+                                            </h2>
+                                            <h2 className='text-xs font-light text-blue-800'>
+                                                TOTAL PENDING TASK COUNT: {totalPendingTaskCount.pending_task_count}
+                                            </h2>
+                                        </div>
+                                        <SparkLineChart data={sparklineData} color={'blue'} />
                                     </div>
-                                </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         }
                     </div>
                 </div>
@@ -444,33 +474,67 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                     </div>
                     <hr className='mt-2 mb-2' />
                     <div className="grid grid-cols-2 gap-6">
-                        {pendingSubtaskCount.map((pendingSubtaskCount) => (
-                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(pendingSubtaskCount.Priority)} >
-                                <div className="card-body">
+                        {prioritySubtaskCount.map((prioritySubtaskCount) => (
+                            <Card key={prioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(prioritySubtaskCount.Priority)} >
+                                <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(pendingSubtaskCount.Priority) }}>{pendingSubtaskCount.Priority} Priority Subtask</h2>
+                                        <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(prioritySubtaskCount.Priority) }}>
+                                            {`${prioritySubtaskCount.Priority} Priority Subtask`}
+                                        </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
-                                        <h2 className='text-4xl font-extrabold' style={{ color: getChartPriorityColor(pendingSubtaskCount.Priority) }}>{pendingSubtaskCount.subtask_count}</h2>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(pendingSubtaskCount.Priority)} />
+                                        <div className='grid grid-cols-1 gap-1'>
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(prioritySubtaskCount.Priority) }}>
+                                                TOTAL SUBTASK COUNT: {prioritySubtaskCount.subtask_count}
+                                            </h2>
+                                            <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(prioritySubtaskCount.Priority) }}>
+                                                {prioritySubtaskCount.Priority === 'Low' &&
+                                                    <>
+                                                        TOTAL PENDING SUBTASK COUNT:{pendingSubtaskCount[0].pending_count}
+                                                    </>
+                                                }
+                                                {prioritySubtaskCount.Priority === 'Medium' &&
+                                                    <>
+                                                        TOTAL PENDING SUBTASK COUNT:{pendingSubtaskCount[1].pending_count}
+                                                    </>
+                                                }
+                                                {prioritySubtaskCount.Priority === 'High' &&
+                                                    <>
+                                                        TOTAL PENDING SUBTASK COUNT:{pendingSubtaskCount[2].pending_count}
+                                                    </>
+                                                }
+                                            </h2>
+                                        </div>
+                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(prioritySubtaskCount.Priority)} />
                                     </div>
-                                </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         ))}
                         {allSubtaskData &&
-                            <div className='card card-compact shadow-xl mt-5 cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick('allsubtaskdata')}>
-                                <div className="card-body">
+                            <Card className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick('allsubtaskdata')}>
+                                <CardContent>
                                     <div className="flex items-center justify-between">
-                                        <h2 className={`text-xl font-bold text-blue-800`}>All Subtask</h2>
+                                        <h2 className={`text-xl font-bold text-blue-800`}>
+                                            {'All Subtasks'}
+                                        </h2>
                                     </div>
                                     <hr className='mt-2 mb-2' />
                                     <div className="flex items-center justify-between">
-                                        <h2 className={`text-4xl font-extrabold text-blue-800`}>{subtaskCount}</h2>
-                                        <SparkLineChart data={sparklineData} color="blue" />
+                                        <div className='grid grid-cols-1 gap-1'>
+                                            <h2 className='text-xs font-light text-blue-800'>
+                                                TOTAL SUBTASK COUNT: {subtaskCount}
+                                            </h2>
+                                            {totalPendingSubtaskCount &&
+                                                <h2 className='text-xs font-light text-blue-800'>
+                                                    TOTAL PENDING SUBTASK COUNT: {totalPendingSubtaskCount.pending_subtask_count}
+                                                </h2>
+                                            }
+                                        </div>
+                                        <SparkLineChart data={sparklineData} color={'blue'} />
                                     </div>
-                                </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         }
                     </div>
                 </div>

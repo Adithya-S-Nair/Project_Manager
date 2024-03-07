@@ -7,20 +7,28 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ProjectDetailMUI from '../../Components/ProjectDetailMUI';
 import ProjectDetailDaisyUI from '../../Components/ProjectDetailDaisyUI';
 import WorkProgress from '../Admin/WorkProgress';
+import { AuthContext } from '../../Context/AuthContext';
+import ProjectDetailMUIUser from '../../Components/ProjectDetailMUIUser'
 
 
 const ProjectDetail = () => {
+    const {user} = useContext(AuthContext);
     const { projectId } = useParams();
     const { theme } = useContext(ThemeContext)
     const [value, setValue] = useState(0);
     const [taskData, setTaskData] = useState([]);
     const [allTaskData, setAllTaskData] = useState();
     const [taskCount, setTaskCount] = useState();
+    const [userAllTaskData, setUserAllTaskData] = useState();
+    const [userTaskCount, setUserTaskCount] = useState();
     const [allSubtaskData, setAllSubtaskData] = useState();
     const [subtaskCount, setSubtaskCount] = useState();
+    const [userAllSubtaskData, setUserAllSubtaskData] = useState();
+    const [userSubtaskCount, setUserSubtaskCount] = useState();
     const [gridApi, setGridApi] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [chevronRotation, setChevronRotation] = useState(0);
+    console.log(user);
     const sparklineData = {
         labels: ['January', 'February', 'March', 'April', 'May', 'June'],
         datasets: [
@@ -36,6 +44,17 @@ const ProjectDetail = () => {
         return response.data;
     });
 
+    const { data: prioritySubtaskCount, error: prioritySubtaskError, isLoading: prioritySubtaskLoading } = useQuery(
+        ['prioritySubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getprioritysubtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
     const { data: pendingSubtaskCount, error: pendingSubtaskError, isLoading: pendingSubtaskLoading } = useQuery(
         ['pendingSubtaskCount', projectId],
         async () => {
@@ -47,6 +66,30 @@ const ProjectDetail = () => {
         }
     );
 
+    const { data: totalPendingSubtaskCount, error: totalPendingSubtaskError, isLoading: totalPendingSubtaskLoading } = useQuery(
+        ['totalPendingSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/gettotalpendingsubtaskcount/${projectId}`);
+
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    const { data: priorityTaskCount, error: priorityTaskError, isLoading: priorityTaskLoading } = useQuery(
+        ['priorityTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getprioritytaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+
     const { data: pendingTaskCount, error: pendingTaskError, isLoading: pendingTaskLoading } = useQuery(
         ['pendingTaskCount', projectId],
         async () => {
@@ -54,7 +97,29 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, // Only fetch if projectData is available
+            enabled: !!projectData,
+        }
+    );
+
+    // const { data: totalTaskCount, error: totalTaskError, isLoading: totalTaskLoading } = useQuery(
+    //     ['totalTaskCount', projectId],
+    //     async () => {
+    //         const response = await makeRequest.get(`/task/gettotaltaskcount/${projectId}`);
+    //         return response.data;
+    //     },
+    //     {
+    //         enabled: !!projectData, 
+    //     }
+    // );
+
+    const { data: totalPendingTaskCount, error: totalPendingTaskError, isLoading: totalPendingTaskLoading } = useQuery(
+        ['totalPendingTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/gettotalpendingtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
         }
     );
 
@@ -137,8 +202,103 @@ const ProjectDetail = () => {
         }
     );
 
-    if (projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
-        console.error('Error fetching data:', projectError || pendingTaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
+    const { data: userPriorityTaskCount, error: userPriorityTaskError, isLoading: userPriorityTaskLoading } = useQuery(
+        ['priorityTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getuserprioritytaskcount/${projectId}/${user.user_id}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+    
+    const { data: userPendingTaskCount, error: userPendingTaskError, isLoading: userPendingTaskLoading } = useQuery(
+        ['UserPendingTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getuserpendingtaskcount/${projectId}/${user.user_id}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    const { data: getUserAllTaskData, error: getUserAllTaskDataError, isLoading: getUserAllTaskDataLoading } = useQuery(
+        ['UserAllTaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getprojecttasks/${projectId}`);
+            setUserTaskCount(response.data.taskCount)
+            setUserAllTaskData(response.data.tasks);
+            // console.log(response.data.tasks);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: userTotalPendingTaskCount, error: userTotalPendingTaskError, isLoading: userTotalPendingTaskLoading } = useQuery(
+        ['UserTotalPendingTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/task/getusertotalpendingtaskcount/${projectId}/${user.user_id}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    const { data: userPrioritySubtaskCount, error: userPrioritySubtaskError, isLoading: userPrioritySubtaskLoading } = useQuery(
+        ['UserPrioritySubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getuserprioritysubtaskcount/${projectId}/${user.user_id}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: userPendingSubtaskCount, error: userPendingSubtaskError, isLoading: userPendingSubtaskLoading } = useQuery(
+        ['UserPendingSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getuserpendingsubtaskcount/${projectId}/${user.user_id}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: getUserAllSubtaskData, error: getUserAllSubtaskDataError, isLoading: getUserAllSubtaskDataLoading } = useQuery(
+        ['UserAllSubtaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getuserprojectsubtasks/${projectId}/${user.user_id}`);
+            setUserSubtaskCount(response.data.subtaskCount)
+            setUserAllSubtaskData(response.data.subtasks);
+            // console.log(response.data.tasks);
+            return response.data;
+        },
+        {
+            enabled: !!projectData && user.user_type==='Users', // Only fetch if projectData is available
+        }
+    );
+
+    const { data: userTotalPendingSubtaskCount, error: userTotalPendingSubtaskError, isLoading: userTotalPendingSubtaskLoading } = useQuery(
+        ['UserTotalPendingSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/subtask/getusertotalpendingsubtaskcount/${projectId}/${user.user_id}`);
+
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    if (projectError || userPrioritySubtaskError  || getUserAllSubtaskDataError || userTotalPendingSubtaskError || pendingTaskError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskLoading || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || prioritySubtaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
+        console.error('Error fetching data:', projectError || pendingTaskError || getUserAllSubtaskDataError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || userTotalPendingSubtaskError || pendingSubtaskError || prioritySubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
         return <div>Error fetching data</div>;
     }
 
@@ -187,7 +347,7 @@ const ProjectDetail = () => {
         }
     };
 
-    if (projectLoading || pendingTaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading || updateTaskLoading) {
+    if (userPrioritySubtaskLoading || userTotalPendingSubtaskLoading || getUserAllSubtaskDataLoading || getUserAllTaskDataLoading || userTotalPendingTaskLoading || projectLoading || pendingTaskLoading || totalPendingTaskLoading || taskDataLoading || priorityTaskLoading || prioritySubtaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading || updateTaskLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />
@@ -195,7 +355,7 @@ const ProjectDetail = () => {
         );
     }
     console.log(gridApi);
-    if (theme === 'theme1') {
+    if (theme === 'theme1' && user.user_type === 'Admin') {
         return (
             <>
                 {projectData && (
@@ -210,6 +370,8 @@ const ProjectDetail = () => {
                         setChevronRotation={setChevronRotation}
                         radarChartData={radarChartData}
                         projectData={projectData}
+                        priorityTaskCount={priorityTaskCount}
+                        prioritySubtaskCount={prioritySubtaskCount}
                         pendingTaskCount={pendingTaskCount}
                         pendingSubtaskCount={pendingSubtaskCount}
                         sparklineData={sparklineData}
@@ -229,6 +391,8 @@ const ProjectDetail = () => {
                         allSubtaskData={allSubtaskData}
                         subtaskCount={subtaskCount}
                         projectId={projectId}
+                        totalPendingTaskCount={totalPendingTaskCount}
+                        totalPendingSubtaskCount={totalPendingSubtaskCount}
                     />
                 )}
 
@@ -236,7 +400,7 @@ const ProjectDetail = () => {
         );
     }
 
-    else if (theme === 'theme2') {
+    else if (theme === 'theme2' && user.user_type === 'Admin') {
         return (
             projectData && (
                 <>
@@ -250,8 +414,8 @@ const ProjectDetail = () => {
                         chevronRotation={chevronRotation}
                         setChevronRotation={setChevronRotation}
                         projectData={projectData}
-                        pendingTaskCount={pendingTaskCount}
-                        pendingSubtaskCount={pendingSubtaskCount}
+                        priorityTaskCount={priorityTaskCount}
+                        prioritySubtaskCount={prioritySubtaskCount}
                         sparklineData={sparklineData}
                         taskData={taskData}
                         subtaskData={subtaskData}
@@ -269,11 +433,59 @@ const ProjectDetail = () => {
                         allSubtaskData={allSubtaskData}
                         subtaskCount={subtaskCount}
                         projectId={projectId}
+                        pendingTaskCount={pendingTaskCount}
+                        pendingSubtaskCount={pendingSubtaskCount}
+                        totalPendingTaskCount={totalPendingTaskCount}
+                        totalPendingSubtaskCount={totalPendingSubtaskCount}
                     />
                 </>
             )
         );
-    } else {
+    } else if (theme === 'theme1' && user.user_type === 'Users' ) {
+        return (
+            <>
+                {projectData && (
+                    <ProjectDetailMUIUser
+                        value={value}
+                        setValue={setValue}
+                        gridApi={gridApi}
+                        setGridApi={setGridApi}
+                        anchorEl={anchorEl}
+                        setAnchorEl={setAnchorEl}
+                        chevronRotation={chevronRotation}
+                        setChevronRotation={setChevronRotation}
+                        radarChartData={radarChartData}
+                        projectData={projectData}
+                        userPriorityTaskCount={userPriorityTaskCount}
+                        userPrioritySubtaskCount={userPrioritySubtaskCount}
+                        userPendingTaskCount={userPendingTaskCount}
+                        userPendingSubtaskCount={userPendingSubtaskCount}
+                        sparklineData={sparklineData}
+                        taskData={taskData}
+                        setTaskData={setTaskData}
+                        subtaskData={subtaskData}
+                        navigate={navigate}
+                        handleMenuOpen={handleMenuOpen}
+                        handleMenuClose={handleMenuClose}
+                        handleChange={handleChange}
+                        navigateToAllProject={navigateToAllProject}
+                        getPriorityColor={getPriorityColor}
+                        getChartPriorityColor={getChartPriorityColor}
+                        projectCompletionStatus={projectCompletionStatus}
+                        userAllTaskData={userAllTaskData}
+                        userTaskCount={userTaskCount}
+                        userAllSubtaskData={userAllSubtaskData}
+                        userSubtaskCount={userSubtaskCount}
+                        projectId={projectId}
+                        userTotalPendingTaskCount={userTotalPendingTaskCount}
+                        userTotalPendingSubtaskCount={userTotalPendingSubtaskCount}
+                    />
+                )}
+
+            </>
+        );
+    }
+    else {
         // Handle unsupported theme
         return null;
     }

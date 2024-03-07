@@ -137,7 +137,7 @@ export const deleteSubtask = (req, res) => {
     })
 }
 
-export const getPendingSubtaskCount = (req, res) => {
+export const getPrioritySubtaskCount = (req, res) => {
     const query = `SELECT
                    possible_priorities.Priority,
                    COALESCE(COUNT(subtask_id), 0) AS subtask_count
@@ -159,6 +159,42 @@ export const getPendingSubtaskCount = (req, res) => {
         if (data.length === 0) return res.status(404).json({ msg: "No data found" })
         return res.status(200).json(data)
     })
+}
+
+export const getPendingSubtaskCount = (req, res) => {
+    const query = `SELECT
+                   possible_priorities.Priority,
+                   COALESCE(SUM(CASE WHEN subtask.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
+                   FROM
+                   (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+                   LEFT JOIN
+                   subtask ON possible_priorities.Priority = subtask.Priority
+                   AND subtask.project_id = ?
+                   AND subtask.is_deleted = 0
+                   WHERE
+                   possible_priorities.Priority IN ('High', 'Medium', 'Low')
+                   GROUP BY
+                   possible_priorities.Priority
+                   ORDER BY
+                   FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High')`
+
+    db.query(query, [req.params.projectId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" })
+        return res.status(200).json(data)
+    })
+}
+
+export const getTotalPendingSubtaskCount = (req, res) => {
+  
+        const query = `SELECT COUNT(status) AS pending_subtask_count from subtask where status = 'pending' AND project_id = ? AND is_deleted = 0`;
+
+        db.query(query, [req.params.projectId], (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length === 0) return res.status(404).json({ msg: "No data found" })
+            return res.status(200).json(data[0])
+        })
+
 }
 
 export const getSubtaskNameById = (req, res) => {
@@ -227,7 +263,7 @@ export const updateSubtaskById = (req, res) => {
                     [subtaskId, employeeName, req.body.project_id]); // replace projectId and roleId with the appropriate values
             }
         });
-    }
+    } 
 
     console.log(subtaskId);
     console.log(req.body);
@@ -294,8 +330,8 @@ export const deleteMultipleSubtask = (req, res) => {
     });
 }
 
-export const getProjectSubtasks = (req,res) =>{
-    const {projectId} = req.params;
+export const getProjectSubtasks = (req, res) => {
+    const { projectId } = req.params;
 
     // Query to fetch all task information
     const subtaskQuery = `SELECT * FROM subtask WHERE project_id = ?`;
@@ -318,24 +354,24 @@ export const getProjectSubtasks = (req,res) =>{
             });
         })
     ])
-    .then(([subtasks, subtaskCount]) => {
-        if (subtasks.length === 0) {
-            return res.status(404).json({ msg: "No tasks found for the project" });
-        }
-        return res.status(200).json({ subtasks, subtaskCount });
-    })
-    .catch(err => {
-        console.error("Error fetching data:", err);
-        return res.status(500).json({ error: "Internal server error" });
-    });
+        .then(([subtasks, subtaskCount]) => {
+            if (subtasks.length === 0) {
+                return res.status(404).json({ msg: "No tasks found for the project" });
+            }
+            return res.status(200).json({ subtasks, subtaskCount });
+        })
+        .catch(err => {
+            console.error("Error fetching data:", err);
+            return res.status(500).json({ error: "Internal server error" });
+        });
 }
 
-export const getProjectSubtaskByProjectId = (req,res) =>{
-    const {projectId} = req.params;
+export const getProjectSubtaskByProjectId = (req, res) => {
+    const { projectId } = req.params;
 
     const query = `SELECT * FROM subtask where project_id = ? AND is_deleted = 0`;
 
-    db.query(query, projectId, (err,data)=>{
+    db.query(query, projectId, (err, data) => {
         if (err) return res.status(500).json(err);
 
         if (data.length === 0) {
@@ -352,12 +388,12 @@ export const getProjectSubtaskByProjectId = (req,res) =>{
     })
 }
 
-export const getProjectPriorityBasedSubtask = (req,res) =>{
-    const {projectId,priority} = req.params;
+export const getProjectPriorityBasedSubtask = (req, res) => {
+    const { projectId, priority } = req.params;
 
-    const query =' SELECT * FROM subtask WHERE project_id = ? AND Priority = ? AND is_deleted = 0';
-    const value =[projectId,priority];
-    db.query(query, value, (err,data)=>{
+    const query = ' SELECT * FROM subtask WHERE project_id = ? AND Priority = ? AND is_deleted = 0';
+    const value = [projectId, priority];
+    db.query(query, value, (err, data) => {
         if (err) return res.status(500).json(err);
 
         if (data.length === 0) {
@@ -373,3 +409,179 @@ export const getProjectPriorityBasedSubtask = (req,res) =>{
         return res.status(200).json(data)
     })
 }
+
+export const getUserProjectSubtasks = (req, res) => {
+    const { projectId, userId } = req.params; 
+
+    const subtaskQuery = `
+        SELECT s.*
+        FROM subtask s
+        INNER JOIN assigned a ON s.subtask_id = a.subtask_id
+        INNER JOIN employee e ON a.employee_id = e.employee_id
+        INNER JOIN users u ON e.user_account_id = u.user_id
+        WHERE s.project_id = ? AND u.user_id = ?
+    `;
+
+    const countQuery = `
+        SELECT COUNT(s.subtask_id) AS subtask_count
+        FROM subtask s
+        INNER JOIN assigned a ON s.subtask_id = a.subtask_id
+        INNER JOIN employee e ON a.employee_id = e.employee_id
+        INNER JOIN users u ON e.user_account_id = u.user_id
+        WHERE s.project_id = ? AND u.user_id = ?
+    `;
+
+    Promise.all([
+        new Promise((resolve, reject) => {
+            db.query(subtaskQuery, [projectId, userId], (err, subtasks) => {
+                if (err) reject(err);
+
+                // Format dates for each subtask
+                subtasks.forEach(row => {
+                    row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+                    row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+                    row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+                    row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+                });
+
+                resolve(subtasks);
+            });
+        }),
+        new Promise((resolve, reject) => {
+            db.query(countQuery, [projectId, userId], (err, counts) => {
+                if (err) reject(err);
+                resolve(counts[0].subtask_count); 
+            });
+        })
+    ])
+        .then(([subtasks, subtaskCount]) => {
+            if (subtasks.length === 0) {
+                return res.status(404).json({ msg: "No subtasks found for the project" });
+            }
+            return res.status(200).json({ subtasks, subtaskCount });
+        })
+        .catch(err => {
+            console.error("Error fetching data:", err);
+            return res.status(500).json({ error: "Internal server error" });
+        });
+}
+
+export const getUserProjectPriorityBasedSubtask = (req, res) => {
+    const { projectId, priority, userId } = req.params;
+
+    const query = `
+        SELECT s.*
+        FROM subtask s
+        INNER JOIN assigned a ON s.subtask_id = a.subtask_id
+        INNER JOIN employee e ON a.employee_id = e.employee_id
+        INNER JOIN users u ON e.user_account_id = u.user_id
+        WHERE s.project_id = ? AND s.Priority = ? AND s.is_deleted = 0 AND u.user_id = ?
+    `;
+    const values = [projectId, priority, userId];
+
+    db.query(query, values, (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data);
+    });
+};
+
+export const getUserPrioritySubtaskCount = (req, res) => {
+    const {userId} = req.params; 
+    const query = `
+        SELECT
+            possible_priorities.Priority,
+            COALESCE(COUNT(subtask.subtask_id), 0) AS subtask_count
+        FROM
+            (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+        LEFT JOIN
+            (SELECT sub.Priority, sub.subtask_id
+            FROM subtask sub
+            INNER JOIN assigned a ON sub.subtask_id = a.subtask_id
+            INNER JOIN employee e ON a.employee_id = e.employee_id
+            INNER JOIN users u ON e.user_account_id = u.user_id
+            WHERE sub.project_id = ?
+            AND sub.is_deleted = 0
+            AND u.user_id = ?) AS subtask
+        ON possible_priorities.Priority = subtask.Priority
+        WHERE
+            possible_priorities.Priority IN ('High', 'Medium', 'Low')
+        GROUP BY
+            possible_priorities.Priority
+        ORDER BY
+            FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High');
+    `;
+
+    db.query(query, [req.params.projectId, userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+        return res.status(200).json(data);
+    });
+};
+
+export const getUserPendingSubtaskCount = (req, res) => {
+    const userId = req.params.userId;
+
+    const query = `
+        SELECT
+            possible_priorities.Priority,
+            COALESCE(SUM(CASE WHEN subtask.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
+        FROM
+            (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+        LEFT JOIN
+            (SELECT sub.Priority, sub.status
+            FROM subtask sub
+            INNER JOIN assigned a ON sub.subtask_id = a.subtask_id
+            INNER JOIN employee e ON a.employee_id = e.employee_id
+            INNER JOIN users u ON e.user_account_id = u.user_id
+            WHERE sub.project_id = ?
+            AND sub.is_deleted = 0
+            AND u.user_id = ?) AS subtask
+        ON possible_priorities.Priority = subtask.Priority
+        WHERE
+            possible_priorities.Priority IN ('High', 'Medium', 'Low')
+        GROUP BY
+            possible_priorities.Priority
+        ORDER BY
+            FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High');
+    `;
+
+    db.query(query, [req.params.projectId, userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+        return res.status(200).json(data);
+    });
+};
+
+export const getUserTotalPendingSubtaskCount = (req, res) => {
+    const userId = req.params.userId;
+
+    const query = `
+        SELECT COUNT(subtask.status) AS pending_subtask_count
+        FROM subtask
+        INNER JOIN assigned ON subtask.subtask_id = assigned.subtask_id
+        INNER JOIN employee ON assigned.employee_id = employee.employee_id
+        INNER JOIN users ON employee.user_account_id = users.user_id
+        WHERE subtask.status = 'pending'
+            AND subtask.project_id = ?
+            AND subtask.is_deleted = 0
+            AND users.user_id = ?
+    `;
+
+    db.query(query, [req.params.projectId, userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+        return res.status(200).json(data[0]);
+    });
+};

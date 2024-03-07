@@ -104,6 +104,18 @@ const App = () => {
           path: '/user/dashboard',
           element: <ProjectDashboard />,
         },
+        {
+          path: '/user/projectdetail/:projectId',
+          element: <ProjectDetail />,
+        },
+        {
+          path: '/user/ganttchart',
+          element: <GanttChart />,
+        },
+        {
+          path: '/user/workprogress/:projectId/:type',
+          element: <WorkProgress />,
+        },
       ],
     },
     {
