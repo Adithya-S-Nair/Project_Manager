@@ -15,7 +15,7 @@ export const register = (req, res) => {
         if (err) return res.status(500).json(err);
         if (data.length) return res.status(409).json("User already exists!");
 
-        const salt = bcrypt.genSaltSync(10);  
+        const salt = bcrypt.genSaltSync(10);
         const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
         const insertQuery =
@@ -66,7 +66,11 @@ export const login = (req, res) => {
         });
 
         const token = jwt.sign(
-            { user_id: selectResult[0].user_id, user_type: selectResult[0].user_type, email: selectResult[0].user_email },
+            {
+                user_id: selectResult[0].user_id,
+                user_type: selectResult[0].user_type,
+                email: selectResult[0].user_email
+            },
             process.env.SECRET
         );
 
@@ -75,12 +79,11 @@ export const login = (req, res) => {
     });
 };
 
-export const logout = (req,res) => {
+export const logout = (req, res) => {
     return res
         .clearCookie("accessToken")
         .status(200)
         .json({ message: "Successfully logged out" });
-
 }
 
 export const verify = (req, res) => {
