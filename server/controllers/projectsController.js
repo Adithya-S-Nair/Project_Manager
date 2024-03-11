@@ -127,7 +127,7 @@ export const getProjectCompletionStatus = (req, res) => {
                     SUM(CASE WHEN status = 'Work In Progress' AND is_deleted = 0 THEN 1 ELSE 0 END) AS workinprogress_count,
                     SUM(CASE WHEN status = 'On Hold' AND is_deleted = 0 THEN 1 ELSE 0 END) AS hold_count,
                     SUM(CASE WHEN status = 'Completed' AND is_deleted = 0 THEN 1 ELSE 0 END) AS completed_count,
-                    COUNT(task_id) AS total_count
+                    COUNT(CASE WHEN is_deleted = 0 THEN task_id END) AS total_count
                 FROM
                     task
                 WHERE
@@ -281,17 +281,48 @@ export const getProjectName = (req, res) => {
 
 export const getAllProjectDetails = (req, res) => {
 
-    const query = `
-    SELECT p.project_id ,p.project_name,p.project_start_date,p.project_end_date, t.task_id ,t.task_name,t.planned_start_date as task_start_date ,t.planned_end_date as task_end_date , s.subtask_id ,s.subtask_name,s.planned_start_date as subtask_start_date,s.planned_end_date as subtask_end_date  
-    FROM project AS p
-    LEFT JOIN task AS t ON p.project_id = t.project_id 
-    LEFT JOIN subtask AS s ON t.task_id = s.task_id
-    ORDER BY p.project_id, t.task_id, s.subtask_id
-    `;
+    let query = ""
+
+    if (req.userType === "Admin" || req.userType === "admin") {
+        query = `
+            SELECT p.project_id ,p.project_name,p.project_start_date,p.project_end_date, t.task_id ,t.task_name,t.planned_start_date as task_start_date ,t.planned_end_date as task_end_date , s.subtask_id ,s.subtask_name,s.planned_start_date as subtask_start_date,s.planned_end_date as subtask_end_date  
+            FROM project AS p
+            LEFT JOIN task AS t ON p.project_id = t.project_id 
+            LEFT JOIN subtask AS s ON t.task_id = s.task_id
+            ORDER BY p.project_id, t.task_id, s.subtask_id
+            `;
+    } else {
+        query = `
+            SELECT 
+            p.project_id,
+            p.project_name,
+            p.project_start_date,
+            p.project_end_date,
+            t.task_id,
+            t.task_name,
+            t.planned_start_date AS task_start_date,
+            t.planned_end_date AS task_end_date,
+            s.subtask_id,
+            s.subtask_name,
+            s.planned_start_date AS subtask_start_date,
+            s.planned_end_date AS subtask_end_date
+        FROM 
+            project AS p
+            LEFT JOIN task AS t ON p.project_id = t.project_id
+            LEFT JOIN subtask AS s ON t.task_id = s.task_id
+            LEFT JOIN assigned AS a ON a.project_id = p.project_id
+            LEFT JOIN employee AS e ON e.employee_id = a.employee_id
+            LEFT JOIN users AS u ON u.user_id = e.user_account_id
+        WHERE 
+            u.user_id = ?
+        ORDER BY 
+            p.project_id, t.task_id, s.subtask_id;     
+            `
+    }
 
     const projects = [];
 
-    db.query(query, (error, results) => {
+    db.query(query, [req.userId], (error, results) => {
         if (error) {
             console.error('Error:', error);
             res.status(500).json({ error: 'Internal server error' });

@@ -12,7 +12,7 @@ import ProjectDetailMUIUser from '../../Components/ProjectDetailMUIUser'
 
 
 const ProjectDetail = () => {
-    const {user} = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
     const { projectId } = useParams();
     const { theme } = useContext(ThemeContext)
     const [value, setValue] = useState(0);
@@ -310,7 +310,7 @@ const ProjectDetail = () => {
             enabled: !!projectData, // Only fetch if projectData is available
         }
     );
-    
+
     const { data: userPendingTaskCount, error: userPendingTaskError, isLoading: userPendingTaskLoading } = useQuery(
         ['UserPendingTaskCount', projectId],
         async () => {
@@ -379,7 +379,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData && user.user_type==='Users', // Only fetch if projectData is available
+            enabled: !!projectData && user.user_type === 'Users', // Only fetch if projectData is available
         }
     );
 
@@ -395,8 +395,8 @@ const ProjectDetail = () => {
         }
     );
 
-    if (projectError || personalPriorityTaskError || personalPendingTaskError || personalTotalPendingTaskError || PersonalTaskDataError || userPrioritySubtaskError  || getUserAllSubtaskDataError || userTotalPendingSubtaskError || pendingTaskError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskLoading || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || prioritySubtaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
-        console.error('Error fetching data:', projectError ||  pendingTaskError || getUserAllSubtaskDataError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || userTotalPendingSubtaskError || pendingSubtaskError || prioritySubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
+    if (projectError || personalPriorityTaskError || personalPendingTaskError || personalTotalPendingTaskError || PersonalTaskDataError || userPrioritySubtaskError || getUserAllSubtaskDataError || userTotalPendingSubtaskError || pendingTaskError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskLoading || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || prioritySubtaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
+        console.error('Error fetching data:', projectError || pendingTaskError || getUserAllSubtaskDataError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || userTotalPendingSubtaskError || pendingSubtaskError || prioritySubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
         return <div>Error fetching data</div>;
     }
 
@@ -539,7 +539,7 @@ const ProjectDetail = () => {
                 </>
             )
         );
-    } else if (theme === 'theme1' && user.user_type === 'Users' ) {
+    } else if (theme === 'theme1' && user.user_type === 'Users') {
         return (
             <>
                 {projectData && (

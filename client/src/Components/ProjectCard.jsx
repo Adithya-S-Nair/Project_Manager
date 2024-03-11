@@ -78,27 +78,15 @@ const ProjectCard = () => {
     const queryClient = useQueryClient()
 
     useEffect(() => {
-
-        if (user.user_type === "Admin") {
-            makeRequest.get('/project/getallprojects')
-                .then((res) => {
-                    console.log(res.data);
-                    setProjectData(res.data)
-                }).catch((err) => {
-                    console.log(err);
-                })
-        } else if (user.user_type === "Users") {
-            makeRequest.get('/project/getallprojects')
-                .then((res) => {
-                    console.log(res.data);
-                    setProjectData(res.data)
-                }).catch((err) => {
-                    console.log(err);
-                })
-        }
+        makeRequest.get('/project/getallprojects')
+            .then((res) => {
+                console.log(res.data);
+                setProjectData(res.data)
+            }).catch((err) => {
+                console.log(err);
+            })
     }, [projectData])
 
-    console.log(projectData);
     // const { isloading: projectDataLoading, err: projectErrorLoading, data: projectInfo} = useQuery(["projectData",projectData], async () => {
     //     console.log("hiiiiiii");
     //     const response = await makeRequest.get('/project/getallprojects')
@@ -109,23 +97,13 @@ const ProjectCard = () => {
     // });
 
     const { isloading, err, data } = useQuery(["gaugeproject"], () => {
-        if (user.user_type === "Admin") {
-            makeRequest.get('/project/getgaugeprojectcompletionstatus')
-                .then((res) => {
-                    setGaugeData(res.data);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else if (user.user_type === "Users") {
-            makeRequest.get('/project/getgaugeprojectcompletionstatus')
-                .then((res) => {
-                    setGaugeData(res.data);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
+        makeRequest.get('/project/getgaugeprojectcompletionstatus')
+            .then((res) => {
+                setGaugeData(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     },
         {
             enabled: !!projectData, // Only fetch if projectData is available
@@ -149,15 +127,16 @@ const ProjectCard = () => {
     //     )
     // }
 
+    if (projectData && projectData.length === 0) {
+        return (
+            <p className='flex items-center justify-center'>No Projects to be shown</p>
+        )
+    }
+
     return (
         <div>
             <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 mx-auto text-center`}>
-                {user.user_type === 'Admin' && projectData && projectData.map((project, index) => (
-                    <div onClick={() => handleNavigate(project.project_id)} key={project.project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
-                        <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]} />
-                    </div>
-                ))}
-                {user.user_type === 'Users' && projectData && projectData.map((project, index) => (
+                {projectData && projectData.map((project, index) => (
                     <div onClick={() => handleNavigate(project.project_id)} key={project.project_id} className='inline-block w-full sm:w-1/2 md:w-1/3'>
                         <CardComponent className='p-5' project={project} gaugeData={gaugeData[index]} />
                     </div>
