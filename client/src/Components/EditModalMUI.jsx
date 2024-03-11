@@ -41,12 +41,12 @@ const style = {
 };
 
 // selectedTasks={taskNames}
-const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks, selectedUser, setRowData }) => {
+const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks, selectedUser, setRowData, projectId, setUpdater }) => {
     let modalContent;
     const { theme } = useContext(ThemeContext)
     const queryClient = useQueryClient();
     const [employeeId, setEmployeeId] = React.useState('');
-    const [projectId, setProjectId] = React.useState('');
+    // const [projectId, setProjectId] = React.useState('');
     const [formData, setFormData] = useState({ ...projectData });
     const [taskFormData, setTaskFormData] = useState();
     const [subtaskFormData, setSubtaskFormData] = useState();
@@ -65,6 +65,15 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         usertype: 'Users',
         password: ''
     });
+    const [personalTask, setPersonalTask] = useState({
+        project_id: projectId,
+        personal_task_name: '',
+        Priority: '',
+        status: '',
+        planned_budget: '',
+        actual_budget: '',
+        personal_task_description: ''
+    })
 
     useEffect(() => {
         if (editType === "edituser") {
@@ -84,6 +93,36 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
             [name]: value,
         });
     }
+
+    const handlePersonalTaskChange = (e) => {
+        setPersonalTask((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    }
+
+    console.log(personalTask);
+    const handleSubmitPersonalTask = () => {
+        createPersonalTaskMutation.mutate()
+    }
+
+    const createPersonalTaskMutation = useMutation(() => {
+        makeRequest.post(`/personaltask/createpersonaltask`, personalTask)
+            .then((response) => {
+                queryClient.invalidateQueries(["priorityPersonalTaskCount"]);
+                queryClient.invalidateQueries(["personalPendingTaskCount"]);
+                queryClient.invalidateQueries(["personalTaskData"]);
+                queryClient.invalidateQueries(["personalTotalPendingTaskCount"]);
+            }).catch((error) => {
+                console.log(error);
+            })
+        }, {
+            onSuccess: () => {
+            handleClose();
+            setToastOpen({
+                open: true,
+                msg: "Personal task created successfully"
+            });
+        }
+    })
+
     const createMutation = useMutation((userId) => {
         makeRequest.patch(`/user/updateuser/${userId}`, userData)
             .then((response) => {
@@ -1094,37 +1133,12 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                             <div className='grid grid-cols-1 gap-y-6'>
                                 <TextField
                                     id="outlined-password-input"
-                                    label="Task Name"
-                                    name="task_name"
+                                    label="Personal Task Name"
+                                    name="personal_task_name"
                                     type="text"
-                                // value={taskFormData.task_name}
-                                // onChange={handleTaskChange}
+                                    value={personalTask.personal_task_name}
+                                    onChange={handlePersonalTaskChange}
                                 />
-                                <div>
-                                    <FormControl fullWidth >
-                                        <InputLabel id="demo-simple-select-label">Project Names</InputLabel>
-                                        <Select
-
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            // value={taskFormData.project_id}
-                                            label="Project Names"
-                                            name='project_id'
-                                            onChange={handleTaskChange}
-                                        >
-                                            {editTaskProjectName && editTaskProjectName.map((project) => (
-                                                <MenuItem
-                                                    key={project.project_id}
-                                                    value={project.project_id}
-                                                // selected={project.project_id === editTaskData.project_id}
-                                                >
-                                                    {project.project_name}
-                                                </MenuItem>
-                                            ))}
-
-                                        </Select>
-                                    </FormControl>
-                                </div>
                                 <div className="flex gap-6">
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
@@ -1132,7 +1146,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                             name="planned_start_date"
                                             slots={{ openPickerIcon: DateRangeIcon }}
                                             // value={dayjs(taskFormData.planned_start_date)}
-                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                            onChange={(date) => setPersonalTask((prevData) => ({
                                                 ...prevData,
                                                 planned_start_date: date.format('YYYY-MM-DD')
                                             }))}
@@ -1144,7 +1158,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                             name="planned_end_date"
                                             slots={{ openPickerIcon: DateRangeIcon }}
                                             // value={dayjs(taskFormData.planned_end_date)}
-                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                            onChange={(date) => setPersonalTask((prevData) => ({
                                                 ...prevData,
                                                 planned_end_date: date.format('YYYY-MM-DD')
                                             }))}
@@ -1159,7 +1173,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                             name="actual_start_time"
                                             slots={{ openPickerIcon: DateRangeIcon }}
                                             // value={dayjs(taskFormData.actual_start_time)}
-                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                            onChange={(date) => setPersonalTask((prevData) => ({
                                                 ...prevData,
                                                 actual_start_time: date.format('YYYY-MM-DD')
                                             }))}
@@ -1172,7 +1186,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                             name="actual_end_time"
                                             slots={{ openPickerIcon: DateRangeIcon }}
                                             // value={dayjs(taskFormData.actual_end_time)}
-                                            onChange={(date) => setTaskFormData((prevData) => ({
+                                            onChange={(date) => setPersonalTask((prevData) => ({
                                                 ...prevData,
                                                 actual_end_time: date.format('YYYY-MM-DD')
                                             }))}
@@ -1187,9 +1201,9 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                             id="demo-simple-select"
 
                                             label="priority"
-                                            name='priority'
+                                            name='Priority'
                                             // value={taskFormData.priority}
-                                            onChange={(e) => { handleTaskChange(e) }}
+                                            onChange={(e) => { handlePersonalTaskChange(e) }}
                                         >
                                             <MenuItem value={priority.high}>High</MenuItem>
                                             <MenuItem value={priority.medium}>Medium</MenuItem>
@@ -1204,7 +1218,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                             // value={taskFormData.status}
                                             label="status"
                                             name='status'
-                                            onChange={(e) => handleTaskChange(e)}
+                                            onChange={(e) => handlePersonalTaskChange(e)}
                                         >
                                             <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
                                             <MenuItem value={status.pending}>Pending</MenuItem>
@@ -1215,32 +1229,34 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                 </div>
                                 <div className="flex gap-6">
                                     <TextField
+                                        fullWidth
                                         id="outlined-password-input"
                                         label="Planned Budget"
                                         name="planned_budget"
                                         type="text"
-                                        // value={taskFormData.planned_budget}
+                                        value={personalTask.planned_budget}
                                         autoComplete="planned-budget"
-                                        onChange={handleTaskChange}
+                                        onChange={handlePersonalTaskChange}
                                     />
                                     <TextField
+                                        fullWidth
                                         id="outlined-password-input"
                                         label="Actual Budget"
                                         name="actual_budget"
                                         type="text"
-                                        // value={taskFormData.actual_budget}
+                                        value={personalTask.actual_budget}
                                         autoComplete="actual-budget"
-                                        onChange={handleTaskChange}
+                                        onChange={handlePersonalTaskChange}
                                     />
                                 </div>
                                 <TextField
                                     multiline
                                     fullWidth
                                     rows={3}
-                                    name='task_description'
-                                    label="Project Description"
-                                    // value={taskFormData.task_description}
-                                    onChange={handleTaskChange}
+                                    name='personal_task_description'
+                                    label="Personal Task Description"
+                                    value={personalTask.personal_task_description}
+                                    onChange={handlePersonalTaskChange}
                                 />
                             </div>
                             <br />
@@ -1248,7 +1264,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                 <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
                                     Cancel
                                 </Button>
-                                <Button variant="contained" size="medium" onClick={handleEditTask}>
+                                <Button variant="contained" size="medium" onClick={handleSubmitPersonalTask}>
                                     Save Changes
                                 </Button>
                             </div>

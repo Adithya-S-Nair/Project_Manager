@@ -116,8 +116,6 @@ export const getProjectTasks = (req, res) => {
                 return res.status(404).json({ msg: "No tasks found for the project" });
             }
 
-
-
             return res.status(200).json({ tasks, taskCount });
         })
         .catch(err => {

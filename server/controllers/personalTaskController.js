@@ -2,7 +2,6 @@ import { db } from '../connections/mysql.js';
 import moment from 'moment';
 
 export const createPersonalTask = (req, res) => {
-    const empFetchQery = "SELECT * FROM employee WHERE "
     const query = `INSERT INTO personal_task (
         employee_id,
         project_id,
@@ -34,16 +33,16 @@ export const createPersonalTask = (req, res) => {
       WHERE e.user_account_id = ?      
     `;
     const values = [
-        req.body.projectId,
-        req.body.personalTaskName,
-        req.body.priority,
-        req.body.personalTaskDescription,
-        req.body.plannedStartDate,
-        req.body.plannedEndDate,
-        req.body.actualStartTime,
-        req.body.actualEndTime,
-        req.body.plannedBudget,
-        req.body.actualBudget,
+        req.body.project_id,
+        req.body.personal_task_name,
+        req.body.Priority,
+        req.body.personal_task_description,
+        req.body.planned_start_date,
+        req.body.planned_end_date,
+        req.body.actual_start_time,
+        req.body.actual_end_time,
+        req.body.planned_budget,
+        req.body.actual_budget,
         req.body.status,
         req.userId,
     ]
@@ -57,21 +56,70 @@ export const createPersonalTask = (req, res) => {
 }
 
 export const getPersonalTasks = (req, res) => {
-    const query = `SELECT pt.*
-            FROM personal_task pt
-            JOIN employee e ON pt.employee_id = e.employee_id
-            JOIN users u ON e.user_account_id = u.user_id
-            WHERE u.user_id = ? AND project_id = ? AND pt.is_deleted = 0`
-    db.query(query, [req.userId, req.params.projectId], (err, data) => {
-        if (err) return res.status(500).json(err);
+    const { projectId } = req.params;
 
-        if (data.length === 0) {
-            return res.status(404).json({ msg: "No data found" });
+    const employeeQuery = `SELECT employee_id FROM employee WHERE user_account_id = ?`;
+
+    db.query(employeeQuery, [req.userId], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Error retrieving employee information" });
+        }
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Employee not found for the given userId" });
         }
 
-        return res.status(200).json(data)
-    })
-}
+        const employeeId = rows[0].employee_id;
+
+        const personalTaskQuery = `
+        SELECT pt.*
+        FROM personal_task pt
+        INNER JOIN employee e ON pt.employee_id = e.employee_id
+        INNER JOIN users u ON e.user_account_id = u.user_id
+        WHERE pt.project_id = ? AND pt.employee_id = ?
+    `;
+
+        const countQuery = `
+        SELECT COUNT(pt.personal_task_id) AS personal_task_count
+        FROM personal_task pt
+        INNER JOIN employee e ON pt.employee_id = e.employee_id
+        INNER JOIN users u ON e.user_account_id = u.user_id
+        WHERE pt.project_id = ? AND pt.employee_id = ?
+    `;
+
+        Promise.all([
+            new Promise((resolve, reject) => {
+                db.query(personalTaskQuery, [projectId, employeeId], (err, personalTasks) => {
+                    if (err) reject(err);
+                    resolve(personalTasks);
+
+                    personalTasks.forEach(row => {
+                        row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+                        row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+                        row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+                        row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+                    });
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.query(countQuery, [projectId, employeeId], (err, counts) => {
+                    if (err) reject(err);
+                    resolve(counts[0].personal_task_count);
+                });
+            })
+        ])
+            .then(([personalTasks, personalTaskCount]) => {
+                if (personalTasks.length === 0) {
+                    return res.status(404).json({ msg: "No personal subtasks found for the project" });
+                }
+                return res.status(200).json({ personalTasks, personalTaskCount });
+            })
+            .catch(err => {
+                console.error("Error fetching data:", err);
+                return res.status(500).json({ error: "Internal server error" });
+            });
+    });
+};
 
 export const updatePersonalTask = (req, res) => {
     const personalTaskId = req.params.personalTaskId;
@@ -154,4 +202,86 @@ export const getProjectPriorityBasedPersonalTask = (req, res) => {
 
         return res.status(200).json(data)
     })
+}
+
+export const getPriorityPersonalTaskCount = (req, res) => {
+    const query = `
+        SELECT
+            possible_priorities.Priority,
+            COALESCE(COUNT(personal_task.personal_task_id), 0) AS task_count
+        FROM
+            (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+        LEFT JOIN
+            (SELECT pt.Priority, pt.personal_task_id
+            FROM personal_task pt
+            INNER JOIN employee e ON pt.employee_id = e.employee_id
+            WHERE pt.project_id = ?
+            AND pt.is_deleted = 0
+            AND e.user_account_id = ?) AS personal_task
+        ON possible_priorities.Priority = personal_task.Priority
+        WHERE
+            possible_priorities.Priority IN ('High', 'Medium', 'Low')
+        GROUP BY
+            possible_priorities.Priority
+        ORDER BY
+            FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High');
+    `;
+
+    db.query(query, [req.params.projectId, req.userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+        return res.status(200).json(data);
+    });
+}
+
+export const getPendingPriorityBasedPersonalTaskCount = (req, res) => {
+
+    const query = `
+        SELECT
+            possible_priorities.Priority,
+            COALESCE(SUM(CASE WHEN personal_task.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
+        FROM
+            (SELECT 'High' AS Priority UNION SELECT 'Medium' UNION SELECT 'Low') AS possible_priorities
+        LEFT JOIN
+            (SELECT pt.Priority, pt.status
+            FROM personal_task pt
+            INNER JOIN employee e ON pt.employee_id = e.employee_id
+            INNER JOIN users u ON e.user_account_id = u.user_id
+            WHERE pt.project_id = ?
+            AND pt.is_deleted = 0
+            AND u.user_id = ?) AS personal_task
+        ON possible_priorities.Priority = personal_task.Priority
+        WHERE
+            possible_priorities.Priority IN ('High', 'Medium', 'Low')
+        GROUP BY
+            possible_priorities.Priority
+        ORDER BY
+            FIELD(possible_priorities.Priority, 'Low', 'Medium', 'High');
+    `;
+
+    db.query(query, [req.params.projectId, req.userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+        return res.status(200).json(data);
+    });
+}
+
+export const getTotalPendingPersonalTaskCount = (req, res) => {
+
+    const query = `
+        SELECT COUNT(personal_task.status) AS pending_task_count
+        FROM personal_task
+        INNER JOIN employee ON personal_task.employee_id = employee.employee_id
+        INNER JOIN users ON employee.user_account_id = users.user_id
+        WHERE personal_task.status = 'pending'
+            AND personal_task.project_id = ?
+            AND personal_task.is_deleted = 0
+            AND users.user_id = ?
+    `;
+
+    db.query(query, [req.params.projectId, req.userId], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json({ msg: "No data found" });
+        return res.status(200).json(data[0]);
+    });
 }

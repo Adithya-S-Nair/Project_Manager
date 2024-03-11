@@ -21,6 +21,10 @@ const ProjectDetail = () => {
     const [taskCount, setTaskCount] = useState();
     const [userAllTaskData, setUserAllTaskData] = useState();
     const [userTaskCount, setUserTaskCount] = useState();
+    const [personalTaskData, setPersonalTaskData] = useState();
+    const [personalTaskCount, setPersonalTaskCount] = useState();
+    const [personalSubtaskData, setPersonalSubtaskData] = useState();
+    const [personalSubtaskCount, setPersonalSubtaskCount] = useState();
     const [allSubtaskData, setAllSubtaskData] = useState();
     const [subtaskCount, setSubtaskCount] = useState();
     const [userAllSubtaskData, setUserAllSubtaskData] = useState();
@@ -202,6 +206,100 @@ const ProjectDetail = () => {
         }
     );
 
+    const { data: personalPriorityTaskCount, error: personalPriorityTaskError, isLoading: personalPriorityTaskLoading } = useQuery(
+        ['priorityPersonalTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personaltask/getprioritypersonaltaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: personalPendingTaskCount, error: personalPendingTaskError, isLoading: personalPendingTaskLoading } = useQuery(
+        ['personalPendingTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personaltask/getpendingprioritybasedpersonaltaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    const { data: PersonalTaskData, error: PersonalTaskDataError, isLoading: PersonalTaskDataLoading } = useQuery(
+        ['personalTaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personaltask/getpersonaltasks/${projectId}`);
+            setPersonalTaskCount(response.data.personalTaskCount);
+            setPersonalTaskData(response.data.personalTasks);
+            // console.log(response.data.tasks);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: personalTotalPendingTaskCount, error: personalTotalPendingTaskError, isLoading: personalTotalPendingTaskLoading } = useQuery(
+        ['personalTotalPendingTaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personaltask/gettotalpendingpersonaltaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    const { data: personalPrioritySubtaskCount, error: personalPrioritySubtaskError, isLoading: personalPrioritySubtaskLoading } = useQuery(
+        ['priorityPersonalSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personalsubtask/getprioritypersonalsubtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: personalPendingSubtaskCount, error: personalPendingSubtaskError, isLoading: personalPendingSubtaskLoading } = useQuery(
+        ['personalPendingSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personalsubtask/getpendingprioritybasedpersonalsubtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+    const { data: PersonalSubtaskData, error: PersonalSubtaskDataError, isLoading: PersonalSubtaskDataLoading } = useQuery(
+        ['personalSubtaskData', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personalsubtask/getallpersonalsubtask/${projectId}`);
+            setPersonalSubtaskCount(response.data.personalSubtaskCount);
+            setPersonalSubtaskData(response.data.personalSubtasks);
+            return response.data;
+        },
+        {
+            enabled: !!projectData, // Only fetch if projectData is available
+        }
+    );
+
+    const { data: personalTotalPendingSubtaskCount, error: personalTotalPendingSubtaskError, isLoading: personalTotalPendingSubtaskLoading } = useQuery(
+        ['personalTotalPendingSubtaskCount', projectId],
+        async () => {
+            const response = await makeRequest.get(`/personalsubtask/gettotalpendingpersonalsubtaskcount/${projectId}`);
+            return response.data;
+        },
+        {
+            enabled: !!projectData,
+        }
+    );
+
+
     const { data: userPriorityTaskCount, error: userPriorityTaskError, isLoading: userPriorityTaskLoading } = useQuery(
         ['priorityTaskCount', projectId],
         async () => {
@@ -297,8 +395,8 @@ const ProjectDetail = () => {
         }
     );
 
-    if (projectError || userPrioritySubtaskError  || getUserAllSubtaskDataError || userTotalPendingSubtaskError || pendingTaskError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskLoading || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || prioritySubtaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
-        console.error('Error fetching data:', projectError || pendingTaskError || getUserAllSubtaskDataError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || userTotalPendingSubtaskError || pendingSubtaskError || prioritySubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
+    if (projectError || personalPriorityTaskError || personalPendingTaskError || personalTotalPendingTaskError || PersonalTaskDataError || userPrioritySubtaskError  || getUserAllSubtaskDataError || userTotalPendingSubtaskError || pendingTaskError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskLoading || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || prioritySubtaskError || pendingSubtaskError || projectCompletionStatusError || radarChartError || taskDataError || updateTaskError) {
+        console.error('Error fetching data:', projectError ||  pendingTaskError || getUserAllSubtaskDataError || userTotalPendingTaskError || getUserAllTaskDataError || userPriorityTaskError || totalPendingSubtaskError || totalPendingTaskError || priorityTaskError || userTotalPendingSubtaskError || pendingSubtaskError || prioritySubtaskError || projectCompletionStatusError || radarChartError || updateTaskError);
         return <div>Error fetching data</div>;
     }
 
@@ -347,7 +445,7 @@ const ProjectDetail = () => {
         }
     };
 
-    if (userPrioritySubtaskLoading || userTotalPendingSubtaskLoading || getUserAllSubtaskDataLoading || getUserAllTaskDataLoading || userTotalPendingTaskLoading || projectLoading || pendingTaskLoading || totalPendingTaskLoading || taskDataLoading || priorityTaskLoading || prioritySubtaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading || updateTaskLoading) {
+    if (userPrioritySubtaskLoading || personalPriorityTaskLoading || personalPendingTaskLoading || personalTotalPendingTaskLoading || PersonalTaskDataLoading || userTotalPendingSubtaskLoading || getUserAllSubtaskDataLoading || getUserAllTaskDataLoading || userTotalPendingTaskLoading || projectLoading || pendingTaskLoading || totalPendingTaskLoading || taskDataLoading || priorityTaskLoading || prioritySubtaskLoading || pendingSubtaskLoading || projectCompletionStatusLoading || radarChartLoading || updateTaskLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />
@@ -479,6 +577,16 @@ const ProjectDetail = () => {
                         projectId={projectId}
                         userTotalPendingTaskCount={userTotalPendingTaskCount}
                         userTotalPendingSubtaskCount={userTotalPendingSubtaskCount}
+                        personalPriorityTaskCount={personalPriorityTaskCount}
+                        personalPendingTaskCount={personalPendingTaskCount}
+                        personalTotalPendingTaskCount={personalTotalPendingTaskCount}
+                        personalTaskData={personalTaskData}
+                        personalTaskCount={personalTaskCount}
+                        personalPrioritySubtaskCount={personalPrioritySubtaskCount}
+                        personalPendingSubtaskCount={personalPendingSubtaskCount}
+                        personalSubtaskCount={personalSubtaskCount}
+                        personalSubtaskData={personalSubtaskData}
+                        personalTotalPendingSubtaskCount={personalTotalPendingSubtaskCount}
                     />
                 )}
 

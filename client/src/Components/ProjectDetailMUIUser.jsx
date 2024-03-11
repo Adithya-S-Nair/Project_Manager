@@ -60,7 +60,7 @@ function a11yProps(index) {
     };
 }
 
-const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, userPriorityTaskCount, userPrioritySubtaskCount, userPendingTaskCount, userPendingSubtaskCount, sparklineData, navigate, taskData, setTaskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, userAllTaskData, userTaskCount, projectId, userAllSubtaskData, userSubtaskCount, userTotalPendingTaskCount, userTotalPendingSubtaskCount }) => {
+const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridApi, anchorEl, setAnchorEl, chevronRotation, setChevronRotation, radarChartData, userPriorityTaskCount, userPrioritySubtaskCount, userPendingTaskCount, userPendingSubtaskCount, sparklineData, navigate, taskData, setTaskData, createTask, subtaskData, handleMenuOpen, handleMenuClose, handleChange, navigateToAllProject, getPriorityColor, getChartPriorityColor, projectCompletionStatus, userAllTaskData, userTaskCount, projectId, userAllSubtaskData, userSubtaskCount, userTotalPendingTaskCount, userTotalPendingSubtaskCount, personalPriorityTaskCount, personalPendingTaskCount, personalTotalPendingTaskCount, personalTaskData, personalTaskCount, personalPrioritySubtaskCount, personalPendingSubtaskCount, personalSubtaskCount, personalSubtaskData, personalTotalPendingSubtaskCount }) => {
     const { user } = useContext(AuthContext)
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [modalEditType, setModalEditType] = useState("")
@@ -73,6 +73,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
     const [currentTab, setCurrentTab] = useState(0);
     const isMobile = useMediaQuery('(max-width:1080px)');
     const [type, setType] = useState('');
+    const [updater, setUpdater] = useState(0);
 
     // const navigates = useNavigate();
     const open = Boolean(anchorEls);
@@ -217,7 +218,17 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
         navigate(`/user/workprogress/${projectId}/subtask${choice}`)
     }
 
+    const handlePersonalTaskDataClick = (choice) => {
+        // console.log(gridApi);
+        setType(choice);
+        navigate(`/user/workprogress/${projectId}/personalTask${choice}`)
+    }
 
+    const handlePersonalSubtaskDataClick = (choice) => {
+        // console.log(gridApi);
+        setType('sub' + choice);
+        navigate(`/user/workprogress/${projectId}/personalSubtask${choice}`)
+    }
 
     return (
         <>
@@ -276,6 +287,13 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                 </svg>
                                             </IconButton>
                                         </Tooltip>
+                                        <Tooltip title="Create Personal Subtask">
+                                            <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("createPersonalTask") }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                                </svg>
+                                            </IconButton>
+                                        </Tooltip>
                                     </div>
                                 }
                             </div>
@@ -331,7 +349,152 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                 </div>
             </div >
 
-            {/* Pending task status */}
+            <>
+                < Card className='mt-5' style={{ width: '100%' }
+                }>
+                    <CardContent>
+                        <div className="flex items-center justify-between">
+                            <h2 className='text-xl font-bold'>Personal Task Status</h2>
+                        </div>
+                        <hr className='mt-2 mb-2' />
+                        <div className="grid grid-cols-2 gap-6">
+                            {personalPriorityTaskCount && personalPriorityTaskCount.map((personalPriorityTaskCount) => (
+                                <Card key={updater} style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handlePersonalTaskDataClick(personalPriorityTaskCount.Priority)} >
+                                    <CardContent>
+                                        <div className="flex items-center justify-between">
+                                            <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(personalPriorityTaskCount.Priority) }}>
+                                                {`${personalPriorityTaskCount.Priority} Priority Task`}
+                                            </h2>
+                                        </div>
+                                        <hr className='mt-2 mb-2' />
+                                        <div className="flex items-center justify-between">
+                                            <div className='grid grid-cols-1 gap-1'>
+                                                <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(personalPriorityTaskCount.Priority) }}>
+                                                    TOTAL {personalPriorityTaskCount.Priority.toUpperCase()} PERSONAL TASK COUNT: {personalPriorityTaskCount.task_count}
+                                                </h2>
+                                                <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(personalPriorityTaskCount.Priority) }}>
+                                                    {personalPriorityTaskCount.Priority === 'Low' &&
+                                                        <>
+                                                            TOTAL PENDING PERSONAL TASK COUNT:{personalPendingTaskCount[0].pending_count}
+                                                        </>
+                                                    }
+                                                    {personalPriorityTaskCount.Priority === 'Medium' &&
+                                                        <>
+                                                            TOTAL PENDING PERSONAL TASK COUNT:{personalPendingTaskCount[1].pending_count}
+                                                        </>
+                                                    }
+                                                    {personalPriorityTaskCount.Priority === 'High' &&
+                                                        <>
+                                                            TOTAL PENDING PERSONAL TASK COUNT:{personalPendingTaskCount[2].pending_count}
+                                                        </>
+                                                    }
+                                                </h2>
+                                            </div>
+                                            <SparkLineChart data={sparklineData} color={getChartPriorityColor(personalPriorityTaskCount.Priority)} />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                            {personalTaskData &&
+                                <Card className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handlePersonalTaskDataClick('data')}>
+                                    <CardContent>
+                                        <div className="flex items-center justify-between">
+                                            <h2 className={`text-xl font-bold text-blue-800`}>
+                                                {`All Personal Tasks`}
+                                            </h2>
+                                        </div>
+                                        <hr className='mt-2 mb-2' />
+                                        <div className="flex items-center justify-between">
+                                            <div className='grid grid-cols-1 gap-1'>
+                                                <h2 className='text-xs font-light text-blue-800'>
+                                                    TOTAL PERSONAL TASK COUNT: {personalTaskCount}
+                                                </h2>
+                                                <h2 className='text-xs font-light text-blue-800'>
+                                                    TOTAL PENDING PERSONAL TASK COUNT: {personalTotalPendingTaskCount.pending_task_count}
+                                                </h2>
+                                            </div>
+                                            <SparkLineChart data={sparklineData} color={'blue'} />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            }
+                        </div>
+                    </CardContent>
+                </Card >
+
+                < Card className='mt-5' style={{ width: '100%' }}>
+                    <CardContent>
+                        <div className="flex items-center justify-between">
+                            <h2 className='text-xl font-bold'>Personal Subtask Status</h2>
+                        </div>
+                        <hr className='mt-2 mb-2' />
+                        <div className="grid grid-cols-2 gap-6">
+                            {personalPrioritySubtaskCount.map((personalPrioritySubtaskCount) => (
+                                <Card key={personalPrioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handlePersonalSubtaskDataClick(personalPrioritySubtaskCount.Priority)} >
+                                    <CardContent>
+                                        <div className="flex items-center justify-between">
+                                            <h2 className='text-xl font-bold' style={{ color: getChartPriorityColor(personalPrioritySubtaskCount.Priority) }}>
+                                                {`${personalPrioritySubtaskCount.Priority} Priority Subtask`}
+                                            </h2>
+                                        </div>
+                                        <hr className='mt-2 mb-2' />
+                                        <div className="flex items-center justify-between">
+                                            <div className='grid grid-cols-1 gap-1'>
+                                                <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(personalPrioritySubtaskCount.Priority) }}>
+                                                    TOTAL PERSONAL SUBTASK COUNT: {personalPrioritySubtaskCount.subtask_count}
+                                                </h2>
+                                                <h2 className='text-xs font-light' style={{ color: getChartPriorityColor(personalPrioritySubtaskCount.Priority) }}>
+                                                    {personalPrioritySubtaskCount.Priority === 'Low' &&
+                                                        <>
+                                                            TOTAL PENDING PERSONAL SUBTASK COUNT:{personalPendingSubtaskCount[0].pending_count}
+                                                        </>
+                                                    }
+                                                    {personalPrioritySubtaskCount.Priority === 'Medium' &&
+                                                        <>
+                                                            TOTAL PENDING PERSONAL SUBTASK COUNT:{personalPendingSubtaskCount[1].pending_count}
+                                                        </>
+                                                    }
+                                                    {personalPrioritySubtaskCount.Priority === 'High' &&
+                                                        <>
+                                                            TOTAL PENDING PERSONAL SUBTASK COUNT:{personalPendingSubtaskCount[2].pending_count}
+                                                        </>
+                                                    }
+                                                </h2>
+                                            </div>
+                                            <SparkLineChart data={sparklineData} color={getChartPriorityColor(personalPrioritySubtaskCount.Priority)} />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                            {personalSubtaskData &&
+                                <Card className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handlePersonalSubtaskDataClick('data')}>
+                                    <CardContent>
+                                        <div className="flex items-center justify-between">
+                                            <h2 className={`text-xl font-bold text-blue-800`}>
+                                                {'All Personal Subtasks'}
+                                            </h2>
+                                        </div>
+                                        <hr className='mt-2 mb-2' />
+                                        <div className="flex items-center justify-between">
+                                            <div className='grid grid-cols-1 gap-1'>
+                                                <h2 className='text-xs font-light text-blue-800'>
+                                                    TOTAL PERSONAL SUBTASK COUNT: {personalSubtaskCount}
+                                                </h2>
+                                                {userTotalPendingSubtaskCount &&
+                                                    <h2 className='text-xs font-light text-blue-800'>
+                                                        TOTAL PENDING PERSONAL SUBTASK COUNT: {personalTotalPendingSubtaskCount.pending_subtask_count}
+                                                    </h2>
+                                                }
+                                            </div>
+                                            <SparkLineChart data={sparklineData} color={'blue'} />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            }
+                        </div>
+                    </CardContent>
+                </Card >
+            </>
 
             < Card className='mt-5' style={{ width: '100%' }
             }>
@@ -407,7 +570,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
 
             {/* Pending subtask status */}
 
-            < Card className='mt-5' style={{ width: '100%' }}>
+            <Card className='mt-5' style={{ width: '100%' }}>
                 <CardContent>
                     <div className="flex items-center justify-between">
                         <h2 className='text-xl font-bold'>Subtask Status</h2>
@@ -488,6 +651,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                     setOpen={setEditModalOpen}
                     handleClose={handleEditModalClose}
                     projectData={projectData}
+                    setUpdater={setUpdater}
                 />
             }
             {
@@ -509,6 +673,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                     editType={modalEditType}
                     setOpen={setEditModalOpen}
                     handleClose={handleEditModalClose}
+                    projectId={projectId}
                 />
             }
 

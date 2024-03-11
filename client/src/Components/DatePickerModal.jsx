@@ -29,7 +29,7 @@ const style = {
 
 
 
-const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskData, filteredTaskData, setFilteredTaskData, filteredSubtaskData, setFilteredSubtaskData, setCalendarStartDate, setCalendarEndDate }) => {
+const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskData, filteredTaskData, setFilteredTaskData, filteredSubtaskData, setFilteredSubtaskData, setCalendarStartDate, setCalendarEndDate, personalTaskData, filteredPersonalTaskData, setFilteredPersonalTaskData, personalSubtaskData, setFilteredPersonalSubtaskData }) => {
 
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
@@ -70,6 +70,36 @@ const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskDat
                 );
             });
             setFilteredSubtaskData(filteredDate);
+        }
+
+        if (personalTaskData) {
+            const dateFilter = personalTaskData;
+            const filteredDate = dateFilter.filter((personalTask) => {
+                console.log(selectedDate.selection.endDate);
+                setCalendarStartDate(selectedDate.selection.startDate)
+                setCalendarEndDate(selectedDate.selection.endDate)
+                const projectDate = new Date(personalTask.planned_start_date);
+                return (
+                    projectDate >= selectedDate.selection.startDate &&
+                    projectDate <= selectedDate.selection.endDate
+                );
+            });
+            setFilteredPersonalTaskData(filteredDate);
+        }
+
+        if (personalSubtaskData) {
+            const dateFilter = personalSubtaskData;
+            const filteredDate = dateFilter.filter((personalSubtask) => {
+                console.log(selectedDate.selection.endDate);
+                setCalendarStartDate(selectedDate.selection.startDate)
+                setCalendarEndDate(selectedDate.selection.endDate)
+                const projectDate = new Date(personalSubtask.planned_start_date);
+                return (
+                    projectDate >= selectedDate.selection.startDate &&
+                    projectDate <= selectedDate.selection.endDate
+                );
+            });
+            setFilteredPersonalSubtaskData(filteredDate);
         }
 
         setStartDate(selectedDate.selection.startDate);

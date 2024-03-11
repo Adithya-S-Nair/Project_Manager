@@ -77,6 +77,8 @@ const WorkProgress = () => {
     const [tableData, setTableData] = useState(null);
     const [filteredTaskData, setFilteredTaskData] = useState();
     const [filteredSubtaskData, setFilteredSubtaskData] = useState();
+    const [filteredPersonalTaskData, setFilteredPersonalTaskData] = useState();
+    const [filteredPersonalSubtaskData, setFilteredPersonalSubtaskData] = useState();
     const [currentTab, setCurrentTab] = useState(0);
     const isMobile = useMediaQuery('(max-width:1080px)');
     const { projectId, type } = useParams();
@@ -85,10 +87,13 @@ const WorkProgress = () => {
     const [value, setValue] = useState(0);
     const [taskData, setTaskData] = useState();
     const [subtaskData, setSubtaskData] = useState();
+    const [personalTaskData, setPersonalTaskData] = useState();
+    const [personalSubtaskData, setPersonalSubtaskData] = useState();
     const [changedDataArray, setChangedDataArray] = useState([]);
     const [dateModalOpen, setDateModalOpen] = React.useState(false);
     const [calendarStartDate, setCalendarStartDate] = useState(null)
     const [calendarEndDate, setCalendarEndDate] = useState(null)
+    const [activeTab, setActiveTab] = useState('personalTask');
 
     const handleOpen = () => setDateModalOpen(true);
     console.log(dateModalOpen);
@@ -143,6 +148,43 @@ const WorkProgress = () => {
         { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
         { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
     ])
+
+    const [personalTaskColumns, setPersonalTaskColumns] = useState([
+        {
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 50
+        },
+        { colId: '0_1', field: 'personal_task_name', headerName: 'Personal Task Name', hide: false },
+        { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
+        { colId: '2_1', field: 'personal_task_description', headerName: 'Personal Task Description', hide: false },
+        { colId: '3_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
+        { colId: '4_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
+        { colId: '5_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
+        { colId: '6_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
+        { colId: '7_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
+        { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
+        { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
+    ])
+
+    const [personalSubtaskColumns, setPersonalSubtaskColumns] = useState([
+        {
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 50
+        },
+        { colId: '0_1', field: 'personalsubtask_name', headerName: 'Personal Subtask Name', hide: false },
+        { colId: '1_1', field: 'Priority', headerName: 'Priority', hide: false },
+        { colId: '2_1', field: 'personalsubtask_description', headerName: 'Personal Subtask Description', hide: false },
+        { colId: '3_1', field: 'planned_start_date', headerName: 'Planned Start Date', hide: false },
+        { colId: '4_1', field: 'planned_end_date', headerName: 'Planned End Date', hide: false },
+        { colId: '5_1', field: 'planned_budget', headerName: 'Planned Budget', hide: false },
+        { colId: '6_1', field: 'actual_start_time', headerName: 'Actual Start Time', hide: false },
+        { colId: '7_1', field: 'actual_end_time', headerName: 'Actual End Time', hide: false },
+        { colId: '8_1', field: 'actual_budget', headerName: 'Actual Budget', hide: false },
+        { colId: '9_1', field: 'status', headerName: 'Status', hide: false },
+    ])
+
 
     const handleSelectedTask = (task, selectedNodes) => {
         console.log(task);
@@ -227,17 +269,20 @@ const WorkProgress = () => {
 
     const handleEditModalClose = () => setEditModalOpen(false);
 
-    const handleSearchInput = (event, tabIndex) => {
-        console.log(tabIndex);
+    const handleSearchInput = (event) => {
         const searchKey = event.target.value;
 
         let dataToFilter = null;
-        console.log(subtaskData);
 
-        // Determine which data to filter based on the tab index
-        if (tabIndex === 0) {
-            dataToFilter = taskData;
-        } else if (tabIndex === 1) {
+        if ( activeTab === 'personalSubtask') {
+            dataToFilter = personalSubtaskData;
+        } else if ( activeTab === 'personalTask') {
+            dataToFilter = personalTaskData;
+        } else if (activeTab === 'Task') {
+            if (taskData.length > 0) {
+                dataToFilter = taskData;
+            }
+        } else if (activeTab === 'Subtask') {
             dataToFilter = subtaskData;
         }
 
@@ -249,14 +294,19 @@ const WorkProgress = () => {
                     field.toString().toLowerCase().includes(searchKey.toLowerCase())
             );
         });
-        console.log(filteredData);
+
         // Update the filtered data based on the active tab
-        if (tabIndex === 0) {
+        if (activeTab === 'personalSubtask') {
+            setFilteredPersonalSubtaskData(filteredData);
+        } else if (activeTab === 'personalTask') {
+            setFilteredPersonalTaskData(filteredData);
+        } else if (activeTab === 'Task') {
             setFilteredTaskData(filteredData);
-        } else if (tabIndex === 1) {
+        } else if (activeTab === 'Subtask') {
             setFilteredSubtaskData(filteredData);
         }
     };
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -276,6 +326,7 @@ const WorkProgress = () => {
                     .then((res) => {
                         setTaskData(res.data.tasks)
                         setFilteredTaskData(res.data.tasks);
+                        setActiveTab('Task')
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -284,6 +335,7 @@ const WorkProgress = () => {
                     .then((res) => {
                         setTaskData(res.data)
                         setFilteredTaskData(res.data);
+                        setActiveTab('Task')
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -295,6 +347,8 @@ const WorkProgress = () => {
                     .then((res) => {
                         setTaskData(res.data)
                         setFilteredTaskData(res.data);
+                        setActiveTab('Task')
+
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -303,6 +357,8 @@ const WorkProgress = () => {
                     .then((res) => {
                         setTaskData(res.data)
                         setFilteredTaskData(res.data);
+                        setActiveTab('Task')
+
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -313,6 +369,8 @@ const WorkProgress = () => {
                     .then((res) => {
                         setSubtaskData(res.data)
                         setFilteredSubtaskData(res.data);
+                        setActiveTab('Subtask')
+
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -321,6 +379,8 @@ const WorkProgress = () => {
                     .then((res) => {
                         setSubtaskData(res.data.subtasks)
                         setFilteredSubtaskData(res.data.subtasks);
+                        setActiveTab('Subtask')
+
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -333,6 +393,8 @@ const WorkProgress = () => {
                     .then((res) => {
                         setSubtaskData(res.data)
                         setFilteredSubtaskData(res.data);
+                        setActiveTab('Subtask')
+
                     }).catch((error) => {
                         console.log(error);
                     })
@@ -341,13 +403,61 @@ const WorkProgress = () => {
                     .then((res) => {
                         setSubtaskData(res.data)
                         setFilteredSubtaskData(res.data);
+                        setActiveTab('Subtask')
+
                     }).catch((error) => {
                         console.log(error);
                     })
             }
+        } else if (type === 'personalTaskHigh' || type === 'personalTaskMedium' || type === 'personalTaskLow') {
+            const choice = type.slice(12);
+            console.log(choice);
+
+            makeRequest.get(`/personaltask/getprojectprioritybasedpersonaltask/${projectId}/${choice}`)
+                .then((res) => {
+                    setPersonalTaskData(res.data)
+                    setFilteredPersonalTaskData(res.data);
+                    setActiveTab('personalTask')
+
+                }).catch((error) => {
+                    console.log(error);
+                })
+        } else if (type === 'personalTaskdata') {
+            makeRequest.get(`/personaltask/getpersonaltasks/${projectId}`)
+                .then((res) => {
+                    setPersonalTaskData(res.data.personalTasks)
+                    setFilteredPersonalTaskData(res.data.personalTasks);
+                    setActiveTab('personalTask')
+
+                }).catch((error) => {
+                    console.log(error);
+                })
+        } else if (type === 'personalSubtaskHigh' || type === 'personalSubtaskMedium' || type === 'personalSubtaskLow') {
+            const choice = type.slice(15);
+            console.log(choice);
+
+            makeRequest.get(`/personalsubtask/getprojectprioritybasedpersonalsubtask/${projectId}/${choice}`)
+                .then((res) => {
+                    setPersonalSubtaskData(res.data)
+                    setFilteredPersonalSubtaskData(res.data);
+                    setActiveTab('personalSubtask')
+
+                }).catch((error) => {
+                    console.log(error);
+                })
+        } else if (type === 'personalSubtaskdata') {
+            makeRequest.get(`/personalsubtask/getallpersonalsubtask/${projectId}`)
+                .then((res) => {
+                    setPersonalSubtaskData(res.data.personalSubtasks)
+                    setFilteredPersonalSubtaskData(res.data.personalSubtasks);
+                    setActiveTab('personalSubtask')
+
+                }).catch((error) => {
+                    console.log(error);
+                })
         }
     }, [])
-
+    // console.log(filteredPersonalTaskData);
     const handleCellValueChanged = (event) => {
         const { data } = event.node;
         const isTaskIdPresent = changedDataArray.some(item => item.task_id === data.task_id);
@@ -394,6 +504,9 @@ const WorkProgress = () => {
             {subtaskData &&
                 <PageTitle titleText='All Subtask Data' titleIcon={titleIcon} />
             }
+            {personalTaskData &&
+                <PageTitle titleText='Personal Task Data' titleIcon={titleIcon} />
+            }
             <Box sx={{ width: '100%' }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <div className='flex items-center justify-between'>
@@ -417,7 +530,7 @@ const WorkProgress = () => {
                                     style: { height: '40px', cursor: 'pointer' }, // Add cursor: pointer here
                                     onClick: handleOpen
                                 }}
-                                value={`FROM ${moment(calendarStartDate).format('YYYY-MM-DD')} TO ${moment(calendarEndDate).format('YYYY-MM-DD')}`}
+                                value={calendarStartDate ? `FROM ${moment(calendarStartDate).format('YYYY-MM-DD')} TO ${moment(calendarEndDate).format('YYYY-MM-DD')}` : `FROM YYYY-MM-DD TO YYYY-MM-DD`}
                             // onClick={handleOpen}
                             />
                             {/* <Button sx={{borderColor: 'black',color: 'black'}} variant="outlined" startIcon={<CalendarMonthIcon sx={{color: 'black'}}/>} onClick={handleOpen}>
@@ -491,18 +604,17 @@ const WorkProgress = () => {
                                 handleSelectedTask={handleSelectedTask}
                             />
                         </CustomTabPanel> */}
-                {(type === 'alltaskdata' || type === 'High' || type === 'Low' || type === 'Medium') ?
+                {type === 'alltaskdata' || type === 'High' || type === 'Low' || type === 'Medium' ? (
                     <>
-                        {theme === 'theme1' ?
+                        {theme === 'theme1' ? (
                             <DatagridComponent
-                                key={value}
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
                                 data={filteredTaskData}
                                 columnDefs={taskColumns}
                                 handleSelectedTask={handleSelectedTask}
                             />
-                            :
+                        ) : (
                             <DatagridComponent
                                 key={value}
                                 gridApi={gridApi}
@@ -513,11 +625,11 @@ const WorkProgress = () => {
                                 handleSelectedTask={handleSelectedTask}
                                 handleCellValueChanged={handleCellValueChanged}
                             />
-                        }
+                        )}
                     </>
-                    :
+                ) : (
                     <>
-                        {(type === 'subtaskallsubtaskdata' || type === 'subtaskHigh' || type === 'subtaskMedium' || type === 'subtaskLow') && theme === 'theme1' ?
+                        {(type === 'subtaskallsubtaskdata' || type === 'subtaskHigh' || type === 'subtaskMedium' || type === 'subtaskLow') && theme === 'theme1' ? (
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
@@ -525,20 +637,52 @@ const WorkProgress = () => {
                                 columnDefs={subtaskColumns}
                                 handleSelectedTask={handleSelectedTask}
                             />
-                            :
-                            <DatagridComponent
-                                key={value}
-                                gridApi={gridApi}
-                                setGridApi={setGridApi}
-                                data={filteredSubtaskData}
-                                columnDefs={subtaskColumns}
-                                type="subtask"
-                                handleSelectedTask={handleSelectedTask}
-                                handleCellValueChanged={handleCellValueChanged}
-                            />
+                        ) :
+                            // (
+                            //     <DatagridComponent
+                            //         key={value}
+                            //         gridApi={gridApi}
+                            //         setGridApi={setGridApi}
+                            //         data={filteredSubtaskData}
+                            //         columnDefs={subtaskColumns}
+                            //         type="subtask"
+                            //         handleSelectedTask={handleSelectedTask}
+                            //         handleCellValueChanged={handleCellValueChanged}
+                            //     />
+                            // )
+                            <></>
                         }
+                        {(type === 'personalTaskdata' || type === 'personalTaskHigh' || type === 'personalTaskMedium' || type === 'personalTaskLow') ? (
+                            theme === 'theme1' ? (
+                                <DatagridComponent
+                                    gridApi={gridApi}
+                                    setGridApi={setGridApi}
+                                    data={filteredPersonalTaskData}
+                                    columnDefs={personalTaskColumns}
+                                    handleSelectedTask={handleSelectedTask}
+                                />
+                            ) : (
+                                <></>
+                            )
+                        ) : (
+                            <>
+                                {(type === 'personalSubtaskdata' || type === 'personalSubtaskHigh' || type === 'personalSubtaskMedium' || type === 'personalSubtaskLow') &&
+                                    theme === 'theme1' ? (
+                                    <DatagridComponent
+                                        gridApi={gridApi}
+                                        setGridApi={setGridApi}
+                                        data={filteredPersonalSubtaskData}
+                                        columnDefs={personalSubtaskColumns}
+                                        handleSelectedTask={handleSelectedTask}
+                                    />
+                                ) :
+                                    <></>
+                                }
+                            </>
+                        )}
                     </>
-                }
+                )}
+
 
             </Box>
 
@@ -613,8 +757,14 @@ const WorkProgress = () => {
                     setDateModalOpen={setDateModalOpen}
                     taskData={taskData}
                     subtaskData={subtaskData}
+                    personalTaskData={personalTaskData}
+                    personalSubtaskData={personalSubtaskData}
                     filteredTaskData={filteredTaskData}
                     setFilteredTaskData={setFilteredTaskData}
+                    filteredPersonalTaskData={filteredPersonalTaskData}
+                    setFilteredPersonalTaskData={setFilteredPersonalTaskData}
+                    filteredPersonalSubtaskData={filteredPersonalSubtaskData}
+                    setFilteredPersonalSubtaskData={setFilteredPersonalSubtaskData}
                     filteredSubtaskData={filteredSubtaskData}
                     setFilteredSubtaskData={setFilteredSubtaskData}
                     setCalendarStartDate={setCalendarStartDate}
