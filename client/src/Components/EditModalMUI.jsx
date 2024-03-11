@@ -1300,12 +1300,24 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                             </div>
                             <br />
                             <div className='flex justify-center space-x-5'>
-                                <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
-                                    Cancel
-                                </Button>
-                                <Button variant="contained" size="medium" onClick={handleSubmitPersonalTask}>
-                                    Save Changes
-                                </Button>
+                                {theme === "theme1" ?
+                                    <>
+                                        <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                            Cancel
+                                        </Button>
+                                        <Button variant="contained" size="medium" onClick={handleSubmitPersonalTask}>
+                                            Create
+                                        </Button>
+                                    </> :
+                                    <>
+                                        <button className='text-white font-bold py-2 px-4 rounded' onClick={() => setOpen(!open)} style={{ background: '#5cd4d0' }}>
+                                            Cancel
+                                        </button>
+                                        <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={handleSubmitPersonalTask}>
+                                            Create
+                                        </button>
+                                    </>
+                                }
                             </div>
                         </Typography>
 
@@ -1483,12 +1495,25 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                             </div>
                             <br />
                             <div className='flex justify-center space-x-5'>
-                                <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
-                                    Cancel
-                                </Button>
-                                <Button variant="contained" size="medium" onClick={handleSubmitPersonalSubtask}>
-                                    Save Changes
-                                </Button>
+                                {theme === "theme1" ?
+                                    <>
+                                        <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                            Cancel
+                                        </Button>
+                                        <Button variant="contained" size="medium" onClick={handleSubmitPersonalSubtask}>
+                                            Create
+                                        </Button>
+                                    </> :
+                                    <>
+                                        <button className='text-white font-bold py-2 px-4 rounded' onClick={() => setOpen(!open)} style={{ background: '#5cd4d0' }}>
+                                            Cancel
+                                        </button>
+                                        <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={handleSubmitPersonalSubtask}>
+                                            Create
+                                        </button>
+                                    </>
+                                }
+
                             </div>
                         </Typography>
 

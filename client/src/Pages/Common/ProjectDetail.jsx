@@ -9,6 +9,7 @@ import ProjectDetailDaisyUI from '../../Components/ProjectDetailDaisyUI';
 import WorkProgress from '../Admin/WorkProgress';
 import { AuthContext } from '../../Context/AuthContext';
 import ProjectDetailMUIUser from '../../Components/ProjectDetailMUIUser'
+import ProjectDetailDaisyUiUser from '../../Components/ProjectDetailDaisyUiUser';
 
 
 const ProjectDetail = () => {
@@ -592,8 +593,60 @@ const ProjectDetail = () => {
 
             </>
         );
-    }
-    else {
+    } else if (theme === 'theme2' && user.user_type === 'Users') {
+        return (
+            <>
+                {projectData && (
+                    <ProjectDetailDaisyUiUser
+                        value={value}
+                        setValue={setValue}
+                        gridApi={gridApi}
+                        setGridApi={setGridApi}
+                        anchorEl={anchorEl}
+                        setAnchorEl={setAnchorEl}
+                        chevronRotation={chevronRotation}
+                        setChevronRotation={setChevronRotation}
+                        radarChartData={radarChartData}
+                        projectData={projectData}
+                        userPriorityTaskCount={userPriorityTaskCount}
+                        userPrioritySubtaskCount={userPrioritySubtaskCount}
+                        userPendingTaskCount={userPendingTaskCount}
+                        userPendingSubtaskCount={userPendingSubtaskCount}
+                        sparklineData={sparklineData}
+                        taskData={taskData}
+                        setTaskData={setTaskData}
+                        subtaskData={subtaskData}
+                        navigate={navigate}
+                        handleMenuOpen={handleMenuOpen}
+                        handleMenuClose={handleMenuClose}
+                        handleChange={handleChange}
+                        navigateToAllProject={navigateToAllProject}
+                        getPriorityColor={getPriorityColor}
+                        getChartPriorityColor={getChartPriorityColor}
+                        projectCompletionStatus={projectCompletionStatus}
+                        userAllTaskData={userAllTaskData}
+                        userTaskCount={userTaskCount}
+                        userAllSubtaskData={userAllSubtaskData}
+                        userSubtaskCount={userSubtaskCount}
+                        projectId={projectId}
+                        userTotalPendingTaskCount={userTotalPendingTaskCount}
+                        userTotalPendingSubtaskCount={userTotalPendingSubtaskCount}
+                        personalPriorityTaskCount={personalPriorityTaskCount}
+                        personalPendingTaskCount={personalPendingTaskCount}
+                        personalTotalPendingTaskCount={personalTotalPendingTaskCount}
+                        personalTaskData={personalTaskData}
+                        personalTaskCount={personalTaskCount}
+                        personalPrioritySubtaskCount={personalPrioritySubtaskCount}
+                        personalPendingSubtaskCount={personalPendingSubtaskCount}
+                        personalSubtaskCount={personalSubtaskCount}
+                        personalSubtaskData={personalSubtaskData}
+                        personalTotalPendingSubtaskCount={personalTotalPendingSubtaskCount}
+                    />
+                )}
+
+            </>
+        )
+    } else {
         // Handle unsupported theme
         return null;
     }
