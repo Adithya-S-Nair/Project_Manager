@@ -213,7 +213,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, // Only fetch if projectData is available
+            enabled: !!projectData && user.user_type === 'Users', // Only fetch if projectData is available
         }
     );
 
@@ -224,7 +224,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData,
+            enabled: !!projectData && user.user_type === 'Users',
         }
     );
 
@@ -238,7 +238,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, // Only fetch if projectData is available
+            enabled: !!projectData && user.user_type === 'Users', // Only fetch if projectData is available
         }
     );
 
@@ -249,7 +249,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData,
+            enabled: !!projectData && user.user_type === 'Users',
         }
     );
 
@@ -260,7 +260,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, // Only fetch if projectData is available
+            enabled: !!projectData && user.user_type === 'Users', // Only fetch if projectData is available
         }
     );
 
@@ -271,7 +271,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData,
+            enabled: !!projectData && user.user_type === 'Users',
         }
     );
 
@@ -284,7 +284,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, // Only fetch if projectData is available
+            enabled: !!projectData && user.user_type === 'Users', // Only fetch if projectData is available
         }
     );
 
@@ -295,7 +295,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData,
+            enabled: !!projectData && user.user_type === 'Users',
         }
     );
 
