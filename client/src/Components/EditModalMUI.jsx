@@ -41,7 +41,7 @@ const style = {
 };
 
 // selectedTasks={taskNames}
-const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks, selectedUser, setRowData, projectId, setUpdater }) => {
+const EditModal = ({ open, setOpen, handleClose, projectData, editType, selectedTask, employeeName, selectedTaskId, selectedTaskNames, selectedSubtaskId, selectedSubtaskNames, selectedTasks, selectedUser, setRowData, projectId, setUpdater, personalTaskData }) => {
     let modalContent;
     const { theme } = useContext(ThemeContext)
     const queryClient = useQueryClient();
@@ -74,6 +74,16 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         actual_budget: '',
         personal_task_description: ''
     })
+    const [personalSubtask, setPersonalSubtask] = useState({
+        project_id: projectId,
+        personal_task_id: '',
+        personalsubtask_name: '',
+        Priority: '',
+        status: '',
+        planned_budget: '',
+        actual_budget: '',
+        personalsubtask_description: ''
+    })
 
     useEffect(() => {
         if (editType === "edituser") {
@@ -98,9 +108,18 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         setPersonalTask((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }
 
-    console.log(personalTask);
+    const handlePersonalSubtaskChange = (e) => {
+        setPersonalSubtask((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    }
+
+    console.log(personalSubtask);
     const handleSubmitPersonalTask = () => {
         createPersonalTaskMutation.mutate()
+    }
+
+    const handleSubmitPersonalSubtask = () => {
+        createPersonalSubtaskMutation.mutate()
+
     }
 
     const createPersonalTaskMutation = useMutation(() => {
@@ -113,12 +132,32 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
             }).catch((error) => {
                 console.log(error);
             })
-        }, {
-            onSuccess: () => {
+    }, {
+        onSuccess: () => {
             handleClose();
             setToastOpen({
                 open: true,
                 msg: "Personal task created successfully"
+            });
+        }
+    })
+
+    const createPersonalSubtaskMutation = useMutation(() => {
+        makeRequest.post(`/personalsubtask/createpersonalsubtask`, personalSubtask)
+            .then((response) => {
+                queryClient.invalidateQueries(["priorityPersonalSubtaskCount"]);
+                queryClient.invalidateQueries(["personalPendingSubtaskCount"]);
+                queryClient.invalidateQueries(["personalSubtaskData"]);
+                queryClient.invalidateQueries(["personalTotalPendingSubtaskCount"]);
+            }).catch((error) => {
+                console.log(error);
+            })
+    }, {
+        onSuccess: () => {
+            handleClose();
+            setToastOpen({
+                open: true,
+                msg: "Personal subtask created successfully"
             });
         }
     })
@@ -1265,6 +1304,189 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                     Cancel
                                 </Button>
                                 <Button variant="contained" size="medium" onClick={handleSubmitPersonalTask}>
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </Typography>
+
+                    </>
+                </>
+            );
+            break;
+        case "createPersonalSubtask":
+            modalContent = (
+                <>
+                    <>
+                        <div className="flex items-center justify-between mb-2">
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Create Personal Subtask
+                            </Typography>
+                            <Tooltip title="Close">
+                                <IconButton onClick={() => { setOpen(!open) }}>
+                                    <CloseIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+                        <hr />
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <div className='grid grid-cols-1 gap-y-6'>
+                                <TextField
+                                    id="outlined-password-input"
+                                    label="Personal Subtask Name"
+                                    name="personalsubtask_name"
+                                    type="text"
+                                    value={personalSubtask.personalsubtask_name}
+                                    onChange={handlePersonalSubtaskChange}
+                                />
+                                <div>
+                                    <FormControl fullWidth >
+                                        <InputLabel id="demo-simple-select-label">Personal Task Names</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={personalSubtask.personal_task_id}
+                                            label="Personal Task Names"
+                                            name='personal_task_id'
+                                            onChange={handlePersonalSubtaskChange}
+                                        >
+                                            {personalTaskData && personalTaskData.map((personalTask) => (
+                                                <MenuItem
+                                                    key={personalTask.personal_task_id}
+                                                    value={personalTask.personal_task_id}
+                                                >
+                                                    {personalTask.personal_task_name}
+                                                </MenuItem>
+                                            ))}
+
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex gap-6">
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Planned Start Date"
+                                            name="planned_start_date"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.planned_start_date)}
+                                            onChange={(date) => setPersonalSubtask((prevData) => ({
+                                                ...prevData,
+                                                planned_start_date: date.format('YYYY-MM-DD')
+                                            }))}
+                                        />
+                                    </LocalizationProvider>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Planned End Date"
+                                            name="planned_end_date"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.planned_end_date)}
+                                            onChange={(date) => setPersonalSubtask((prevData) => ({
+                                                ...prevData,
+                                                planned_end_date: date.format('YYYY-MM-DD')
+                                            }))}
+
+                                        />
+                                    </LocalizationProvider>
+                                </div>
+                                <div className="flex gap-6">
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Actual Start Time"
+                                            name="actual_start_time"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.actual_start_time)}
+                                            onChange={(date) => setPersonalSubtask((prevData) => ({
+                                                ...prevData,
+                                                actual_start_time: date.format('YYYY-MM-DD')
+                                            }))}
+
+                                        />
+                                    </LocalizationProvider>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Actual End Time"
+                                            name="actual_end_time"
+                                            slots={{ openPickerIcon: DateRangeIcon }}
+                                            // value={dayjs(taskFormData.actual_end_time)}
+                                            onChange={(date) => setPersonalSubtask((prevData) => ({
+                                                ...prevData,
+                                                actual_end_time: date.format('YYYY-MM-DD')
+                                            }))}
+                                        />
+                                    </LocalizationProvider>
+                                </div>
+                                <div className="flex gap-6">
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+
+                                            label="priority"
+                                            name='Priority'
+                                            // value={taskFormData.priority}
+                                            onChange={(e) => { handlePersonalSubtaskChange(e) }}
+                                        >
+                                            <MenuItem value={priority.high}>High</MenuItem>
+                                            <MenuItem value={priority.medium}>Medium</MenuItem>
+                                            <MenuItem value={priority.low}>Low</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            // value={taskFormData.status}
+                                            label="status"
+                                            name='status'
+                                            onChange={(e) => handlePersonalSubtaskChange(e)}
+                                        >
+                                            <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
+                                            <MenuItem value={status.pending}>Pending</MenuItem>
+                                            <MenuItem value={status.onhold}>On Hold</MenuItem>
+                                            <MenuItem value={status.completed}>Completed</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div className="flex gap-6">
+                                    <TextField
+                                        fullWidth
+                                        id="outlined-password-input"
+                                        label="Planned Budget"
+                                        name="planned_budget"
+                                        type="text"
+                                        value={personalSubtask.planned_budget}
+                                        autoComplete="planned-budget"
+                                        onChange={handlePersonalSubtaskChange}
+                                    />
+                                    <TextField
+                                        fullWidth
+                                        id="outlined-password-input"
+                                        label="Actual Budget"
+                                        name="actual_budget"
+                                        type="text"
+                                        value={personalSubtask.actual_budget}
+                                        autoComplete="actual-budget"
+                                        onChange={handlePersonalSubtaskChange}
+                                    />
+                                </div>
+                                <TextField
+                                    multiline
+                                    fullWidth
+                                    rows={3}
+                                    name='personalsubtask_description'
+                                    label="Personal Subtask Description"
+                                    value={personalSubtask.personal_subtask_description}
+                                    onChange={handlePersonalSubtaskChange}
+                                />
+                            </div>
+                            <br />
+                            <div className='flex justify-center space-x-5'>
+                                <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                    Cancel
+                                </Button>
+                                <Button variant="contained" size="medium" onClick={handleSubmitPersonalSubtask}>
                                     Save Changes
                                 </Button>
                             </div>

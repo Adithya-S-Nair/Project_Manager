@@ -170,6 +170,9 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
         } else if (type === "createPersonalTask") {
 
         }
+        else if (type === "createPersonalSubtask") {
+
+        }
         setEditModalOpen(true);
     };
 
@@ -288,7 +291,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Create Personal Subtask">
-                                            <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("createPersonalTask") }}>
+                                            <IconButton aria-label="Edit" onClick={() => { handleEditModalOpen("createPersonalSubtask") }}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                                 </svg>
@@ -674,6 +677,17 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                     setOpen={setEditModalOpen}
                     handleClose={handleEditModalClose}
                     projectId={projectId}
+                />
+            }
+            {
+                modalEditType === "createPersonalSubtask" &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    projectId={projectId}
+                    personalTaskData={personalTaskData}
                 />
             }
 

@@ -307,7 +307,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, // Only fetch if projectData is available
+            enabled: !!projectData, 
         }
     );
 

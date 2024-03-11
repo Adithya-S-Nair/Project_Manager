@@ -3,17 +3,17 @@ import moment from 'moment';
 
 export const createPersonalSubtask = (req, res) => {
     const {
-        personalsubtaskName,
-        personaltaskId,
-        projectId,
-        priority,
-        personalsubtaskDescription,
-        plannedStartDate,
-        plannedEndDate,
-        plannedBudget,
-        actualStartTime,
-        actualEndTime,
-        actualBudget,
+        personalsubtask_name,
+        personal_task_id,
+        project_id,
+        Priority,
+        personalsubtask_description,
+        planned_start_date,
+        planned_end_date,
+        planned_budget,
+        actual_start_time,
+        actual_end_time,
+        actual_budget,
         status,
     } = req.body;
 
@@ -48,17 +48,17 @@ export const createPersonalSubtask = (req, res) => {
             ) VALUES (?)`;
 
         const values = [
-            personalsubtaskName,
-            personaltaskId,
-            projectId,
-            priority,
-            personalsubtaskDescription,
-            moment(plannedStartDate).format('YYYY-MM-DD'),
-            moment(plannedEndDate).format('YYYY-MM-DD'),
-            plannedBudget,
-            moment(actualStartTime).format('YYYY-MM-DD'),
-            moment(actualEndTime).format('YYYY-MM-DD'),
-            actualBudget,
+            personalsubtask_name,
+            personal_task_id,
+            project_id,
+            Priority,
+            personalsubtask_description,
+            moment(planned_start_date).format('YYYY-MM-DD'),
+            moment(planned_end_date).format('YYYY-MM-DD'),
+            planned_budget,
+            moment(actual_start_time).format('YYYY-MM-DD'),
+            moment(actual_end_time).format('YYYY-MM-DD'),
+            actual_budget,
             status,
             employeeId
         ];
