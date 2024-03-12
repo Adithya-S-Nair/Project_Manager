@@ -362,7 +362,7 @@ const WorkProgress = () => {
             }
         } else if (type === 'High' || type === 'Medium' || type === 'Low') {
             // console.log(type);
-            if (user.user_type === 'Admin') {
+            if (user.user_type === 'Users') {
                 makeRequest.get(`/task/getprojectprioritybasedtask/${projectId}/${type}`)
                     .then((res) => {
                         setTaskData(res.data)
@@ -658,7 +658,7 @@ const WorkProgress = () => {
                                 columnDefs={taskColumns}
                                 handleSelectedTask={handleSelectedTask}
                             />
-                        ) : (
+                        ) :
                             <DatagridComponent
                                 key={value}
                                 gridApi={gridApi}
@@ -669,7 +669,7 @@ const WorkProgress = () => {
                                 handleSelectedTask={handleSelectedTask}
                                 handleCellValueChanged={handleCellValueChanged}
                             />
-                        )}
+                        }
                     </>
                 ) : (
                     <>
@@ -683,7 +683,7 @@ const WorkProgress = () => {
                             />
                         ) :
                             <>
-                                (
+
                                 <DatagridComponent
                                     key={value}
                                     gridApi={gridApi}
@@ -694,7 +694,7 @@ const WorkProgress = () => {
                                     handleSelectedTask={handleSelectedTask}
                                     handleCellValueChanged={handleCellValueChanged}
                                 />
-                                )
+
                             </>
                             :
                             <></>
@@ -879,6 +879,13 @@ const WorkProgress = () => {
                     setCalendarEndDate={setCalendarEndDate}
                 />
             }
+            <EditModalMUI
+                open={editModalOpen}
+                editType={modalEditType}
+                setOpen={setEditModalOpen}
+                handleClose={handleEditModalClose}
+                selectedTask={selectedTask}
+            />
         </div >
     )
 }
