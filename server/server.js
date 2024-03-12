@@ -41,7 +41,7 @@ app.use('/pmapi/user', userRoute);
 app.use('/pmapi/employee', employeeRoute);
 app.use('/pmapi/assign', assignRoute);
 app.use('/pmapi/personaltask', personalTaskRoute);
-app.use('/pmapi/personalSubtask', personalSubtaskRoute);
+app.use('/pmapi/personalsubtask', personalSubtaskRoute);
 
 // Listen to port
 app.listen(PORT, () => {

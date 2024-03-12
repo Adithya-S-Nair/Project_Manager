@@ -274,9 +274,9 @@ const WorkProgress = () => {
 
         let dataToFilter = null;
 
-        if ( activeTab === 'personalSubtask') {
+        if (activeTab === 'personalSubtask') {
             dataToFilter = personalSubtaskData;
-        } else if ( activeTab === 'personalTask') {
+        } else if (activeTab === 'personalTask') {
             dataToFilter = personalTaskData;
         } else if (activeTab === 'Task') {
             if (taskData.length > 0) {
@@ -469,11 +469,15 @@ const WorkProgress = () => {
 
     const handleSaveChanges = () => {
         changedDataArray.map((updateData) => {
-            console.log(updateData);
-            if (!updateData.subtask_id) {
-                makeRequest.patch(`/task/updatetask/${updateData.task_id}`, updateData)
-            } else {
+            if (updateData.subtask_id) {
                 makeRequest.patch(`/subtask/updatesubtaskbyid/${updateData.subtask_id}`, updateData)
+            } else if (updateData.task_id) {
+                makeRequest.patch(`/task/updatetask/${updateData.task_id}`, updateData)
+            } else if (!updateData.personalsubtask_id) {
+                makeRequest.patch(`/personaltask/updatepersonaltask/${updateData.personal_task_id}`, updateData)
+            } else {
+                makeRequest.patch(`/personalsubtask/updatepersonalsubtaskbyid/${updateData.personalsubtask_id}`, updateData)
+                console.log(updateData);
             }
         })
     }
@@ -629,7 +633,7 @@ const WorkProgress = () => {
                     </>
                 ) : (
                     <>
-                        {(type === 'subtaskallsubtaskdata' || type === 'subtaskHigh' || type === 'subtaskMedium' || type === 'subtaskLow') && theme === 'theme1' ? (
+                        {(type === 'subtaskallsubtaskdata' || type === 'subtaskHigh' || type === 'subtaskMedium' || type === 'subtaskLow') ? theme === 'theme1' ? (
                             <DatagridComponent
                                 gridApi={gridApi}
                                 setGridApi={setGridApi}
@@ -638,18 +642,21 @@ const WorkProgress = () => {
                                 handleSelectedTask={handleSelectedTask}
                             />
                         ) :
-                            // (
-                            //     <DatagridComponent
-                            //         key={value}
-                            //         gridApi={gridApi}
-                            //         setGridApi={setGridApi}
-                            //         data={filteredSubtaskData}
-                            //         columnDefs={subtaskColumns}
-                            //         type="subtask"
-                            //         handleSelectedTask={handleSelectedTask}
-                            //         handleCellValueChanged={handleCellValueChanged}
-                            //     />
-                            // )
+                            <>
+                                (
+                                <DatagridComponent
+                                    key={value}
+                                    gridApi={gridApi}
+                                    setGridApi={setGridApi}
+                                    data={filteredSubtaskData}
+                                    columnDefs={subtaskColumns}
+                                    type="subtask"
+                                    handleSelectedTask={handleSelectedTask}
+                                    handleCellValueChanged={handleCellValueChanged}
+                                />
+                                )
+                            </>
+                            :
                             <></>
                         }
                         {(type === 'personalTaskdata' || type === 'personalTaskHigh' || type === 'personalTaskMedium' || type === 'personalTaskLow') ? (
@@ -662,20 +669,39 @@ const WorkProgress = () => {
                                     handleSelectedTask={handleSelectedTask}
                                 />
                             ) : (
-                                <></>
+                                <DatagridComponent
+                                    gridApi={gridApi}
+                                    setGridApi={setGridApi}
+                                    data={filteredPersonalTaskData}
+                                    columnDefs={personalTaskColumns}
+                                    type="personaltask"
+                                    handleSelectedTask={handleSelectedTask}
+                                    handleCellValueChanged={handleCellValueChanged}
+                                />
                             )
                         ) : (
                             <>
-                                {(type === 'personalSubtaskdata' || type === 'personalSubtaskHigh' || type === 'personalSubtaskMedium' || type === 'personalSubtaskLow') &&
+                                {(type === 'personalSubtaskdata' || type === 'personalSubtaskHigh' || type === 'personalSubtaskMedium' || type === 'personalSubtaskLow') ?
                                     theme === 'theme1' ? (
-                                    <DatagridComponent
-                                        gridApi={gridApi}
-                                        setGridApi={setGridApi}
-                                        data={filteredPersonalSubtaskData}
-                                        columnDefs={personalSubtaskColumns}
-                                        handleSelectedTask={handleSelectedTask}
-                                    />
-                                ) :
+                                        <DatagridComponent
+                                            gridApi={gridApi}
+                                            setGridApi={setGridApi}
+                                            data={filteredPersonalSubtaskData}
+                                            columnDefs={personalSubtaskColumns}
+                                            handleSelectedTask={handleSelectedTask}
+                                        />
+                                    ) : (
+                                        <DatagridComponent
+                                            gridApi={gridApi}
+                                            setGridApi={setGridApi}
+                                            data={filteredPersonalSubtaskData}
+                                            columnDefs={personalSubtaskColumns}
+                                            type="personalsubtask"
+                                            handleSelectedTask={handleSelectedTask}
+                                            handleCellValueChanged={handleCellValueChanged}
+                                        />
+                                    )
+                                    :
                                     <></>
                                 }
                             </>

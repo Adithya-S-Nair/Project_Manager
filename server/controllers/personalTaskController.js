@@ -142,15 +142,15 @@ export const updatePersonalTask = (req, res) => {
             And is_deleted = 0`
 
     const values = [
-        req.body.personalTaskName,
+        req.body.personal_task_name,
         req.body.Priority,
-        req.body.personalTaskDesc,
-        moment(req.body.plannedStartDate).format('YYYY-MM-DD'),
-        moment(req.body.plannedEndDate).format('YYYY-MM-DD'),
-        moment(req.body.actualStartTime).format('YYYY-MM-DD'),
-        moment(req.body.actualEndTime).format('YYYY-MM-DD'),
-        req.body.plannedBudget,
-        req.body.actualBudget,
+        req.body.personal_task_description,
+        moment(req.body.planned_start_date).format('YYYY-MM-DD'),
+        moment(req.body.planned_end_date).format('YYYY-MM-DD'),
+        moment(req.body.actual_start_time).format('YYYY-MM-DD'),
+        moment(req.body.actual_end_time).format('YYYY-MM-DD'),
+        req.body.planned_budget,
+        req.body.actual_budget,
         req.body.status,
         personalTaskId
     ];

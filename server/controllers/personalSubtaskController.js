@@ -96,6 +96,7 @@ export const deletePersonalSubtasks = (req, res) => {
 }
 
 export const updatePersonalSubtaskById = (req, res) => {
+    console.log("hi");
     const { personalsubtaskId } = req.params;
     const {
         personalsubtaskName,

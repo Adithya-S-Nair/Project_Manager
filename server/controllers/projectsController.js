@@ -294,7 +294,7 @@ export const getAllProjectDetails = (req, res) => {
     } else {
         query = `
             SELECT 
-            p.project_id,
+            Distinct p.project_id,
             p.project_name,
             p.project_start_date,
             p.project_end_date,
@@ -333,7 +333,7 @@ export const getAllProjectDetails = (req, res) => {
         let currentTask = null;
 
 
-
+        // console.log(results);
         results.forEach((row) => {
             if (currentProject === null || currentProject.project_id !== row.project_id) {
                 currentProject = {
@@ -358,7 +358,7 @@ export const getAllProjectDetails = (req, res) => {
                     };
                     currentProject.tasks.push(currentTask);
                 }
-
+                // console.log(row);
                 if (row.subtask_id) {
                     currentTask.subtasks.push({
                         subtask_id: row.subtask_id,
