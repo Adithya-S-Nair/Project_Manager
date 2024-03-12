@@ -434,7 +434,15 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(priorityTaskCount.Priority)} />
+                                        <SparkLineChart
+                                            data={
+                                                priorityTaskCount.Priority === 'Low'
+                                                    ? [parseInt(pendingTaskCount[0].pending_count), priorityTaskCount.task_count]
+                                                    : priorityTaskCount.Priority === 'Medium'
+                                                        ? [parseInt(pendingTaskCount[1].pending_count), priorityTaskCount.task_count]
+                                                        : [parseInt(pendingTaskCount[2].pending_count), priorityTaskCount.task_count]
+                                            }
+                                            type={priorityTaskCount.Priority} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -457,7 +465,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                                                 TOTAL PENDING TASK COUNT: {totalPendingTaskCount.pending_task_count}
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={'blue'} />
+                                        <SparkLineChart data={[totalPendingTaskCount.pending_task_count, taskCount]} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -506,7 +514,15 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(prioritySubtaskCount.Priority)} />
+                                        <SparkLineChart
+                                            data={
+                                                prioritySubtaskCount.Priority === 'Low'
+                                                    ? [parseInt(pendingSubtaskCount[0].pending_count), prioritySubtaskCount.subtask_count]
+                                                    : prioritySubtaskCount.Priority === 'Medium'
+                                                        ? [parseInt(pendingSubtaskCount[1].pending_count), prioritySubtaskCount.subtask_count]
+                                                        : [parseInt(pendingSubtaskCount[2].pending_count), prioritySubtaskCount.subtask_count]
+                                            }
+                                            type={prioritySubtaskCount.Priority} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -531,7 +547,7 @@ function ProjectDetailDaisyUI({ value, setValue, anchorEl, setAnchorEl, projectD
                                                 </h2>
                                             }
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={'blue'} />
+                                        <SparkLineChart data={[totalPendingSubtaskCount.pending_subtask_count, subtaskCount]} />
                                     </div>
                                 </CardContent>
                             </Card>

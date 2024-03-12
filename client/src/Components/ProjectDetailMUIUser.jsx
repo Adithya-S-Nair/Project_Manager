@@ -360,7 +360,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                             <h2 className='text-xl font-bold'>Personal Task Status</h2>
                         </div>
                         <hr className='mt-2 mb-2' />
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                             {personalPriorityTaskCount && personalPriorityTaskCount.map((personalPriorityTaskCount) => (
                                 <Card key={updater} style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handlePersonalTaskDataClick(personalPriorityTaskCount.Priority)} >
                                     <CardContent>
@@ -393,7 +393,16 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                     }
                                                 </h2>
                                             </div>
-                                            <SparkLineChart data={sparklineData} color={getChartPriorityColor(personalPriorityTaskCount.Priority)} />
+                                            <SparkLineChart
+                                                data={
+                                                    personalPriorityTaskCount.Priority === 'Low'
+                                                        ? [parseInt(personalPendingTaskCount[0].pending_count), personalPriorityTaskCount.task_count]
+                                                        : personalPriorityTaskCount.Priority === 'Medium'
+                                                            ? [parseInt(personalPendingTaskCount[1].pending_count), personalPriorityTaskCount.task_count]
+                                                            : [parseInt(personalPendingTaskCount[2].pending_count), personalPriorityTaskCount.task_count]
+                                                }
+                                                type={personalPriorityTaskCount.Priority}
+                                            />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -416,7 +425,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                     TOTAL PENDING PERSONAL TASK COUNT: {personalTotalPendingTaskCount.pending_task_count}
                                                 </h2>
                                             </div>
-                                            <SparkLineChart data={sparklineData} color={'blue'} />
+                                            <SparkLineChart data={[personalTotalPendingTaskCount.pending_task_count, personalTaskCount]} type={personalTotalPendingTaskCount.Priority} />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -431,7 +440,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                             <h2 className='text-xl font-bold'>Personal Subtask Status</h2>
                         </div>
                         <hr className='mt-2 mb-2' />
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                             {personalPrioritySubtaskCount.map((personalPrioritySubtaskCount) => (
                                 <Card key={personalPrioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handlePersonalSubtaskDataClick(personalPrioritySubtaskCount.Priority)} >
                                     <CardContent>
@@ -464,7 +473,15 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                     }
                                                 </h2>
                                             </div>
-                                            <SparkLineChart data={sparklineData} color={getChartPriorityColor(personalPrioritySubtaskCount.Priority)} />
+                                            <SparkLineChart
+                                                data={
+                                                    personalPrioritySubtaskCount.Priority === 'Low'
+                                                        ? [parseInt(personalPendingTaskCount[0].pending_count), personalPrioritySubtaskCount.subtask_count]
+                                                        : personalPrioritySubtaskCount.Priority === 'Medium'
+                                                            ? [parseInt(personalPendingTaskCount[1].pending_count), personalPrioritySubtaskCount.subtask_count]
+                                                            : [parseInt(personalPendingTaskCount[2].pending_count), personalPrioritySubtaskCount.subtask_count]
+                                                }
+                                                type={personalPrioritySubtaskCount.Priority} />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -489,7 +506,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                     </h2>
                                                 }
                                             </div>
-                                            <SparkLineChart data={sparklineData} color={'blue'} />
+                                            <SparkLineChart data={[personalTotalPendingSubtaskCount.pending_subtask_count, personalSubtaskCount]} />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -506,7 +523,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                         <h2 className='text-xl font-bold'>Task Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                         {userPriorityTaskCount && userPriorityTaskCount.map((userPriorityTaskCount) => (
                             <Card style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handleTaskDataClick(userPriorityTaskCount.Priority)} >
                                 <CardContent>
@@ -539,7 +556,15 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(userPriorityTaskCount.Priority)} />
+                                        <SparkLineChart
+                                            data={
+                                                userPriorityTaskCount.Priority === 'Low'
+                                                    ? [parseInt(userPendingTaskCount[0].pending_count), userPriorityTaskCount.task_count]
+                                                    : userPriorityTaskCount.Priority === 'Medium'
+                                                        ? [parseInt(userPendingTaskCount[1].pending_count), userPriorityTaskCount.task_count]
+                                                        : [parseInt(userPendingTaskCount[2].pending_count), userPriorityTaskCount.task_count]
+                                            }
+                                            type={userPriorityTaskCount.Priority} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -562,7 +587,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                 TOTAL PENDING TASK COUNT: {userTotalPendingTaskCount.total_pending_tasks}
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={'blue'} />
+                                        <SparkLineChart data={[userTotalPendingTaskCount.total_pending_tasks, userTaskCount]} color={'blue'} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -579,7 +604,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                         <h2 className='text-xl font-bold'>Subtask Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                         {userPrioritySubtaskCount.map((userPrioritySubtaskCount) => (
                             <Card key={userPrioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(userPrioritySubtaskCount.Priority)} >
                                 <CardContent>
@@ -612,7 +637,15 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(userPrioritySubtaskCount.Priority)} />
+                                        <SparkLineChart
+                                            data={
+                                                userPrioritySubtaskCount.Priority === 'Low'
+                                                    ? [parseInt(userPendingSubtaskCount[0].pending_count), userPrioritySubtaskCount.subtask_count]
+                                                    : userPriorityTaskCount.Priority === 'Medium'
+                                                        ? [parseInt(userPendingSubtaskCount[1].pending_count), userPrioritySubtaskCount.subtask_count]
+                                                        : [parseInt(userPendingSubtaskCount[2].pending_count), userPrioritySubtaskCount.subtask_count]
+                                            }
+                                            type={userPrioritySubtaskCount.Priority} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -637,7 +670,7 @@ const ProjectDetailMUIUser = ({ value, setValue, projectData, gridApi, setGridAp
                                                 </h2>
                                             }
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={'blue'} />
+                                        <SparkLineChart data={[userTotalPendingSubtaskCount.pending_subtask_count, userSubtaskCount]} color={'blue'} />
                                     </div>
                                 </CardContent>
                             </Card>

@@ -72,7 +72,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
     const [currentTab, setCurrentTab] = useState(0);
     const isMobile = useMediaQuery('(max-width:1080px)');
     const [type, setType] = useState('');
-    const {user} = useContext(AuthContext)
+    const { user } = useContext(AuthContext)
 
     // const navigates = useNavigate();
     const open = Boolean(anchorEls);
@@ -320,7 +320,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                         <h2 className='text-xl font-bold'>Task Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                         {priorityTaskCount && priorityTaskCount.map((priorityTaskCount) => (
                             <Card style={{ width: 'auto' }} className='cursor-pointer' onClick={() => handleTaskDataClick(priorityTaskCount.Priority)} >
                                 <CardContent>
@@ -353,7 +353,15 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(priorityTaskCount.Priority)} />
+                                        <SparkLineChart
+                                            data={
+                                                priorityTaskCount.Priority === 'Low'
+                                                    ? [parseInt(pendingTaskCount[0].pending_count), priorityTaskCount.task_count]
+                                                    : priorityTaskCount.Priority === 'Medium'
+                                                        ? [parseInt(pendingTaskCount[1].pending_count), priorityTaskCount.task_count]
+                                                        : [parseInt(pendingTaskCount[2].pending_count), priorityTaskCount.task_count]
+                                            }
+                                            type={priorityTaskCount.Priority} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -376,7 +384,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                                 TOTAL PENDING TASK COUNT: {totalPendingTaskCount.pending_task_count}
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={'blue'} />
+                                        <SparkLineChart data={[totalPendingTaskCount.pending_task_count, taskCount]} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -393,7 +401,7 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                         <h2 className='text-xl font-bold'>Subtask Status</h2>
                     </div>
                     <hr className='mt-2 mb-2' />
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
                         {prioritySubtaskCount.map((prioritySubtaskCount) => (
                             <Card key={prioritySubtaskCount.Priority} className='cursor-pointer' style={{ width: 'auto' }} onClick={() => handleSubtaskDataClick(prioritySubtaskCount.Priority)} >
                                 <CardContent>
@@ -426,7 +434,15 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                                 }
                                             </h2>
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={getChartPriorityColor(prioritySubtaskCount.Priority)} />
+                                        <SparkLineChart
+                                            data={
+                                                prioritySubtaskCount.Priority === 'Low'
+                                                    ? [parseInt(pendingSubtaskCount[0].pending_count), prioritySubtaskCount.subtask_count]
+                                                    : prioritySubtaskCount.Priority === 'Medium'
+                                                        ? [parseInt(pendingSubtaskCount[1].pending_count), prioritySubtaskCount.subtask_count]
+                                                        : [parseInt(pendingSubtaskCount[2].pending_count), prioritySubtaskCount.subtask_count]
+                                            }
+                                            type={prioritySubtaskCount.Priority} />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -446,12 +462,12 @@ const ProjectDetailMUI = ({ value, setValue, projectData, gridApi, setGridApi, a
                                                 TOTAL SUBTASK COUNT: {subtaskCount}
                                             </h2>
                                             {totalPendingSubtaskCount &&
-                                            <h2 className='text-xs font-light text-blue-800'>
-                                                TOTAL PENDING SUBTASK COUNT: {totalPendingSubtaskCount.pending_subtask_count}
-                                            </h2>
+                                                <h2 className='text-xs font-light text-blue-800'>
+                                                    TOTAL PENDING SUBTASK COUNT: {totalPendingSubtaskCount.pending_subtask_count}
+                                                </h2>
                                             }
                                         </div>
-                                        <SparkLineChart data={sparklineData} color={'blue'} />
+                                        <SparkLineChart data={[totalPendingSubtaskCount.pending_subtask_count, subtaskCount]} />
                                     </div>
                                 </CardContent>
                             </Card>
