@@ -96,19 +96,22 @@ export const deletePersonalSubtasks = (req, res) => {
 }
 
 export const updatePersonalSubtaskById = (req, res) => {
-    console.log("hi");
-    const { personalsubtaskId } = req.params;
+    // console.log("hi");
+    const { personalSubtaskId } = req.params;
+    console.log(personalSubtaskId);
     const {
-        personalsubtaskName,
-        personalsubtaskDescription,
-        priority,
-        plannedStartDate,
-        plannedEndDate,
-        plannedBudget,
-        actualStartTime,
-        actualEndTime,
-        actualBudget,
-        status
+        personalsubtask_name,
+        project_id,
+        personal_task_id,
+        planned_start_date,
+        planned_end_date,
+        actual_start_time,
+        actual_end_time,
+        Priority,
+        status,
+        planned_budget,
+        actual_budget,
+        personalsubtask_description,
     } = req.body;
 
     const employeeQuery = `SELECT employee_id FROM employee WHERE user_account_id = ?`;
@@ -128,6 +131,8 @@ export const updatePersonalSubtaskById = (req, res) => {
         UPDATE personalsubtask
         SET 
             personalsubtask_name = ?,
+            personal_task_id = ?,
+            project_id = ?,
             personalsubtask_description = ?,
             Priority = ?,
             planned_start_date = ?,
@@ -141,18 +146,20 @@ export const updatePersonalSubtaskById = (req, res) => {
         WHERE personalsubtask_id = ?`;
 
         const values = [
-            personalsubtaskName,
-            personalsubtaskDescription,
-            priority,
-            moment(plannedStartDate).format('YYYY-MM-DD'),
-            moment(plannedEndDate).format('YYYY-MM-DD'),
-            plannedBudget,
-            moment(actualStartTime).format('YYYY-MM-DD'),
-            moment(actualEndTime).format('YYYY-MM-DD'),
-            actualBudget,
+            personalsubtask_name,
+            personal_task_id,
+            project_id,
+            personalsubtask_description,
+            Priority,
+            moment(planned_start_date).format('YYYY-MM-DD'),
+            moment(planned_end_date).format('YYYY-MM-DD'),
+            planned_budget,
+            moment(actual_start_time).format('YYYY-MM-DD'),
+            moment(actual_end_time).format('YYYY-MM-DD'),
+            actual_budget,
             status,
             employeeId,
-            personalsubtaskId
+            personalSubtaskId
         ];
 
         db.query(query, values, (err, data) => {
@@ -163,6 +170,70 @@ export const updatePersonalSubtaskById = (req, res) => {
             return res.status(200).json({ message: "Personal subtask updated successfully" });
         });
     });
+}
+
+export const getPersonalSubtask = (req, res) => {
+    const { personalSubtaskId } = req.params;
+    const query = `SELECT * FROM personalsubtask WHERE personalsubtask_id = ?`;
+
+    db.query(query, [personalSubtaskId], (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data[0])
+    })
+}
+
+export const getPersonalSubtaskIdAndName = (req, res) => {
+    const q = "SELECT personalsubtask_id,personalsubtask_name FROM personalsubtask";
+
+    db.query(q, (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+
+        return res.status(200).json(data)
+    })
+}
+
+export const getPersonalSubtaskNameById = (req, res) => {
+    console.log(req.body);
+    const personalSubtaskIds = req.body;
+    // console.log(taskIds);
+    const promises = personalSubtaskIds.map((personalSubtaskId) => {
+        return new Promise((resolve, reject) => {
+            const query = `SELECT personalsubtask_id, personalsubtask_name from personalsubtask where personalsubtask_id = ?`;
+            db.query(query, personalSubtaskId, (err, data) => {
+                if (err) return reject(err);
+
+                if (data.length === 0) {
+                    return reject({ msg: `No personal subtask name found for personal subtask ID ${personalSubtaskId}` });
+                }
+
+                resolve(data[0]);
+            });
+        });
+    });
+
+    // Wait for all promises to resolve
+    Promise.all(promises)
+        .then((personalSubtaskNames) => {
+            res.status(200).json(personalSubtaskNames);
+        })
+        .catch((error) => {
+            res.status(500).json(error); // Send an error response if any query fails
+        });
 }
 
 export const getAllPersonalSubtask = (req, res) => {

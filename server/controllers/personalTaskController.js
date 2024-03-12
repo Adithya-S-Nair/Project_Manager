@@ -121,6 +121,70 @@ export const getPersonalTasks = (req, res) => {
     });
 };
 
+export const getPersonalTask = (req, res) => {
+    const { personalTaskId } = req.params;
+    const query = `SELECT * FROM personal_task WHERE personal_task_id = ?`;
+
+    db.query(query, [personalTaskId], (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+        data.forEach(row => {
+            row.planned_start_date = moment(row.planned_start_date).format('YYYY-MM-DD');
+            row.planned_end_date = moment(row.planned_end_date).format('YYYY-MM-DD');
+            row.actual_start_time = moment(row.actual_start_time).format('YYYY-MM-DD');
+            row.actual_end_time = moment(row.actual_end_time).format('YYYY-MM-DD');
+        });
+
+        return res.status(200).json(data[0])
+    })
+}
+
+export const getPersonalTaskIdAndName = (req, res) => {
+    const q = "SELECT personal_task_id,personal_task_name FROM personal_task";
+
+    db.query(q, (err, data) => {
+        if (err) return res.status(500).json(err);
+
+        if (data.length === 0) {
+            return res.status(404).json({ msg: "No data found" });
+        }
+
+        return res.status(200).json(data)
+    })
+}
+
+export const getPersonalTaskNameById = (req,res) =>{
+    console.log(req.body);
+    const personalTaskIds = req.body;
+    // console.log(taskIds);
+    const promises = personalTaskIds.map((personalTaskId) => {
+        return new Promise((resolve, reject) => {
+            const query = `SELECT personal_task_id, personal_task_name from personal_task where personal_task_id = ?`;
+            db.query(query, personalTaskId, (err, data) => {
+                if (err) return reject(err);
+
+                if (data.length === 0) {
+                    return reject({ msg: `No personal task name found for personal task ID ${personalTaskId}` });
+                }
+
+                resolve(data[0]); 
+            });
+        });
+    });
+
+    // Wait for all promises to resolve
+    Promise.all(promises)
+        .then((personalTaskNames) => {
+            res.status(200).json(personalTaskNames);
+        })
+        .catch((error) => {
+            res.status(500).json(error); // Send an error response if any query fails
+        });
+}
+
 export const updatePersonalTask = (req, res) => {
     const personalTaskId = req.params.personalTaskId;
 

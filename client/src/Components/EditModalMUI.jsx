@@ -50,6 +50,8 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
     const [formData, setFormData] = useState({ ...projectData });
     const [taskFormData, setTaskFormData] = useState();
     const [subtaskFormData, setSubtaskFormData] = useState();
+    const [personalTaskFormData, setPersonalTaskFormData] = useState();
+    const [personalSubtaskFormData, setPersonalSubtaskFormData] = useState();
     const [toastOpen, setToastOpen] = useState({ open: false, msg: "" })
     const [userData, setUserData] = useState({
         userName: '',
@@ -367,8 +369,8 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         }));
     };
 
-    const { data: editSubtaskProjectName, error: editSubtaskProjectNameError, isLoading: editSubtaskProjectNameLoading } = useQuery(
-        ['subtaskprojectName', selectedTask],
+    const { data: editProjectName, error: editProjectNameError, isLoading: editProjectNameLoading } = useQuery(
+        ['projectName', selectedTask],
         async () => {
             const response = await makeRequest.get(`/project/getprojectidandname`);
             return response.data;
@@ -450,6 +452,102 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
         createRegisterMutation.mutate(input);
     }
 
+    const { data: editPersonalTaskData, error: editPersonalTaskDataError, isLoading: editPersonalTaskDataLoading } = useQuery(
+        ['PersonalTaskdataById', selectedTask],
+        async () => {
+            // console.log(selectedTask);
+            const response = await makeRequest.get(`/personaltask/getpersonaltask/${selectedTask}`);
+            // console.log(response.data);
+            setPersonalTaskFormData(response.data);
+            return response.data;
+        }
+    );
+
+    const { data: editPersonalTaskName, error: editPersonalTaskNameError, isLoading: editPersonalTaskNameLoading } = useQuery(
+        ['personalTaskName', selectedTask],
+        async () => {
+            const response = await makeRequest.get(`/personaltask/getpersonaltaskidandname`);
+            return response.data;
+        }
+    );
+
+    const handleEditPersonalTaskChange = (e) => {
+        const { name, value } = e.target;
+        setPersonalTaskFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+
+    const handleEditPersonalTask = () => {
+        // console.log(selectedTask);
+        makeRequest.patch(`/personaltask/updatepersonaltask/${selectedTask}`, personalTaskFormData)
+            .then((res) => {
+                setToastOpen({ open: true, msg: "Personal Task Updated Successfully" })
+                window.location.reload();
+                handleClose();
+
+                // console.log("Personal Task updated successfully");
+            }).catch((error) => {
+                console.log("Personal Task updating error:", error);
+            })
+    }
+
+    const handlePersonalTaskDelete = () => {
+        // console.log(selectedTaskId);
+        makeRequest.delete(`/personaltask/deletepersonaltask/${selectedTaskId}`)
+            .then((res) => {
+                setToastOpen({ open: true, msg: "Personal Task Deleted Successfully" })
+                window.location.reload();
+                // console.log("deleted successfully");
+            }).catch((error) => {
+                console.log("error in deleting");
+            })
+    }
+
+    const { data: editPersonalSubtaskData, error: editPersonalSubtaskDataError, isLoading: editPersonalSubtaskDataLoading } = useQuery(
+        ['PersonalSubtaskDataById', selectedTask],
+        async () => {
+            // console.log(selectedTask);
+            const response = await makeRequest.get(`/personalsubtask/getpersonalsubtask/${selectedTask}`);
+            console.log(response.data);
+            setPersonalSubtaskFormData(response.data);
+            return response.data;
+        }
+    );
+
+    const handleEditPersonalSubtaskChange = (e) => {
+        const { name, value } = e.target;
+        setPersonalSubtaskFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+    console.log(personalSubtaskFormData);
+
+    const handleEditPersonalSubtask = () => {
+        makeRequest.patch(`/personalsubtask/updatepersonalsubtaskbyid/${selectedTask}`, personalSubtaskFormData)
+            .then((res) => {
+                // setToastOpen({ open: true, msg: "Personal Subtask Updated Successfully" })
+                window.location.reload();
+                handleClose();
+
+            }).catch((error) => {
+                console.log("Personal Subtask updating error:", error);
+            })
+    }
+
+    const handlePersonalSubtaskDelete = () => {
+        // console.log(selectedTaskId);
+        makeRequest.delete(`/personalsubtask/deletepersonalsubtasks/${selectedTaskId}`)
+            .then((res) => {
+                // setToastOpen({ open: true, msg: "Personal Subtask Deleted Successfully" })
+                window.location.reload();
+                // console.log("deleted successfully");
+            }).catch((error) => {
+                console.log("error in deleting");
+            })
+    }
 
     // console.log(editType);
     switch (editType) {
@@ -783,7 +881,7 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                                                 name='project_id'
                                                 onChange={handleSubtaskChange}
                                             >
-                                                {editSubtaskProjectName && editSubtaskProjectName.map((project) => (
+                                                {editProjectName && editProjectName.map((project) => (
                                                     <MenuItem
                                                         key={project.project_id}
                                                         value={project.project_id}
@@ -1518,6 +1616,467 @@ const EditModal = ({ open, setOpen, handleClose, projectData, editType, selected
                         </Typography>
 
                     </>
+                </>
+            );
+            break;
+        case "editPersonalTask":
+            modalContent = (
+                <>
+                    {editPersonalTaskData &&
+                        <>
+                            <div className="flex items-center justify-between mb-2">
+                                <Typography id="modal-modal-title" variant="h6" component="h2">
+                                    Edit Personal Task Details
+                                </Typography>
+                                <Tooltip title="Close">
+                                    <IconButton onClick={() => { setOpen(!open) }}>
+                                        <CloseIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                            <hr />
+                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                <div className='grid grid-cols-1 gap-y-6'>
+                                    <TextField
+                                        id="outlined-password-input"
+                                        label="Personal Task Name"
+                                        name="personal_task_name"
+                                        type="text"
+                                        value={personalTaskFormData.personal_task_name}
+                                        onChange={handleEditPersonalTaskChange}
+
+                                    // onChange={(e) => handleCreateProjectChange(e)}
+                                    />
+                                    <div className=''>
+                                        <FormControl fullWidth >
+                                            <InputLabel id="demo-simple-select-label">Project Names</InputLabel>
+                                            <Select
+
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={personalTaskFormData.project_id}
+                                                label="Project Names"
+                                                name='project_id'
+                                                onChange={handleEditPersonalTaskChange}
+                                            >
+                                                {editProjectName && editProjectName.map((project) => (
+                                                    <MenuItem
+                                                        key={project.project_id}
+                                                        value={project.project_id}
+                                                    >
+                                                        {project.project_name}
+                                                    </MenuItem>
+                                                ))}
+
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Planned Start Date"
+                                                name="planned_start_date"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalTaskFormData.planned_start_date)}
+                                                onChange={(date) => setPersonalTaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    planned_start_date: date.format('YYYY-MM-DD')
+                                                }))}
+                                            />
+                                        </LocalizationProvider>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Planned End Date"
+                                                name="planned_end_date"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalTaskFormData.planned_end_date)}
+                                                onChange={(date) => setPersonalTaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    planned_end_date: date.format('YYYY-MM-DD')
+                                                }))}
+
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Actual Start Time"
+                                                name="actual_start_time"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalTaskFormData.actual_start_time)}
+                                                onChange={(date) => setPersonalTaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    actual_start_time: date.format('YYYY-MM-DD')
+                                                }))}
+
+                                            />
+                                        </LocalizationProvider>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Actual End Time"
+                                                name="actual_end_time"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalTaskFormData.actual_end_time)}
+                                                onChange={(date) => setPersonalTaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    actual_end_time: date.format('YYYY-MM-DD')
+                                                }))}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+
+                                                label="priority"
+                                                name='priority'
+                                                value={personalTaskFormData.Priority}
+                                                onChange={(e) => { handleEditPersonalTaskChange(e) }}
+                                            >
+                                                <MenuItem value={priority.high}>High</MenuItem>
+                                                <MenuItem value={priority.medium}>Medium</MenuItem>
+                                                <MenuItem value={priority.low}>Low</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={personalTaskFormData.status}
+                                                label="status"
+                                                name='status'
+                                                onChange={(e) => handleEditPersonalTaskChange(e)}
+                                            >
+                                                <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
+                                                <MenuItem value={status.pending}>Pending</MenuItem>
+                                                <MenuItem value={status.onhold}>On Hold</MenuItem>
+                                                <MenuItem value={status.completed}>Completed</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className="flex gap-6 justify-between">
+                                        <TextField
+                                            fullWidth
+                                            id="outlined-password-input"
+                                            label="Planned Budget"
+                                            name="planned_budget"
+                                            type="text"
+                                            value={personalTaskFormData.planned_budget}
+                                            autoComplete="planned-budget"
+                                            onChange={handleEditPersonalTaskChange}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            id="outlined-password-input"
+                                            label="Actual Budget"
+                                            name="actual_budget"
+                                            type="text"
+                                            value={personalTaskFormData.actual_budget}
+                                            autoComplete="actual-budget"
+                                            onChange={handleEditPersonalTaskChange}
+                                        />
+                                    </div>
+                                    <TextField
+                                        multiline
+                                        fullWidth
+                                        rows={3}
+                                        name='personal_task_description'
+                                        label="Personal Task Description"
+                                        value={personalTaskFormData.personal_task_description}
+                                        onChange={handleEditPersonalTaskChange}
+                                    />
+                                </div>
+                                <br />
+                                <div className='flex justify-center space-x-5'>
+                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" size="medium" onClick={handleEditPersonalTask}>
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </Typography>
+
+                        </>
+                    }
+                </>
+            );
+            break;
+        case "deletePersonalTask":
+            modalContent = (
+                <>
+                    <div className="flex items-center justify-between mb-2">
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Delete Personal Tasks From Project
+                        </Typography>
+                        <Tooltip title="Close">
+                            <IconButton onClick={() => { setOpen(!open) }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <hr />
+                    <div className='grid grid-cols-2 justify-content-between mt-4 gap-3 '>
+                        {selectedTaskNames && selectedTaskNames.map((personalTask) => (
+                            <Tooltip key={personalTask.personal_task_id} title={personalTask.personal_task_name}>
+                                <Chip label={personalTask.personal_task_name} variant="outlined" onDelete={handlePersonalTaskDelete} />
+                            </Tooltip>
+                        ))}
+                    </div>
+
+                    <div className='flex justify-center mt-4'>
+                        {theme === 'theme1' ?
+                            <Button variant="contained" onClick={handlePersonalTaskDelete}>Delete Personal Tasks</Button>
+                            :
+                            <button className='text-white font-bold py-2 px-4 rounded' style={{ background: '#5cd4d0' }} onClick={handleTaskDelete}>Delete Personal Tasks</button>
+                        }
+                    </div>
+                </>
+            );
+            break;
+        case "editPersonalSubtask":
+            modalContent = (
+                <>
+                    {editPersonalSubtaskData &&
+                        <>
+                            <div className="flex items-center justify-between mb-2">
+                                <Typography id="modal-modal-title" variant="h6" component="h2">
+                                    Edit Personal Subtask Details
+                                </Typography>
+                                <Tooltip title="Close">
+                                    <IconButton onClick={() => { setOpen(!open) }}>
+                                        <CloseIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                            <hr />
+                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                <div className='grid grid-cols-1 gap-y-6'>
+                                    <TextField
+                                        id="outlined-password-input"
+                                        label="Personal Subtask Name"
+                                        name="personalsubtask_name"
+                                        type="text"
+                                        value={personalSubtaskFormData.personalsubtask_name}
+                                        onChange={handleEditPersonalSubtaskChange}
+
+                                    />
+                                    <div className=''>
+                                        <FormControl fullWidth >
+                                            <InputLabel id="demo-simple-select-label">Project Names</InputLabel>
+                                            <Select
+
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={personalSubtaskFormData.project_id}
+                                                label="Project Names"
+                                                name='project_id'
+                                                onChange={handleEditPersonalSubtaskChange}
+                                            >
+                                                {editProjectName && editProjectName.map((project) => (
+                                                    <MenuItem
+                                                        key={project.project_id}
+                                                        value={project.project_id}
+                                                    >
+                                                        {project.project_name}
+                                                    </MenuItem>
+                                                ))}
+
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className=''>
+                                        <FormControl fullWidth >
+                                            <InputLabel id="demo-simple-select-label">Personal Task Names</InputLabel>
+                                            <Select
+
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={personalSubtaskFormData.personal_task_id}
+                                                label="Personal Task Names"
+                                                name='personal_task_id'
+                                                onChange={handleEditPersonalSubtaskChange}
+                                            >
+                                                {editPersonalTaskName && editPersonalTaskName.map((personalTask) => (
+                                                    <MenuItem
+                                                        key={personalTask.personal_task_id}
+                                                        value={personalTask.personal_task_id}
+                                                    >
+                                                        {personalTask.personal_task_name}
+                                                    </MenuItem>
+                                                ))}
+
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Planned Start Date"
+                                                name="planned_start_date"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalSubtaskFormData.planned_start_date)}
+                                                onChange={(date) => setPersonalSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    planned_start_date: date.format('YYYY-MM-DD')
+                                                }))}
+                                            />
+                                        </LocalizationProvider>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Planned End Date"
+                                                name="planned_end_date"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalSubtaskFormData.planned_end_date)}
+                                                onChange={(date) => setPersonalSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    planned_end_date: date.format('YYYY-MM-DD')
+                                                }))}
+
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Actual Start Time"
+                                                name="actual_start_time"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalSubtaskFormData.actual_start_time)}
+                                                onChange={(date) => setPersonalSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    actual_start_time: date.format('YYYY-MM-DD')
+                                                }))}
+
+                                            />
+                                        </LocalizationProvider>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Actual End Time"
+                                                name="actual_end_time"
+                                                slots={{ openPickerIcon: DateRangeIcon }}
+                                                value={dayjs(personalSubtaskFormData.actual_end_time)}
+                                                onChange={(date) => setPersonalSubtaskFormData((prevData) => ({
+                                                    ...prevData,
+                                                    actual_end_time: date.format('YYYY-MM-DD')
+                                                }))}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+
+                                                label="priority"
+                                                name='Priority'
+                                                value={personalSubtaskFormData.Priority}
+                                                onChange={(e) => { handleEditPersonalSubtaskChange(e) }}
+                                            >
+                                                <MenuItem value={priority.high}>High</MenuItem>
+                                                <MenuItem value={priority.medium}>Medium</MenuItem>
+                                                <MenuItem value={priority.low}>Low</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                value={personalSubtaskFormData.status}
+                                                label="status"
+                                                name='status'
+                                                onChange={(e) => handleEditPersonalSubtaskChange(e)}
+                                            >
+                                                <MenuItem value={status.workinprogress}>Work In Progress</MenuItem>
+                                                <MenuItem value={status.pending}>Pending</MenuItem>
+                                                <MenuItem value={status.onhold}>On Hold</MenuItem>
+                                                <MenuItem value={status.completed}>Completed</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+                                    <div className="flex gap-6 justify-between">
+                                        <TextField
+                                            fullWidth
+                                            id="outlined-password-input"
+                                            label="Planned Budget"
+                                            name="planned_budget"
+                                            type="text"
+                                            value={personalSubtaskFormData.planned_budget}
+                                            autoComplete="planned-budget"
+                                            onChange={handleEditPersonalSubtaskChange}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            id="outlined-password-input"
+                                            label="Actual Budget"
+                                            name="actual_budget"
+                                            type="text"
+                                            value={personalSubtaskFormData.actual_budget}
+                                            autoComplete="actual-budget"
+                                            onChange={handleEditPersonalSubtaskChange}
+                                        />
+                                    </div>
+                                    <TextField
+                                        multiline
+                                        fullWidth
+                                        rows={3}
+                                        name='personalsubtask_description'
+                                        label="Personal Subtask Description"
+                                        value={personalSubtaskFormData.personalsubtask_description}
+                                        onChange={handleEditPersonalSubtaskChange}
+                                    />
+                                </div>
+                                <br />
+                                <div className='flex justify-center space-x-5'>
+                                    <Button variant="contained" size="medium" onClick={() => setOpen(!open)}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="contained" size="medium" onClick={handleEditPersonalSubtask}>
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </Typography>
+
+                        </>
+                    }
+                </>
+            );
+            break;
+        case "deletePersonalSubtask":
+            modalContent = (
+                <>
+                    <div className="flex items-center justify-between mb-2">
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Delete Personal Subtasks From Project
+                        </Typography>
+                        <Tooltip title="Close">
+                            <IconButton onClick={() => { setOpen(!open) }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <hr />
+                    <div className='grid grid-cols-2 justify-content-between mt-4 gap-3 '>
+                        {selectedTaskNames && selectedTaskNames.map((personalSubtask) => (
+                            <Tooltip key={personalSubtask.personalsubtask_id} title={personalSubtask.personalsubtask_name}>
+                                <Chip label={personalSubtask.personalsubtask_name} variant="outlined" 
+                                // onDelete={handleDeleteSubtask}
+                                 />
+                            </Tooltip>
+                        ))}
+                    </div>
+
+                    <div className='flex justify-center mt-4'>
+                        <Button variant="contained" onClick={handlePersonalSubtaskDelete}>Delete Personal Subtasks</Button>
+                    </div>
                 </>
             );
             break;

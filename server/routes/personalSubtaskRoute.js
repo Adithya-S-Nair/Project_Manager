@@ -8,7 +8,10 @@ import {
     getProjectPriorityBasedPersonalSubtask,
     getPriorityPersonalSubtaskCount,
     getPendingPriorityBasedPersonalSubtaskCount,
-    getTotalPendingPersonalSubtaskCount
+    getTotalPendingPersonalSubtaskCount,
+    getPersonalSubtask,
+    getPersonalSubtaskIdAndName,
+    getPersonalSubtaskNameById
 } 
 from '../controllers/personalSubtaskController.js';
 
@@ -18,6 +21,9 @@ const router = express.Router();
 router.post('/createpersonalsubtask', checkAuth, createPersonalSubtask);
 router.delete('/deletepersonalsubtasks/:personalSubtaskIds', checkAuth, deletePersonalSubtasks);
 router.patch('/updatepersonalsubtaskbyid/:personalSubtaskId', checkAuth, updatePersonalSubtaskById)
+router.get('/getpersonalsubtask/:personalSubtaskId', checkAuth, getPersonalSubtask);
+router.get('/getpersonalsubtaskidandname', checkAuth, getPersonalSubtaskIdAndName);
+router.post('/getpersonalsubtasknamebyid', checkAuth, getPersonalSubtaskNameById);
 router.get('/getallpersonalsubtask/:projectId', checkAuth, getAllPersonalSubtask);
 router.get('/getprojectprioritybasedpersonalsubtask/:projectId/:priority', checkAuth, getProjectPriorityBasedPersonalSubtask)
 router.get('/getprioritypersonalsubtaskcount/:projectId', checkAuth, getPriorityPersonalSubtaskCount) 

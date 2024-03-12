@@ -189,9 +189,8 @@ const WorkProgress = () => {
     const handleSelectedTask = (task, selectedNodes) => {
         console.log(task);
         setSelectedTask(task);
-        // console.log(selectedNodes[0]);
-        setTableData(selectedNodes[0])
-
+        console.log(selectedNodes[0]);
+        setTableData(selectedNodes[0]);
     };
     // console.log(selectedTask);
     const taskId = tableData ? Object.keys(tableData) : null;
@@ -202,6 +201,7 @@ const WorkProgress = () => {
     // console.log(taskNames);
     const handleEditModalOpen = (type) => {
         setModalEditType(type)
+        console.log(type);
         if (type === "assignedTask") {
             makeRequest.post(`/task/gettasknamebyid`, selectedTask)
                 .then((res) => {
@@ -263,10 +263,30 @@ const WorkProgress = () => {
                 }).catch((error) => {
                     console.log(error);
                 })
+        } else if (type == "editPersonalTask") {
+
+        } else if (type === "deletePersonalTask") {
+            // console.log(selectedTask);
+            makeRequest.post(`/personaltask/getpersonaltasknamebyid`, selectedTask)
+                .then((res) => {
+                    // console.log(res.data);
+                    setTaskNames(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
+        } else if (type == "editPersonalTask") {
+
+        } else if (type === "deletePersonalSubtask") {
+            makeRequest.post(`/personalsubtask/getpersonalsubtasknamebyid`, selectedTask)
+                .then((res) => {
+                    setTaskNames(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                })
         }
         setEditModalOpen(true);
     };
-
+    // console.log(taskNames);
     const handleEditModalClose = () => setEditModalOpen(false);
 
     const handleSearchInput = (event) => {
@@ -423,6 +443,7 @@ const WorkProgress = () => {
                     console.log(error);
                 })
         } else if (type === 'personalTaskdata') {
+
             makeRequest.get(`/personaltask/getpersonaltasks/${projectId}`)
                 .then((res) => {
                     setPersonalTaskData(res.data.personalTasks)
@@ -457,6 +478,7 @@ const WorkProgress = () => {
                 })
         }
     }, [])
+
     // console.log(filteredPersonalTaskData);
     const handleCellValueChanged = (event) => {
         const { data } = event.node;
@@ -558,20 +580,38 @@ const WorkProgress = () => {
                                                     'aria-labelledby': 'basic-button',
                                                 }}
                                             >
-                                                {taskId && taskId[0] === "task_id" ?
+                                                {taskId && taskId[0] === "task_id" &&
                                                     <>
                                                         <MenuItem onClick={() => { handleEditModalOpen("assignedTask") }}>Assigned Tasks</MenuItem>
                                                         {selectedTask && selectedTask.length <= 1 &&
                                                             <MenuItem onClick={() => { handleEditModalOpen("editTask") }}>Edit Tasks</MenuItem>
                                                         }
                                                         <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete Tasks</MenuItem>
-                                                    </> :
+                                                    </>
+                                                }
+                                                {taskId && taskId[0] === "subtask_id" &&
                                                     <>
                                                         <MenuItem onClick={() => { handleEditModalOpen("assignedSubtask") }}>Assigned Subtasks</MenuItem>
                                                         {selectedTask && selectedTask.length <= 1 &&
                                                             <MenuItem onClick={() => { handleEditModalOpen("editSubtask") }}>Edit Subtasks</MenuItem>
                                                         }
                                                         <MenuItem onClick={() => { handleEditModalOpen("deleteSubtask") }}>Delete Subtasks</MenuItem>
+                                                    </>
+                                                }
+                                                {taskId && taskId[0] === "personal_task_id" &&
+                                                    <>
+                                                        {selectedTask && selectedTask.length <= 1 &&
+                                                            <MenuItem onClick={() => { handleEditModalOpen("editPersonalTask") }}>Edit Personal Task</MenuItem>
+                                                        }
+                                                        <MenuItem onClick={() => { handleEditModalOpen("deletePersonalTask") }}>Delete Personal Task</MenuItem>
+                                                    </>
+                                                }
+                                                {taskId && taskId[0] === "personalsubtask_id" &&
+                                                    <>
+                                                        {selectedTask && selectedTask.length <= 1 &&
+                                                            <MenuItem onClick={() => { handleEditModalOpen("editPersonalSubtask") }}>Edit Personal Subtask</MenuItem>
+                                                        }
+                                                        <MenuItem onClick={() => { handleEditModalOpen("deletePersonalSubtask") }}>Delete Personal Subtask</MenuItem>
                                                     </>
                                                 }
                                             </Menu>
@@ -775,6 +815,48 @@ const WorkProgress = () => {
                     handleClose={handleEditModalClose}
                     selectedSubtaskId={selectedTask}
                     selectedSubtaskNames={taskNames}
+                />
+            }
+            {
+                modalEditType === "editPersonalTask" &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTask={selectedTask}
+                />
+            }
+            {
+                modalEditType === "deletePersonalTask" && selectedTask && taskNames &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTaskId={selectedTask}
+                    selectedTaskNames={taskNames}
+                />
+            }
+            {
+                modalEditType === "editPersonalSubtask" &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTask={selectedTask}
+                />
+            }
+            {
+                modalEditType === "deletePersonalSubtask" && selectedTask && taskNames &&
+                <EditModalMUI
+                    open={editModalOpen}
+                    editType={modalEditType}
+                    setOpen={setEditModalOpen}
+                    handleClose={handleEditModalClose}
+                    selectedTaskId={selectedTask}
+                    selectedTaskNames={taskNames}
                 />
             }
             {dateModalOpen &&

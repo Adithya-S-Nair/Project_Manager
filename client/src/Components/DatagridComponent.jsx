@@ -25,7 +25,9 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
 
     function handleSelectionChanged(event) {
         const selectedNodes = event.columnApi.api.getSelectedRows();
+        // console.log(selectedNodes);
         const titleName = selectedNodes[0] ? Object.keys(selectedNodes[0]) : null;
+        // console.log(titleName);
         if (titleName && titleName.length > 0) {
             // console.log(selectedNodes);
             // console.log(titleName[0]);
@@ -35,7 +37,14 @@ const DatagridComponent = ({ data, columnDefs, gridApi, setGridApi, setColumnDef
             } else if (titleName[0] === "subtask_id") {
                 const selectedData = selectedNodes.map(node => node.subtask_id);
                 handleSelectedTask(selectedData, selectedNodes);
+            } else if (titleName[0] === "personal_task_id") {
+                const selectedData = selectedNodes.map(node => node.personal_task_id);
+                handleSelectedTask(selectedData, selectedNodes);
+            } else if (titleName[0] === "personalsubtask_id") {
+                const selectedData = selectedNodes.map(node => node.personalsubtask_id);
+                handleSelectedTask(selectedData, selectedNodes);
             }
+
         } else {
             // const selectedNodes = event.columnApi.api.deselectAll();
             handleSelectedTask([], []);
