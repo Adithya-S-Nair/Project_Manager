@@ -362,7 +362,7 @@ const WorkProgress = () => {
             }
         } else if (type === 'High' || type === 'Medium' || type === 'Low') {
             // console.log(type);
-            if (user.user_type === 'Users') {
+            if (user.user_type === 'Admin') {
                 makeRequest.get(`/task/getprojectprioritybasedtask/${projectId}/${type}`)
                     .then((res) => {
                         setTaskData(res.data)
