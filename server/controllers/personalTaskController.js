@@ -157,7 +157,7 @@ export const getPersonalTaskIdAndName = (req, res) => {
 }
 
 export const getPersonalTaskNameById = (req,res) =>{
-    console.log(req.body);
+    // console.log(req.body);
     const personalTaskIds = req.body;
     // console.log(taskIds);
     const promises = personalTaskIds.map((personalTaskId) => {

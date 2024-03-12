@@ -76,7 +76,7 @@ export const createPersonalSubtask = (req, res) => {
 
 export const deletePersonalSubtasks = (req, res) => {
     const personalsubtaskIds = req.params.personalSubtaskIds.split(',');
-    console.log("personalsubtaskId is:" + personalsubtaskIds);
+    // console.log("personalsubtaskId is:" + personalsubtaskIds);
     if (!Array.isArray(personalsubtaskIds) || personalsubtaskIds.length === 0) {
         return res.status(400).json({ error: 'Invalid personal subtask IDs provided' });
     }
@@ -98,7 +98,7 @@ export const deletePersonalSubtasks = (req, res) => {
 export const updatePersonalSubtaskById = (req, res) => {
     // console.log("hi");
     const { personalSubtaskId } = req.params;
-    console.log(personalSubtaskId);
+    // console.log(personalSubtaskId);
     const {
         personalsubtask_name,
         project_id,
@@ -208,7 +208,7 @@ export const getPersonalSubtaskIdAndName = (req, res) => {
 }
 
 export const getPersonalSubtaskNameById = (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const personalSubtaskIds = req.body;
     // console.log(taskIds);
     const promises = personalSubtaskIds.map((personalSubtaskId) => {
