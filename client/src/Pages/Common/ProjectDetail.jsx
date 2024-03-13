@@ -308,7 +308,7 @@ const ProjectDetail = () => {
             return response.data;
         },
         {
-            enabled: !!projectData, 
+            enabled: !!projectData && user.user_type === "Users",
         }
     );
 

@@ -200,8 +200,45 @@ const WorkProgress = () => {
     }, [taskId])
     // console.log(taskNames);
     const handleEditModalOpen = (type) => {
-        setModalEditType(type)
-        console.log(type);
+        if (type === "delete") {
+            if (tableData.task_id && !tableData.subtask_id) {
+                setModalEditType("deleteTask")
+                makeRequest.post(`/task/gettasknamebyid`, selectedTask)
+                    .then((res) => {
+                        setTaskNames(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            } else if (tableData.subtask_id) {
+                setModalEditType("deleteSubtask")
+                makeRequest.post(`/subtask/getsubtasknamebyid`, selectedTask)
+                    .then((res) => {
+                        setTaskNames(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            } else if (!tableData.personalsubtask_id && tableData.personal_task_id) {
+                setModalEditType("deletePersonalTask")
+                makeRequest.post(`/personaltask/getpersonaltasknamebyid`, selectedTask)
+                    .then((res) => {
+                        // console.log(res.data);
+                        setTaskNames(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+
+            } else if (tableData.personalsubtask_id) {
+                setModalEditType("deletePersonalSubtask")
+                makeRequest.post(`/personalsubtask/getpersonalsubtasknamebyid`, selectedTask)
+                    .then((res) => {
+                        setTaskNames(res.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+            }
+        } else {
+            setModalEditType(type)
+        }
         if (type === "assignedTask") {
             makeRequest.post(`/task/gettasknamebyid`, selectedTask)
                 .then((res) => {
@@ -351,6 +388,7 @@ const WorkProgress = () => {
                         console.log(error);
                     })
             } else {
+                console.log("hiiiiiiiii");
                 makeRequest.get(`/task/getusertasks/${projectId}/${user.user_id}`)
                     .then((res) => {
                         setTaskData(res.data)
@@ -633,7 +671,7 @@ const WorkProgress = () => {
                                     >
 
                                         <MenuItem onClick={handleSaveChanges}>Save Changes</MenuItem>
-                                        <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete</MenuItem>
+                                        <MenuItem onClick={() => { handleEditModalOpen("delete") }}>Delete</MenuItem>
                                     </Menu>
                                 </>}
                         </div>
@@ -775,7 +813,7 @@ const WorkProgress = () => {
                 />
             }
             {
-                modalEditType === "deleteTask" && selectedTask && taskNames &&
+                (modalEditType === "deleteTask" || modalEditType === "delete") && selectedTask && taskNames &&
                 <EditModalMUI
                     open={editModalOpen}
                     editType={modalEditType}
