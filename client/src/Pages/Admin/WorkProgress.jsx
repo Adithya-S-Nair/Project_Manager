@@ -222,7 +222,7 @@ const WorkProgress = () => {
         else if (type === "editTask") {
 
         } else if (type === "deleteTask") {
-            // console.log(selectedTask);
+            console.log(selectedTask);
             makeRequest.post(`/task/gettasknamebyid`, selectedTask)
                 .then((res) => {
                     setTaskNames(res.data);
@@ -362,7 +362,7 @@ const WorkProgress = () => {
             }
         } else if (type === 'High' || type === 'Medium' || type === 'Low') {
             // console.log(type);
-            if (user.user_type === 'Users') {
+            if (user.user_type === 'Admin') {
                 makeRequest.get(`/task/getprojectprioritybasedtask/${projectId}/${type}`)
                     .then((res) => {
                         setTaskData(res.data)
@@ -879,13 +879,13 @@ const WorkProgress = () => {
                     setCalendarEndDate={setCalendarEndDate}
                 />
             }
-            <EditModalMUI
+            {/* <EditModalMUI
                 open={editModalOpen}
                 editType={modalEditType}
                 setOpen={setEditModalOpen}
                 handleClose={handleEditModalClose}
                 selectedTask={selectedTask}
-            />
+            /> */}
         </div >
     )
 }
