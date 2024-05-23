@@ -65,7 +65,6 @@ function a11yProps(index) {
     };
 }
 
-
 const WorkProgress = () => {
     const { user } = useContext(AuthContext)
     const { theme } = useContext(ThemeContext)
@@ -618,7 +617,7 @@ const WorkProgress = () => {
                                                     'aria-labelledby': 'basic-button',
                                                 }}
                                             >
-                                                {taskId && taskId[0] === "task_id" &&
+                                                {taskId && taskId[0] === "task_id" && user.user_type === 'Admin' &&
                                                     <>
                                                         <MenuItem onClick={() => { handleEditModalOpen("assignedTask") }}>Assigned Tasks</MenuItem>
                                                         {selectedTask && selectedTask.length <= 1 &&
@@ -627,7 +626,7 @@ const WorkProgress = () => {
                                                         <MenuItem onClick={() => { handleEditModalOpen("deleteTask") }}>Delete Tasks</MenuItem>
                                                     </>
                                                 }
-                                                {taskId && taskId[0] === "subtask_id" &&
+                                                {taskId && taskId[0] === "subtask_id" && user.user_type === 'Admin' &&
                                                     <>
                                                         <MenuItem onClick={() => { handleEditModalOpen("assignedSubtask") }}>Assigned Subtasks</MenuItem>
                                                         {selectedTask && selectedTask.length <= 1 &&
@@ -636,7 +635,7 @@ const WorkProgress = () => {
                                                         <MenuItem onClick={() => { handleEditModalOpen("deleteSubtask") }}>Delete Subtasks</MenuItem>
                                                     </>
                                                 }
-                                                {taskId && taskId[0] === "personal_task_id" &&
+                                                {taskId && taskId[0] === "personal_task_id" && 
                                                     <>
                                                         {selectedTask && selectedTask.length <= 1 &&
                                                             <MenuItem onClick={() => { handleEditModalOpen("editPersonalTask") }}>Edit Personal Task</MenuItem>
@@ -644,7 +643,7 @@ const WorkProgress = () => {
                                                         <MenuItem onClick={() => { handleEditModalOpen("deletePersonalTask") }}>Delete Personal Task</MenuItem>
                                                     </>
                                                 }
-                                                {taskId && taskId[0] === "personalsubtask_id" &&
+                                                {taskId && taskId[0] === "personalsubtask_id" && 
                                                     <>
                                                         {selectedTask && selectedTask.length <= 1 &&
                                                             <MenuItem onClick={() => { handleEditModalOpen("editPersonalSubtask") }}>Edit Personal Subtask</MenuItem>

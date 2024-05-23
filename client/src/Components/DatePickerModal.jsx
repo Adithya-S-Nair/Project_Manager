@@ -45,7 +45,7 @@ const DatePickerModal = ({ dateModalOpen, setDateModalOpen, taskData, subtaskDat
     const handleSelect = (selectedDate) => {
         if (taskData) {
             const dateFilter = taskData;
-            const filteredDate = dateFilter.filter((task) => {
+            const filteredDate = dateFilter.filter((consentDate) => {
                 console.log(selectedDate.selection.endDate);
                 setCalendarStartDate(selectedDate.selection.startDate)
                 setCalendarEndDate(selectedDate.selection.endDate)

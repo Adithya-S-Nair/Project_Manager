@@ -35,6 +35,7 @@ import { makeRequest } from '../Axios';
 import { AuthContext } from '../Context/AuthContext';
 import { ThemeContext } from '../Context/ThemeContext';
 import { useContext } from 'react';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 const drawerWidth = 240;
@@ -234,7 +235,7 @@ const UserLayout = () => {
                                             "&.Mui-selected": { backgroundColor: "#596876", color: "#161245" }
                                         }}>
                                         <ListItemIcon>
-                                            <PersonAddAltIcon className='text-white' />
+                                            <DashboardIcon className='text-white' />
                                         </ListItemIcon>
                                         <ListItemText className='text-white' primary='Project Dashboard' />
                                     </ListItemButton>
@@ -248,7 +249,7 @@ const UserLayout = () => {
                                             "&.Mui-selected": { backgroundColor: "#0057c9", color: "#161245" }
                                         }}>
                                         <ListItemIcon>
-                                            <AccountBalanceIcon className='text-white' />
+                                            <InsertChartIcon className='text-white' />
                                         </ListItemIcon>
                                         <ListItemText className='text-white' primary='Gantt Chart' />
                                     </ListItemButton>

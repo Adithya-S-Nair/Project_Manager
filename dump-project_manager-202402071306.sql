@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.2.0, for macos12.6 (x86_64)
+  -- MySQL dump 10.13  Distrib 8.2.0, for macos12.6 (x86_64)
 --
 -- Host: localhost    Database: project_manager
 -- ------------------------------------------------------
